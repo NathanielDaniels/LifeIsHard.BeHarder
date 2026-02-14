@@ -110,3 +110,38 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+
+
+export async function GET() {
+  const apiKey = process.env.RESEND_API_KEY;
+  const audienceId = process.env.RESEND_AUDIENCE_ID;
+
+  try {
+    if (!apiKey) throw new Error('Missing RESEND_API_KEY');
+    
+    const resend = new Resend(apiKey);
+    const { data, error } = await resend.audiences.list();
+    
+    return NextResponse.json({
+      status: 'ok',
+      env: {
+        hasApiKey: !!apiKey,
+        hasAudienceId: !!audienceId,
+        // Show partial ID to verify it matches
+        audienceIdHint: audienceId ? `${audienceId.substring(0, 7)}...` : null
+      },
+      audiences: data,
+      resendError: error
+    });
+  } catch (err) {
+    return NextResponse.json({ 
+      status: 'error', 
+      message: String(err),
+      env: {
+        hasApiKey: !!apiKey,
+        hasAudienceId: !!audienceId
+      }
+    }, { status: 500 });
+  }
+}
+
