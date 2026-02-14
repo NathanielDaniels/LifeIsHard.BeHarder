@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { rateLimit, getClientIP, rateLimitResponse } from '@/lib/rate-limit';
+import WelcomeEmail from '@/emails/welcome-email';
 
 // Lazy-init so build doesn't crash when env vars are missing
 let _resend: Resend | null = null;
@@ -97,10 +98,23 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Send welcome email
+    const { error: emailError } = await getResend().emails.send({
+      from: `Patrick Wingert <${process.env.RESEND_FROM_EMAIL || 'noreply@patrickwingert.com'}>`,
+      to: email,
+      subject: "You're in. Something unstoppable is coming.",
+      react: WelcomeEmail({ email }),
+    });
+
+    if (emailError) {
+      console.error('Welcome email failed:', emailError);
+      // Contact was still added — don't fail the whole request
+    }
+
     return NextResponse.json(
-      { 
+      {
         message: "You're in. We'll let you know when it drops.",
-        debug: contactData 
+        debug: contactData
       },
       { status: 201 }
     );
