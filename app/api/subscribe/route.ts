@@ -77,29 +77,31 @@ export async function POST(request: NextRequest) {
     }
 
     // --- Add contact to Resend Audience ---
-    const { error } = await getResend().contacts.create({
+    const { data: contactData, error } = await getResend().contacts.create({
       email,
       audienceId: getAudienceId(),
+      firstName: '', // Optional
+      unsubscribed: false,
     });
 
     if (error) {
-      // Resend returns a specific error when the contact already exists
       if (error.message?.includes('already exists')) {
         return NextResponse.json(
           { message: "You're already on the list." },
           { status: 200 }
         );
       }
-
-      console.error('Resend error:', error);
       return NextResponse.json(
-        { error: 'Something went wrong. Try again.' },
+        { error: `Resend Error: ${error.message}` },
         { status: 500 }
       );
     }
 
     return NextResponse.json(
-      { message: "You're in. We'll let you know when it drops." },
+      { 
+        message: "You're in. We'll let you know when it drops.",
+        debug: contactData 
+      },
       { status: 201 }
     );
   } catch (err) {
