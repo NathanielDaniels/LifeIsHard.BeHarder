@@ -1,9 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { promises as fs } from 'fs';
-import path from 'path';
+import { Resend } from 'resend';
 import { rateLimit, getClientIP, rateLimitResponse } from '@/lib/rate-limit';
 
-const SUBSCRIBERS_FILE = path.join(process.cwd(), 'data', 'subscribers.json');
+// Lazy-init so build doesn't crash when env vars are missing
+let _resend: Resend | null = null;
+function getResend() {
+  if (!_resend) _resend = new Resend(process.env.RESEND_API_KEY);
+  return _resend;
+}
+function getAudienceId() {
+  const id = process.env.RESEND_AUDIENCE_ID;
+  if (!id) throw new Error('RESEND_AUDIENCE_ID is not set');
+  return id;
+}
 
 // Max email length (RFC 5321)
 const MAX_EMAIL_LENGTH = 254;
@@ -31,9 +40,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
 
     // --- Honeypot check (bot trap) ---
-    // If `website` field is filled, it's a bot — real form doesn't have this field
     if (body.website) {
-      // Silently accept to not tip off bots
       return NextResponse.json(
         { message: "You're in. We'll let you know when it drops." },
         { status: 201 }
@@ -61,7 +68,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Reject suspicious patterns (script injection attempts)
+    // Reject suspicious patterns
     if (/<|>|javascript:|data:|on\w+=/i.test(email)) {
       return NextResponse.json(
         { error: 'Invalid email address.' },
@@ -69,37 +76,36 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // --- Store subscriber ---
-    let subscribers: { email: string; subscribedAt: string }[] = [];
-    try {
-      const data = await fs.readFile(SUBSCRIBERS_FILE, 'utf-8');
-      subscribers = JSON.parse(data);
-    } catch {
-      // File doesn't exist yet — start fresh
-      await fs.mkdir(path.dirname(SUBSCRIBERS_FILE), { recursive: true });
-    }
-
-    if (subscribers.some((s) => s.email === email)) {
-      return NextResponse.json(
-        { message: "You're already on the list." },
-        { status: 200 }
-      );
-    }
-
-    subscribers.push({
+    // --- Add contact to Resend Audience ---
+    const { error } = await getResend().contacts.create({
       email,
-      subscribedAt: new Date().toISOString(),
+      audienceId: getAudienceId(),
     });
 
-    await fs.writeFile(SUBSCRIBERS_FILE, JSON.stringify(subscribers, null, 2));
+    if (error) {
+      // Resend returns a specific error when the contact already exists
+      if (error.message?.includes('already exists')) {
+        return NextResponse.json(
+          { message: "You're already on the list." },
+          { status: 200 }
+        );
+      }
+
+      console.error('Resend error:', error);
+      return NextResponse.json(
+        { error: 'Something went wrong. Try again.' },
+        { status: 500 }
+      );
+    }
 
     return NextResponse.json(
       { message: "You're in. We'll let you know when it drops." },
       { status: 201 }
     );
-  } catch {
+  } catch (err) {
+    console.error('Subscribe error:', err);
     return NextResponse.json(
-      { error: 'Something went wrong. Try again.' },
+      { error: `Debug Error: ${err instanceof Error ? err.message : String(err)}` },
       { status: 500 }
     );
   }
