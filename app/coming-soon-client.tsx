@@ -137,6 +137,28 @@ export default function ComingSoonClient() {
   const [daysSober, setDaysSober] = useState(0);
   const [daysUntilRace, setDaysUntilRace] = useState(0);
   
+  // Scroll indicator (delayed appearance, hides on scroll)
+  const [showScrollHint, setShowScrollHint] = useState(false);
+  const hasScrolledRef = useRef(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (!hasScrolledRef.current) setShowScrollHint(true);
+    }, 8000);
+
+    const onScroll = () => {
+      hasScrolledRef.current = true;
+      setShowScrollHint(false);
+      window.removeEventListener('scroll', onScroll);
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('scroll', onScroll);
+    };
+  }, []);
+
   // Custom cursor
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 });
@@ -690,24 +712,28 @@ export default function ComingSoonClient() {
           </motion.p>
         </motion.div>
 
-        {/* Scroll Indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 hidden md:flex flex-col items-center gap-2 z-30">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={phase >= 3 ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 1, delay: 0.5 }}
-            className="flex flex-col items-center gap-2"
-          >
-            <span className="font-mono text-[0.7rem] tracking-[0.3em] text-white/50">SCROLL</span>
-            <div 
-              className="w-[1.5px] h-8 bg-gradient-to-b to-transparent"
-              style={{ 
-                background: `linear-gradient(to bottom, ${themeColor}, transparent)`,
-                animation: 'scroll-pulse 2s ease-in-out infinite'
-              }}
-            />
-          </motion.div>
-        </div>
+        {/* Scroll Indicator — appears after 3s idle, vanishes on scroll */}
+        <AnimatePresence>
+          {showScrollHint && phase >= 3 && (
+            <motion.div
+              key="scroll-hint"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.8 }}
+              className="absolute bottom-8 left-1/2 -translate-x-1/2 hidden md:flex flex-col items-center gap-2 z-30"
+            >
+              <span className="font-mono text-[0.7rem] tracking-[0.3em] text-white/50">SCROLL</span>
+              <div 
+                className="w-[1.5px] h-8 bg-gradient-to-b to-transparent"
+                style={{ 
+                  background: `linear-gradient(to bottom, ${themeColor}, transparent)`,
+                  animation: 'scroll-pulse 2s ease-in-out infinite'
+                }}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Live Stats Bar */}
         <motion.div 
