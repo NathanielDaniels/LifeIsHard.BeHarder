@@ -398,7 +398,7 @@ export default function ComingSoonClient() {
   const socialLinks = [
     { name: 'Instagram', href: 'https://www.instagram.com/patwingzzz' },
     { name: 'Strava', href: 'https://www.strava.com' },
-    { name: 'Dare2tri', href: 'https://www.dare2tri.org' },
+    { name: 'Dare2tri', href: 'https://give.dare2tri.org/fundraiser/6928347' },
   ];
 
   return (
