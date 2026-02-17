@@ -7,7 +7,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { exchangeCodeForTokens, getProfile } from '@/lib/whoop-client';
 import { storeTokens } from '@/lib/whoop-token-storage';
 import { invalidateCache } from '@/lib/whoop-cache';
-import { cookies } from 'next/headers';
+import { supabase } from '@/lib/supabase';
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
@@ -19,52 +19,72 @@ export async function GET(request: NextRequest) {
   if (error) {
     console.error('WHOOP OAuth error:', error);
     return NextResponse.redirect(
-      new URL(`/admin/whoop?error=${encodeURIComponent(error)}`, request.url)
+      new URL(`/?error=${encodeURIComponent(error)}`, request.url)
     );
   }
-  
+
   // Validate required params
   if (!code || !state) {
     return NextResponse.redirect(
-      new URL('/admin/whoop?error=missing_params', request.url)
+      new URL('/?error=missing_params', request.url)
     );
   }
-  
-  // Validate state (CSRF protection)
-  const cookieStore = await cookies();
-  const storedState = cookieStore.get('whoop_oauth_state')?.value;
-  
-  if (!storedState || storedState !== state) {
+
+  // Validate state (CSRF protection) — read from Supabase
+  const { data: stateRow, error: stateError } = await supabase
+    .from('whoop_oauth_state')
+    .select('state, created_at')
+    .eq('id', 'primary')
+    .single();
+
+  if (stateError || !stateRow || stateRow.state !== state) {
+    console.error('OAuth state mismatch:', { stateError, hasRow: !!stateRow, matches: stateRow?.state === state });
     return NextResponse.redirect(
-      new URL('/admin/whoop?error=invalid_state', request.url)
+      new URL('/?error=invalid_state', request.url)
     );
   }
-  
-  // Clear state cookie
-  cookieStore.delete('whoop_oauth_state');
-  
+
+  // Check state is not older than 10 minutes
+  const stateAge = Date.now() - new Date(stateRow.created_at).getTime();
+  if (stateAge > 10 * 60 * 1000) {
+    console.error('OAuth state expired:', { ageMs: stateAge });
+    return NextResponse.redirect(
+      new URL('/?error=state_expired', request.url)
+    );
+  }
+
+  // Delete used state from Supabase
+  await supabase.from('whoop_oauth_state').delete().eq('id', 'primary');
+
   try {
     // Exchange code for tokens
     const tokens = await exchangeCodeForTokens(code);
-    
+
     // Get user profile to verify and store user ID
     const profile = await getProfile(tokens.access_token);
-    
-    // Store tokens
-    await storeTokens(tokens, profile.user_id);
-    
+
+    // Store tokens in Supabase
+    try {
+      await storeTokens(tokens, profile.user_id);
+    } catch (storageErr) {
+      console.error('Supabase storage error:', storageErr);
+      return NextResponse.redirect(
+        new URL(`/?error=${encodeURIComponent('token_storage_failed')}`, request.url)
+      );
+    }
+
     // Clear any cached data
     invalidateCache();
-    
-    // Redirect to success page
+
+    // Redirect to home on success
     return NextResponse.redirect(
-      new URL(`/admin/whoop?success=true&user=${encodeURIComponent(profile.first_name)}`, request.url)
+      new URL(`/?success=true&user=${encodeURIComponent(profile.first_name)}`, request.url)
     );
-    
+
   } catch (err) {
     console.error('Token exchange error:', err);
     return NextResponse.redirect(
-      new URL(`/admin/whoop?error=${encodeURIComponent('token_exchange_failed')}`, request.url)
+      new URL(`/?error=${encodeURIComponent('token_exchange_failed')}`, request.url)
     );
   }
 }

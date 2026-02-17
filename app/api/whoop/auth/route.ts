@@ -6,7 +6,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthorizationUrl, isWhoopEnabled } from '@/lib/whoop-client';
-import { cookies } from 'next/headers';
+import { supabase } from '@/lib/supabase';
 import { rateLimit, getClientIP, rateLimitResponse } from '@/lib/rate-limit';
 
 export async function GET(request: NextRequest) {
@@ -43,20 +43,23 @@ export async function GET(request: NextRequest) {
   
   // Generate state for CSRF protection
   const state = generateState();
-  
-  // Store state in cookie for validation on callback
-  const cookieStore = await cookies();
-  cookieStore.set('whoop_oauth_state', state, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    maxAge: 60 * 10, // 10 minutes
-    path: '/',
-  });
-  
+
+  // Store state in Supabase (survives cross-domain redirects unlike cookies)
+  const { error: upsertError } = await supabase
+    .from('whoop_oauth_state')
+    .upsert({ id: 'primary', state, created_at: new Date().toISOString() }, { onConflict: 'id' });
+
+  if (upsertError) {
+    console.error('Failed to store OAuth state in Supabase:', upsertError);
+    return NextResponse.json(
+      { error: 'Failed to initiate OAuth flow' },
+      { status: 500 }
+    );
+  }
+
   // Redirect to WHOOP authorization
   const authUrl = getAuthorizationUrl(state);
-  
+
   return NextResponse.redirect(authUrl);
 }
 
