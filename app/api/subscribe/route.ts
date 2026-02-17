@@ -100,7 +100,7 @@ export async function POST(request: NextRequest) {
 
     // Send welcome email
     const { error: emailError } = await getResend().emails.send({
-      from: `Patrick Wingert <${process.env.RESEND_FROM_EMAIL || 'noreply@patrickwingert.com'}>`,
+      from: `Patrick Wingert <${process.env.RESEND_FROM_EMAIL || 'patrick@patrickwingert.com'}>`,
       to: email,
       subject: "You're in. Something unstoppable is coming.",
       react: WelcomeEmail({ email }),

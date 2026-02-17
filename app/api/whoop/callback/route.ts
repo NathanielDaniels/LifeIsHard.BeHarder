@@ -5,7 +5,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { exchangeCodeForTokens, getProfile } from '@/lib/whoop-client';
-import { storeTokens } from '@/lib/whoop-storage';
+import { storeTokens } from '@/lib/whoop-token-storage';
 import { invalidateCache } from '@/lib/whoop-cache';
 import { cookies } from 'next/headers';
 

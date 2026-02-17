@@ -5,7 +5,7 @@
 // ============================================
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getValidAccessToken, clearTokens } from '@/lib/whoop-storage';
+import { getValidAccessToken, clearTokens } from '@/lib/whoop-token-storage';
 import { invalidateCache } from '@/lib/whoop-cache';
 import { verifyAdminAccess, adminUnauthorizedResponse } from '@/lib/admin-auth';
 import { rateLimit, getClientIP, rateLimitResponse } from '@/lib/rate-limit';
