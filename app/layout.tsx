@@ -12,14 +12,29 @@ const bebasNeue = Bebas_Neue({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://patrickwingert.com'),
   title: "Patrick Wingert | Dare2tri Elite Team Athlete",
-  description: "Life is Hard. Be Harder. Follow Patrick Wingert's journey as a Dare2tri Elite Team athlete, record-setting trekker, and unstoppable force in para-triathlon.",
-  keywords: ["Patrick Wingert", "Dare2tri", "para-triathlon", "elite athlete", "Bhutan trek", "adaptive sports"],
+  description: "Life is Hard. Be Harder. Follow Patrick Wingert's journey as a Dare2tri Elite Team athlete, record-setting trekker, and unstoppable force in adaptive-sports.",
+  keywords: ["Patrick Wingert", "Dare2tri", "adaptive-athlete", "elite athlete", "Bhutan trek", "adaptive sports"],
   authors: [{ name: "Patrick Wingert" }],
   openGraph: {
     title: "Patrick Wingert | Dare2tri Elite Team Athlete",
-    description: "Life is Hard. Be Harder. Record-setting para-triathlete pushing limits and inspiring possibility.",
+    description: "Life is Hard. Be Harder. Record-setting adaptive-athlete pushing limits and inspiring possibility.",
     type: "website",
+    images: [
+      {
+        url: '/Pat_D2T.png',
+        width: 1200,
+        height: 630,
+        alt: 'Patrick Wingert - Dare2tri Elite Team Athlete',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Patrick Wingert | Dare2tri Elite Team Athlete',
+    description: "Life is Hard. Be Harder. Record-setting adaptive-athlete pushing limits and inspiring possibility.",
+    images: ['/Pat_D2T.png'],
   },
 };
 
