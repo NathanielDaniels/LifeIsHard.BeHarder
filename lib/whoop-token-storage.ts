@@ -1,59 +1,70 @@
 // ============================================
-// WHOOP Token Storage
-// Simple file-based storage for single-user setup
-// Replace with database for multi-user scenarios
+// WHOOP Token Storage (Supabase)
+// Replaces the old fs-based whoop-storage.ts
+// Single-user setup: one row in whoop_tokens table
 // ============================================
 
-import { promises as fs } from 'fs';
-import path from 'path';
+import { supabase } from './supabase';
 import { WhoopTokens } from '@/types/whoop';
 
-// Store tokens in a JSON file (gitignored)
-const TOKEN_FILE = path.join(process.cwd(), '.whoop-tokens.json');
-
-interface StoredData {
-  tokens: WhoopTokens | null;
-  userId: number | null;
-}
-
-const DEFAULT_DATA: StoredData = {
-  tokens: null,
-  userId: null,
-};
-
-async function readStorage(): Promise<StoredData> {
-  try {
-    const data = await fs.readFile(TOKEN_FILE, 'utf-8');
-    return JSON.parse(data);
-  } catch {
-    return DEFAULT_DATA;
-  }
-}
-
-async function writeStorage(data: StoredData): Promise<void> {
-  await fs.writeFile(TOKEN_FILE, JSON.stringify(data, null, 2));
-}
+const TABLE = 'whoop_tokens';
+const SINGLE_USER_ID = 'primary';
 
 // ============================================
 // Public API
 // ============================================
 
 export async function getStoredTokens(): Promise<WhoopTokens | null> {
-  const data = await readStorage();
-  return data.tokens;
+  const { data, error } = await supabase
+    .from(TABLE)
+    .select('access_token, refresh_token, expires_at')
+    .eq('id', SINGLE_USER_ID)
+    .single();
+
+  if (error || !data) {
+    return null;
+  }
+
+  return {
+    access_token: data.access_token,
+    refresh_token: data.refresh_token,
+    expires_at: data.expires_at,
+  };
 }
 
 export async function storeTokens(tokens: WhoopTokens, userId?: number): Promise<void> {
-  const data = await readStorage();
-  data.tokens = tokens;
-  if (userId) {
-    data.userId = userId;
+  const row: Record<string, unknown> = {
+    id: SINGLE_USER_ID,
+    access_token: tokens.access_token,
+    refresh_token: tokens.refresh_token,
+    expires_at: tokens.expires_at,
+    updated_at: new Date().toISOString(),
+  };
+
+  if (userId !== undefined) {
+    row.whoop_user_id = userId;
   }
-  await writeStorage(data);
+
+  const { error } = await supabase
+    .from(TABLE)
+    .upsert(row, { onConflict: 'id' });
+
+  if (error) {
+    console.error('Failed to store WHOOP tokens in Supabase:', error);
+    throw new Error(`Token storage failed: ${error.message}`);
+  }
 }
 
 export async function clearTokens(): Promise<void> {
-  await writeStorage(DEFAULT_DATA);
+  const { error } = await supabase
+    .from(TABLE)
+    .delete()
+    .eq('id', SINGLE_USER_ID);
+
+  if (error) {
+    console.error('Failed to clear WHOOP tokens from Supabase:', error);
+    throw new Error(`Token clear failed: ${error.message}`);
+  }
 }
 
 export async function isAuthorized(): Promise<boolean> {
@@ -63,19 +74,19 @@ export async function isAuthorized(): Promise<boolean> {
 
 export async function getValidAccessToken(): Promise<string | null> {
   const { refreshAccessToken } = await import('./whoop-client');
-  
+
   const tokens = await getStoredTokens();
   if (!tokens) {
     return null;
   }
-  
+
   // Check if token is expired (with 5 minute buffer)
   const isExpired = Date.now() >= (tokens.expires_at - 5 * 60 * 1000);
-  
+
   if (!isExpired) {
     return tokens.access_token;
   }
-  
+
   // Token expired, try to refresh
   try {
     const newTokens = await refreshAccessToken(tokens.refresh_token);

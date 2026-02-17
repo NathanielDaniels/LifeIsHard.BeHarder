@@ -5,7 +5,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { isWhoopEnabled, fetchWhoopStats, getDemoStats } from '@/lib/whoop-client';
-import { getValidAccessToken } from '@/lib/whoop-storage';
+import { getValidAccessToken } from '@/lib/whoop-token-storage';
 import { getStatsWithCache } from '@/lib/whoop-cache';
 import { WhoopStats } from '@/types/whoop';
 import { rateLimit, getClientIP, rateLimitResponse } from '@/lib/rate-limit';

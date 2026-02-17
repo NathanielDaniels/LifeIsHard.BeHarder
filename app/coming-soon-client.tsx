@@ -472,16 +472,16 @@ export default function ComingSoonClient() {
 
       {/* Floating Background Text */}
       <motion.div
-        className="fixed top-[15%] left-[-10%] font-display text-[12vw] text-white/[0.02] pointer-events-none z-[1] whitespace-nowrap font-bold tracking-tight"
+        className="fixed top-[15%] left-[1%] font-display text-[12vw] text-white/[0.02] pointer-events-none z-[1] whitespace-nowrap font-bold tracking-tight"
         style={{ x: floatX }}
       >
-        UNSTOPPABLE • RELENTLESS • UNBROKEN •
+        • UNSTOPPABLE • RELENTLESS • UNBROKEN • UNDEFEATED •
       </motion.div>
       <motion.div
         className="fixed bottom-[15%] right-[-10%] font-display text-[12vw] text-white/[0.02] pointer-events-none z-[1] whitespace-nowrap font-bold tracking-tight"
         style={{ x: floatXReverse }}
       >
-        DARE2TRI • ADAPTIVE ATHLETE • ELITE •
+        • RECORD BREAKER • DARE2TRI • ADAPTIVE ATHLETE • ELITE •
       </motion.div>
 
       {/* --- LAYER 1: ATMOSPHERE (Parallax Depth 1) --- */}
