@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef, FormEvent } from 'react';
+import { useEffect, useState, useRef, useMemo, FormEvent } from 'react';
 import { motion, AnimatePresence, useSpring, useTransform, useScroll } from 'framer-motion';
 import { useVitality } from '@/contexts/VitalityContext';
 import { useWhoop } from '@/contexts/WhoopContext';
@@ -117,11 +117,47 @@ function AnimatedCounter({ value, duration = 2000 }: { value: number; duration?:
   return <>{displayValue.toLocaleString()}</>;
 }
 
-const credentials = [
-  "Dare2tri Elite Team Athlete",
-  "Record-Setting Trekker", 
-  "Unstoppable"
-];
+interface BiometricCardProps {
+  label: string;
+  value: string | number | null;
+  unit: string;
+  color: string;
+  delay: number;
+  subtext?: string;
+  animateValue?: { animate: Record<string, unknown>; transition: Record<string, unknown> };
+}
+
+function BiometricCard({ label, value, unit, color, delay, subtext, animateValue }: BiometricCardProps) {
+  const ValueTag = animateValue ? motion.span : 'span';
+  const valueProps = animateValue ? animateValue : {};
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.5, delay }}
+      className="bg-white/[0.03] border border-white/10 rounded-lg p-5 backdrop-blur-sm"
+    >
+      <span className="font-mono text-[0.75rem] tracking-[0.3em] text-white/60 block mb-3">{label}</span>
+      <div className="flex items-end gap-1">
+        <ValueTag
+          className="font-display text-5xl md:text-6xl font-bold leading-none"
+          style={{ color }}
+          {...valueProps}
+        >
+          {value !== null ? value : '—'}
+        </ValueTag>
+        <span className="font-mono text-sm text-white/50 mb-1">{unit}</span>
+      </div>
+      {subtext && (
+        <span className="font-mono text-[0.65rem] text-white/40 mt-2 block">
+          {subtext}
+        </span>
+      )}
+    </motion.div>
+  );
+}
 
 // --- Main Component ---
 
@@ -161,6 +197,7 @@ export default function ComingSoonClient() {
 
   // Custom cursor
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const mousePositionRef = useRef({ x: 0, y: 0 });
   const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 });
   const [isHovering, setIsHovering] = useState(false);
 
@@ -193,12 +230,12 @@ export default function ComingSoonClient() {
   const heartbeatDuration = 60 / heartbeat;
 
     // Dynamic status messages based on real connection
-  const getStatusMessages = () => {
+  const statusMessages = useMemo(() => {
     const messages = [
       { text: '> INIT Vitality Engine v2.1', delay: 0 },
       { text: '> Locating WINGERT_VITALITY_FEED...', delay: 0.5 },
     ];
-    
+
     if (connectionStatus === 'connecting') {
       messages.push({ text: '> Establishing secure connection...', delay: 1.2 });
     } else if (connectionStatus === 'syncing' || connectionStatus === 'connected') {
@@ -214,9 +251,9 @@ export default function ComingSoonClient() {
       messages.push({ text: '> Connection failed — using cached data', delay: 1.2 });
       messages.push({ text: `> Fallback heart rate: ${heartbeat} BPM`, delay: 1.8 });
     }
-    
+
     return messages;
-  };
+  }, [connectionStatus, heartbeat, whoopStats.recovery, whoopStats.strain, whoopMode, isConnected]);
 
   // 3D Parallax Logic
   const mouseX = useSpring(0, { stiffness: 50, damping: 20 });
@@ -229,6 +266,7 @@ export default function ComingSoonClient() {
     const yPct = (clientY / innerHeight) - 0.5;
     mouseX.set(xPct);
     mouseY.set(yPct);
+    mousePositionRef.current = { x: clientX, y: clientY };
     setMousePosition({ x: clientX, y: clientY });
   }
 
@@ -258,14 +296,14 @@ export default function ComingSoonClient() {
     let animationId: number;
     const animate = () => {
       setCursorPosition(prev => ({
-        x: prev.x + (mousePosition.x - prev.x) * 0.15,
-        y: prev.y + (mousePosition.y - prev.y) * 0.15,
+        x: prev.x + (mousePositionRef.current.x - prev.x) * 0.15,
+        y: prev.y + (mousePositionRef.current.y - prev.y) * 0.15,
       }));
       animationId = requestAnimationFrame(animate);
     };
     animationId = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(animationId);
-  }, [mousePosition]);
+  }, []);
 
     // ============================================
   // CONNECTION-SYNCED PROGRESS BAR
@@ -555,7 +593,7 @@ export default function ComingSoonClient() {
             </div> */}
             {/* Status Log - DYNAMIC */}
             <div className="absolute top-10 left-10 font-mono text-xs md:text-sm text-white/60 tracking-widest flex flex-col gap-2 overflow-hidden">
-              {getStatusMessages().map((line, i) => (
+              {statusMessages.map((line, i) => (
                 <motion.span
                   key={i}
                   initial={{ opacity: 0, x: -10 }}
@@ -885,162 +923,85 @@ export default function ComingSoonClient() {
 
           {/* Vitals Grid */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-            {/* Recovery */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-              className="bg-white/[0.03] border border-white/10 rounded-lg p-5 backdrop-blur-sm"
-            >
-              <span className="font-mono text-[0.75rem] tracking-[0.3em] text-white/60 block mb-3">RECOVERY</span>
-              <div className="flex items-end gap-1">
-                <span 
-                  className="font-display text-5xl md:text-6xl font-bold leading-none"
-                  style={{ color: whoopStats.recovery !== null ? (whoopStats.recovery >= 67 ? '#00e676' : whoopStats.recovery >= 34 ? '#ffab00' : '#ff5252') : themeColor }}
-                >
-                  {whoopStats.recovery !== null ? whoopStats.recovery : '—'}
-                </span>
-                <span className="font-mono text-sm text-white/50 mb-1">%</span>
-              </div>
-            </motion.div>
-
-            {/* Strain */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              className="bg-white/[0.03] border border-white/10 rounded-lg p-5 backdrop-blur-sm"
-            >
-              <span className="font-mono text-[0.75rem] tracking-[0.3em] text-white/60 block mb-3">DAILY STRAIN</span>
-              <div className="flex items-end gap-1">
-                <span className="font-display text-5xl md:text-6xl font-bold leading-none" style={{ color: themeColor }}>
-                  {whoopStats.strain !== null ? whoopStats.strain.toFixed(1) : '—'}
-                </span>
-                <span className="font-mono text-sm text-white/50 mb-1">/21</span>
-              </div>
-            </motion.div>
-
-            {/* Heart Rate */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className="bg-white/[0.03] border border-white/10 rounded-lg p-5 backdrop-blur-sm"
-            >
-              <span className="font-mono text-[0.75rem] tracking-[0.3em] text-white/60 block mb-3">HEART RATE</span>
-              <div className="flex items-end gap-1">
-                <motion.span 
-                  className="font-display text-5xl md:text-6xl font-bold leading-none" 
-                  style={{ color: themeColor }}
-                  animate={{ opacity: [1, 0.7, 1] }}
-                  transition={{ duration: heartbeatDuration, repeat: Infinity }}
-                >
-                  {heartbeat}
-                </motion.span>
-                <span className="font-mono text-sm text-white/50 mb-1">BPM</span>
-              </div>
-              {whoopStats.restingHeartRate !== null && (
-                <span className="font-mono text-[0.65rem] text-white/40 mt-2 block">
-                  RESTING: {whoopStats.restingHeartRate} • MAX: {whoopStats.maxHeartRate || '—'}
-                </span>
-              )}
-            </motion.div>
-
-            {/* HRV */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.3 }}
-              className="bg-white/[0.03] border border-white/10 rounded-lg p-5 backdrop-blur-sm"
-            >
-              <span className="font-mono text-[0.75rem] tracking-[0.3em] text-white/60 block mb-3">HRV</span>
-              <div className="flex items-end gap-1">
-                <span className="font-display text-5xl md:text-6xl font-bold leading-none" style={{ color: themeColor }}>
-                  {whoopStats.hrv !== null ? Math.round(whoopStats.hrv) : '—'}
-                </span>
-                <span className="font-mono text-sm text-white/50 mb-1">ms</span>
-              </div>
-            </motion.div>
-
-            {/* SpO2 */}
-            {whoopStats.spo2 !== null && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: 0.4 }}
-                className="bg-white/[0.03] border border-white/10 rounded-lg p-5 backdrop-blur-sm"
-              >
-                <span className="font-mono text-[0.75rem] tracking-[0.3em] text-white/60 block mb-3">BLOOD OXYGEN</span>
-                <div className="flex items-end gap-1">
-                  <span className="font-display text-5xl md:text-6xl font-bold leading-none" style={{ color: themeColor }}>
-                    {Math.round(whoopStats.spo2)}
-                  </span>
-                  <span className="font-mono text-sm text-white/50 mb-1">%</span>
-                </div>
-              </motion.div>
-            )}
-
-            {/* Skin Temp */}
-            {whoopStats.skinTemp !== null && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: 0.5 }}
-                className="bg-white/[0.03] border border-white/10 rounded-lg p-5 backdrop-blur-sm"
-              >
-                <span className="font-mono text-[0.75rem] tracking-[0.3em] text-white/60 block mb-3">SKIN TEMP</span>
-                <div className="flex items-end gap-1">
-                  <span className="font-display text-5xl md:text-6xl font-bold leading-none" style={{ color: themeColor }}>
-                    {whoopStats.skinTemp.toFixed(1)}
-                  </span>
-                  <span className="font-mono text-sm text-white/50 mb-1">°C</span>
-                </div>
-              </motion.div>
-            )}
-
-            {/* Calories */}
-            {whoopStats.calories !== null && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: 0.6 }}
-                className="bg-white/[0.03] border border-white/10 rounded-lg p-5 backdrop-blur-sm"
-              >
-                <span className="font-mono text-[0.75rem] tracking-[0.3em] text-white/60 block mb-3">CALORIES</span>
-                <div className="flex items-end gap-1">
-                  <span className="font-display text-5xl md:text-6xl font-bold leading-none" style={{ color: themeColor }}>
-                    {whoopStats.calories.toLocaleString()}
-                  </span>
-                  <span className="font-mono text-sm text-white/50 mb-1">kcal</span>
-                </div>
-              </motion.div>
-            )}
-
-            {/* Average HR */}
-            {whoopStats.averageHeartRate !== null && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: 0.7 }}
-                className="bg-white/[0.03] border border-white/10 rounded-lg p-5 backdrop-blur-sm"
-              >
-                <span className="font-mono text-[0.75rem] tracking-[0.3em] text-white/60 block mb-3">AVG HEART RATE</span>
-                <div className="flex items-end gap-1">
-                  <span className="font-display text-5xl md:text-6xl font-bold leading-none" style={{ color: themeColor }}>
-                    {whoopStats.averageHeartRate}
-                  </span>
-                  <span className="font-mono text-sm text-white/50 mb-1">BPM</span>
-                </div>
-              </motion.div>
-            )}
+            {[
+              {
+                label: 'RECOVERY',
+                value: whoopStats.recovery,
+                unit: '%',
+                color: whoopStats.recovery !== null ? (whoopStats.recovery >= 67 ? '#00e676' : whoopStats.recovery >= 34 ? '#ffab00' : '#ff5252') : themeColor,
+                delay: 0,
+                condition: true,
+              },
+              {
+                label: 'DAILY STRAIN',
+                value: whoopStats.strain !== null ? whoopStats.strain.toFixed(1) : null,
+                unit: '/21',
+                color: themeColor,
+                delay: 0.1,
+                condition: true,
+              },
+              {
+                label: 'HEART RATE',
+                value: heartbeat,
+                unit: 'BPM',
+                color: themeColor,
+                delay: 0.2,
+                condition: true,
+                animateValue: { animate: { opacity: [1, 0.7, 1] }, transition: { duration: heartbeatDuration, repeat: Infinity } },
+                subtext: whoopStats.restingHeartRate !== null ? `RESTING: ${whoopStats.restingHeartRate} • MAX: ${whoopStats.maxHeartRate || '—'}` : undefined,
+              },
+              {
+                label: 'HRV',
+                value: whoopStats.hrv !== null ? Math.round(whoopStats.hrv) : null,
+                unit: 'ms',
+                color: themeColor,
+                delay: 0.3,
+                condition: true,
+              },
+              {
+                label: 'BLOOD OXYGEN',
+                value: whoopStats.spo2 !== null ? Math.round(whoopStats.spo2) : null,
+                unit: '%',
+                color: themeColor,
+                delay: 0.4,
+                condition: whoopStats.spo2 !== null,
+              },
+              {
+                label: 'SKIN TEMP',
+                value: whoopStats.skinTemp !== null ? whoopStats.skinTemp.toFixed(1) : null,
+                unit: '°C',
+                color: themeColor,
+                delay: 0.5,
+                condition: whoopStats.skinTemp !== null,
+              },
+              {
+                label: 'CALORIES',
+                value: whoopStats.calories !== null ? whoopStats.calories.toLocaleString() : null,
+                unit: 'kcal',
+                color: themeColor,
+                delay: 0.6,
+                condition: whoopStats.calories !== null,
+              },
+              {
+                label: 'AVG HEART RATE',
+                value: whoopStats.averageHeartRate,
+                unit: 'BPM',
+                color: themeColor,
+                delay: 0.7,
+                condition: whoopStats.averageHeartRate !== null,
+              },
+            ].filter(card => card.condition).map((card) => (
+              <BiometricCard
+                key={card.label}
+                label={card.label}
+                value={card.value}
+                unit={card.unit}
+                color={card.color}
+                delay={card.delay}
+                subtext={card.subtext}
+                animateValue={card.animateValue}
+              />
+            ))}
           </div>
 
           {/* Last Workout Card */}
