@@ -193,7 +193,7 @@ export default function WelcomeEmail({ email }: WelcomeEmailProps) {
             <Text style={socialRow}>
               <Link href="https://www.instagram.com/patwings666" style={socialLink}>INSTAGRAM</Link>
               <span style={socialDot}> • </span>
-              <Link href="https://www.strava.com" style={socialLink}>STRAVA</Link>
+              <Link href="https://strava.app.link/gVriWQZiL0b" style={socialLink}>STRAVA</Link>
               <span style={socialDot}> • </span>
               <Link href="https://give.dare2tri.org/fundraiser/6928347" style={socialLink}>DARE2TRI</Link>
             </Text>
