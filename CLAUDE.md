@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-Premium personal website for **Patrick Wingert**, a para-triathlon athlete and member of the **2026 Dare2Tri Elite Development Team**. The site tells his story of resilience through cinematic, boundary-pushing web design integrated with live biometric data from his WHOOP device.
+Premium personal website for **Patrick Wingert**, an adaptive-triathlon athlete and member of the **2026 Dare2Tri Elite Development Team**. The site tells his story of resilience through cinematic, boundary-pushing web design integrated with live biometric data from his WHOOP device.
 
 **Project codename:** Project Pulse
 **Developer:** Nathaniel
@@ -16,7 +16,7 @@ Patrick Wingert lost his **right leg below the knee** on **November 1, 2020** wh
 
 In **October 2022**, less than two years after amputation, Patrick flew to Bhutan alone — a country he'd dreamed of visiting since reading about it as a sophomore at Lyons Township High School in 2002. Over 29 days he walked **250 miles** across the **Trans Bhutan Trail**, crossing 12 mountain passes and climbing 14,000+ feet of elevation. He became the **first American** and **first below-knee amputee** to complete the entire trail. He was also the first Westerner since COVID reopening.
 
-Today he competes in paratriathlon and marathon events, training toward podium finishes at state championships and qualification for **USA Para Triathlon National Championships (August 2026, Milwaukee)**.
+Today, he competes in triathlon and marathon events, training toward podium finishes at state championships and qualification for **USA Para Triathlon National Championships (August 2026, Milwaukee)**.
 
 **Motto:** "Life is Hard. Be Harder."
 
@@ -284,6 +284,80 @@ npm run build    # Production build
 npm run start    # Start production server
 npm run lint     # Run ESLint
 ```
+
+---
+
+Plan Mode — Code Review Framework:
+
+Before making any significant code changes, run through this review. For every issue found, explain the concrete tradeoffs, give an opinionated recommendation, and ask for input before assuming a direction.
+
+Engineering Preferences:
+
+- DRY is non-negotiable — flag repetition aggressively. The WHOOP stats cards, biometric grid items, and phase animation patterns are prime candidates.
+- Engineered enough — not fragile/hacky, not over-abstracted. A well-placed helper function beats copy-paste; a premature abstraction layer beats neither.
+- Handle more edge cases, not fewer — WHOOP API failures, demo mode fallbacks, serverless cold starts, and token expiry are all real scenarios. Account for them explicitly.
+- Explicit over clever — especially in animation timing, context state, and API response handling. Future-you needs to read this at 11pm.
+- Bias toward fewer dependencies — before adding a package, ask if Framer Motion or native browser APIs already cover it.
+
+1. Architecture Review
+Evaluate:
+
+- WHOOP data flow — is the boundary between WhoopContext, VitalityContext, and components clean? No component should reach past its context.
+- Serverless gotchas — any file system reads/writes outside of /tmp? Any state assumed to persist between function invocations? (Learned the hard way with token storage.)
+- API route structure — are /api/whoop/* routes handling errors and returning consistent shapes? A failed fetch should never crash the UI.
+- Context coupling — VitalityContext and WhoopContext should remain independently functional. Demo mode must work with zero env vars set.
+- Two-version system integrity — changes to shared components (Providers, SmoothScroll, contexts) affect both coming-soon-client.tsx and the full site. Flag blast radius.
+
+2. Code Quality Review
+Evaluate:   
+
+- DRY violations — the biometric stat cards in coming-soon-client.tsx are a known repeat pattern. Should be extracted.
+- Error handling — every fetch() call needs a catch. Every WHOOP API response needs a null/undefined guard before accessing .data.
+- TypeScript strictness — no any, no @ts-expect-error unless genuinely unavoidable and commented.
+- Dead code — commented-out blocks (like the old static status messages) should be removed, not left as clutter.
+- Magic numbers — animation durations, phase timing delays, and HR decay constants should be named constants, not inline literals.
+
+3. Animation & Performance Review
+Evaluate:
+
+- Framer Motion overhead — are useTransform and useSpring hooks being created at the top level of components (correct) or inside loops/conditionals (wrong)?
+- will-change and GPU layers — fixed position elements with continuous animation (scan line, particles, ECG) should not cause layout thrash.
+- Particle count — 30 particles is the current default. On low-end mobile this may tank FPS. Should respect prefers-reduced-motion.
+- useEffect cleanup — every requestAnimationFrame loop, timer, and event listener must return a cleanup function. Check cursor follow, counter animation, and progress bar RAF loops.
+- Re-render triggers — mousePosition state updates on every mousemove. Ensure this doesn't cascade re-renders into expensive child components.
+
+4. WHOOP Integration Review
+Evaluate:
+
+- Token persistence — tokens must go through Supabase, never the filesystem. Flag any fs imports in API routes.
+- Dual-mode fallback — if WHOOP_ENABLED=false or credentials are missing, the site must render correctly in demo mode with no console errors.
+- Rate limit safety — no unbounded polling. All client-side fetches must go through the cached /api/whoop/stats endpoint, not direct WHOOP API calls.
+- Webhook reliability — the webhook handler must respond with 200 quickly and process async. Long-running webhook handlers will time out on Vercel.
+- HR decay correctness — the post-workout HR decay logic should handle edge cases: no workout today, workout older than 2 hours, resting HR unavailable.
+
+5. Design Quality Review
+Evaluate:
+
+- Does it clear the bar? Would this make someone stop scrolling and say "what the hell is this?" — in a good way. If not, it's not done.
+- Orange discipline — accent color used for emphasis, not decoration. Count orange elements per viewport. If it's more than 3-4, pull back.
+- Typography hierarchy — Bebas Neue for display, Inter for body, mono for UI labels. No mixing outside these roles.
+- Mobile degradation — custom cursor hidden on touch, particle count reduced, parallax disabled. Verify on 375px viewport.
+- Intro sequence sacred — the boot animation with WHOOP progress bar is a signature element. Any change to it requires explicit discussion.
+
+For Each Issue Found
+
+- Describe the problem concretely, with file and line references.
+- Present 2–3 options including "do nothing" where reasonable.
+- For each option: implementation effort, risk, impact on other code, maintenance burden.
+- Give a recommended option and explain why it maps to the preferences above.
+- Ask whether to proceed before making the change.
+
+Workflow
+
+- Don't assume priorities on timeline or scale.
+- For BIG CHANGES (new sections, refactors, integration work): work through interactively, one review area at a time, max 4 top issues per area.
+- For SMALL CHANGES (bug fixes, copy updates, style tweaks): work through interactively ONE question per review area.
+- After each section, pause and ask for feedback before moving on.
 
 ---
 
