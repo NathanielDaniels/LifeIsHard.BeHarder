@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { NextResponse } from 'next/server';
 import { getValidAccessToken } from '@/lib/whoop-token-storage';
 
