@@ -124,12 +124,14 @@ interface BiometricCardProps {
   color: string;
   delay: number;
   subtext?: string;
+  tooltip?: string;
   animateValue?: { animate: Record<string, unknown>; transition: Record<string, unknown> };
 }
 
-function BiometricCard({ label, value, unit, color, delay, subtext, animateValue }: BiometricCardProps) {
+function BiometricCard({ label, value, unit, color, delay, subtext, tooltip, animateValue }: BiometricCardProps) {
   const ValueTag = animateValue ? motion.span : 'span';
   const valueProps = animateValue ? animateValue : {};
+  const [tooltipOpen, setTooltipOpen] = useState(false);
 
   return (
     <motion.div
@@ -137,8 +139,41 @@ function BiometricCard({ label, value, unit, color, delay, subtext, animateValue
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.5, delay }}
-      className="bg-white/[0.03] border border-white/10 rounded-lg p-5 backdrop-blur-sm"
+      className="bg-white/[0.03] border border-white/10 rounded-lg p-5 backdrop-blur-sm relative"
     >
+      {tooltip && (
+        <div
+          className="absolute top-3 right-3 z-50"
+          onMouseEnter={() => setTooltipOpen(true)}
+          onMouseLeave={() => setTooltipOpen(false)}
+        >
+          <button
+            type="button"
+            onClick={() => setTooltipOpen(prev => !prev)}
+            className="w-[14px] h-[14px] rounded-full border flex items-center justify-center text-[8px] leading-none font-mono transition-colors duration-200 cursor-pointer"
+            style={{
+              color: tooltipOpen ? color : undefined,
+              borderColor: tooltipOpen ? color : undefined,
+            }}
+            aria-label={`Info: ${label}`}
+          >
+            <span className={tooltipOpen ? '' : 'text-white/30 hover:text-white/60'}>i</span>
+          </button>
+          <AnimatePresence>
+            {tooltipOpen && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9, y: -2 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.9, y: -2 }}
+                transition={{ duration: 0.15 }}
+                className="absolute top-full right-0 mt-1.5 bg-black/80 border border-white/10 rounded-lg px-3 py-2 max-w-[180px] z-50"
+              >
+                <span className="font-mono text-[10px] leading-relaxed text-white/70 block">{tooltip}</span>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      )}
       <span className="font-mono text-[0.75rem] tracking-[0.3em] text-white/60 block mb-3">{label}</span>
       <div className="flex items-end gap-1">
         <ValueTag
@@ -931,6 +966,7 @@ export default function ComingSoonClient() {
                 color: whoopStats.recovery !== null ? (whoopStats.recovery >= 67 ? '#00e676' : whoopStats.recovery >= 34 ? '#ffab00' : '#ff5252') : themeColor,
                 delay: 0,
                 condition: true,
+                tooltip: 'Body readiness to perform. Green = well recovered (67-100%). Yellow = maintaining (34-66%). Red = rest needed (0-33%).',
               },
               {
                 label: 'DAILY STRAIN',
@@ -939,6 +975,7 @@ export default function ComingSoonClient() {
                 color: themeColor,
                 delay: 0.1,
                 condition: true,
+                tooltip: 'Cardiovascular load on a 0-21 scale. 14+ is High Strain, which builds fitness gains.',
               },
               {
                 label: 'HEART RATE',
@@ -949,6 +986,7 @@ export default function ComingSoonClient() {
                 condition: true,
                 animateValue: { animate: { opacity: [1, 0.7, 1] }, transition: { duration: heartbeatDuration, repeat: Infinity } },
                 subtext: whoopStats.restingHeartRate !== null ? `RESTING: ${whoopStats.restingHeartRate} • MAX: ${whoopStats.maxHeartRate || '—'}` : undefined,
+                tooltip: 'Current heart rate in beats per minute, synced live from Patrick\'s WHOOP device.',
               },
               {
                 label: 'HRV',
@@ -957,6 +995,7 @@ export default function ComingSoonClient() {
                 color: themeColor,
                 delay: 0.3,
                 condition: true,
+                tooltip: 'Heart rate variability in milliseconds. A key recovery indicator — higher generally means better recovery.',
               },
               {
                 label: 'BLOOD OXYGEN',
@@ -965,6 +1004,7 @@ export default function ComingSoonClient() {
                 color: themeColor,
                 delay: 0.4,
                 condition: whoopStats.spo2 !== null,
+                tooltip: 'Blood oxygen saturation (SpO2). Healthy range is typically 95-100%.',
               },
               {
                 label: 'SKIN TEMP',
@@ -973,6 +1013,7 @@ export default function ComingSoonClient() {
                 color: themeColor,
                 delay: 0.5,
                 condition: whoopStats.skinTemp !== null,
+                tooltip: 'Skin temperature in Celsius, monitored continuously by WHOOP.',
               },
               {
                 label: 'CALORIES',
@@ -981,6 +1022,7 @@ export default function ComingSoonClient() {
                 color: themeColor,
                 delay: 0.6,
                 condition: whoopStats.calories !== null,
+                tooltip: 'Total calories burned today based on continuous monitoring.',
               },
               {
                 label: 'AVG HEART RATE',
@@ -989,6 +1031,7 @@ export default function ComingSoonClient() {
                 color: themeColor,
                 delay: 0.7,
                 condition: whoopStats.averageHeartRate !== null,
+                tooltip: 'Average heart rate across all activity today.',
               },
             ].filter(card => card.condition).map((card) => (
               <BiometricCard
@@ -999,6 +1042,7 @@ export default function ComingSoonClient() {
                 color={card.color}
                 delay={card.delay}
                 subtext={card.subtext}
+                tooltip={card.tooltip}
                 animateValue={card.animateValue}
               />
             ))}
