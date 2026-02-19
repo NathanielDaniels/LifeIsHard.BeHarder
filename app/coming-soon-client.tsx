@@ -1080,16 +1080,6 @@ export default function ComingSoonClient() {
           >
             THE FULL STORY DROPS SOON
           </motion.p>
-          
-          {/* <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.1 }}
-            className="font-display text-[clamp(2rem,6vw,4rem)] font-bold mb-4"
-          >
-            DON'T MISS <span style={{ color: themeColor }}>THE MOMENT.</span>
-          </motion.h2> */}
 
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
