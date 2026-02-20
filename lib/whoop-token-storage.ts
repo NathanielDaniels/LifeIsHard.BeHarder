@@ -138,6 +138,10 @@ async function refreshWithRetry(refreshToken: string): Promise<string> {
   try {
     const newTokens = await refreshAccessToken(refreshToken);
     await storeTokens(newTokens);
+    // Fire-and-forget health check after successful refresh
+    import('./whoop-client').then(({ verifyTokenHealth }) =>
+      verifyTokenHealth(newTokens.access_token)
+    ).catch(() => {}); // swallow — observability only
     return newTokens.access_token;
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
@@ -159,6 +163,10 @@ async function refreshWithRetry(refreshToken: string): Promise<string> {
   try {
     const newTokens = await refreshAccessToken(refreshToken);
     await storeTokens(newTokens);
+    // Fire-and-forget health check after successful retry
+    import('./whoop-client').then(({ verifyTokenHealth }) =>
+      verifyTokenHealth(newTokens.access_token)
+    ).catch(() => {}); // swallow — observability only
     return newTokens.access_token;
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);

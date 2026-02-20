@@ -7,7 +7,7 @@ import { useVitality } from '@/contexts/VitalityContext';
 interface WhoopData {
   strain: number;
   recovery: number;
-  sleep: number;
+  // sleep: number;
   hrv: number;
 }
 
@@ -25,7 +25,7 @@ export default function LiveStats() {
   const whoopData: WhoopData = {
     strain: 16.8,
     recovery: 87, // Change this to test different states (e.g. 25 for Low)
-    sleep: 8.2,
+    // sleep: 8.2,
     hrv: 72
   };
 
@@ -104,7 +104,7 @@ export default function LiveStats() {
           />
 
           {/* Sleep */}
-          <StatCard
+          {/* <StatCard
             label="Sleep"
             value={whoopData.sleep}
             unit="hrs"
@@ -113,7 +113,7 @@ export default function LiveStats() {
             description="Last night"
             delay={0.3}
             speed={theme.animationSpeed}
-          />
+          /> */}
 
           {/* HRV */}
           <StatCard
