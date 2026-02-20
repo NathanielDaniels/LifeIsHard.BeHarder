@@ -124,7 +124,7 @@ interface BiometricCardProps {
   color: string;
   delay: number;
   subtext?: string;
-  tooltip?: string;
+  tooltip?: React.ReactNode;
   animateValue?: { animate: Record<string, unknown>; transition: Record<string, unknown> };
 }
 
@@ -150,25 +150,50 @@ function BiometricCard({ label, value, unit, color, delay, subtext, tooltip, ani
           <button
             type="button"
             onClick={() => setTooltipOpen(prev => !prev)}
-            className="w-[14px] h-[14px] rounded-full border flex items-center justify-center text-[8px] leading-none font-mono transition-colors duration-200 cursor-pointer"
+            className="w-5 h-5 rounded-full flex items-center justify-center transition-all duration-300 cursor-pointer group bg-black/40 border border-white/10 backdrop-blur-md"
             style={{
-              color: tooltipOpen ? color : undefined,
-              borderColor: tooltipOpen ? color : undefined,
+              boxShadow: tooltipOpen ? `0 0 12px ${color}30` : 'none',
+              borderColor: tooltipOpen ? `${color}80` : undefined,
             }}
             aria-label={`Info: ${label}`}
           >
-            <span className={tooltipOpen ? '' : 'text-white/30 hover:text-white/60'}>i</span>
+            <span 
+              className="font-mono text-[9px] font-bold transition-colors duration-300"
+              style={{ color: tooltipOpen ? color : 'rgba(255,255,255,0.4)' }}
+            >
+              i
+            </span>
           </button>
           <AnimatePresence>
             {tooltipOpen && (
               <motion.div
-                initial={{ opacity: 0, scale: 0.9, y: -2 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.9, y: -2 }}
-                transition={{ duration: 0.15 }}
-                className="absolute top-full right-0 mt-1.5 bg-black/80 border border-white/10 rounded-lg px-3 py-2 max-w-[180px] z-50"
+                initial={{ opacity: 0, scale: 0.95, y: 8, filter: 'blur(4px)' }}
+                animate={{ opacity: 1, scale: 1, y: 0, filter: 'blur(0px)' }}
+                exit={{ opacity: 0, scale: 0.95, y: 4, filter: 'blur(4px)' }}
+                transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+                className="absolute top-full right-0 mt-3 rounded-xl overflow-hidden min-w-[220px] max-w-[260px] z-[9999]"
+                style={{
+                  boxShadow: `0 10px 40px -10px rgba(0,0,0,0.8), 0 0 20px ${color}10`,
+                }}
               >
-                <span className="font-mono text-[10px] leading-relaxed text-white/70 block">{tooltip}</span>
+                {/* Glassy Background & Borders */}
+                <div className="absolute inset-0 bg-black/95 backdrop-blur-xl border border-white/10 rounded-xl" />
+                
+                {/* Glowing Top Border */}
+                <div 
+                  className="absolute top-0 left-0 w-full h-[2px]" 
+                  style={{ 
+                    background: `linear-gradient(90deg, transparent, ${color}, transparent)`, 
+                    opacity: 0.8 
+                  }} 
+                />
+                
+                {/* Content */}
+                <div className="relative z-10 p-3.5">
+                  <span className="font-sans text-[11px] leading-[1.6] text-white/80 block break-words">
+                    {tooltip}
+                  </span>
+                </div>
               </motion.div>
             )}
           </AnimatePresence>
@@ -274,7 +299,7 @@ export default function ComingSoonClient() {
     if (connectionStatus === 'connecting') {
       messages.push({ text: '> Establishing secure connection...', delay: 1.2 });
     } else if (connectionStatus === 'syncing' || connectionStatus === 'connected') {
-      messages.push({ text: '> Handshake OK — Biometric stream detected', delay: 1.2 });
+      messages.push({ text: '> Handshake OK - Biometric stream detected', delay: 1.2 });
       messages.push({ text: `> Syncing heart rate... ${heartbeat} BPM`, delay: 1.8 });
       if (whoopStats.recovery !== null) {
         messages.push({ text: `> Recovery score: ${whoopStats.recovery}%`, delay: 2.3 });
@@ -283,7 +308,7 @@ export default function ComingSoonClient() {
         messages.push({ text: `> Daily strain: ${whoopStats.strain.toFixed(1)}`, delay: 2.6 });
       }
     } else {
-      messages.push({ text: '> Connection failed — using cached data', delay: 1.2 });
+      messages.push({ text: '> Connection failed - using cached data', delay: 1.2 });
       messages.push({ text: `> Fallback heart rate: ${heartbeat} BPM`, delay: 1.8 });
     }
 
@@ -509,7 +534,7 @@ export default function ComingSoonClient() {
 
       {/* Custom Cursor */}
       <div
-        className="fixed w-5 h-5 border rounded-full pointer-events-none z-[9999] mix-blend-difference transition-transform duration-100"
+        className="fixed w-5 h-5 border rounded-full pointer-events-none z-[9999] mix-blend-difference transition-transform duration-100 hidden md:block"
         style={{ 
           left: cursorPosition.x, 
           top: cursorPosition.y, 
@@ -518,7 +543,7 @@ export default function ComingSoonClient() {
         }}
       />
       <div
-        className="fixed w-1.5 h-1.5 rounded-full pointer-events-none z-[10000]"
+        className="fixed w-1.5 h-1.5 rounded-full pointer-events-none z-[10000] hidden md:block"
         style={{ 
           left: mousePosition.x, 
           top: mousePosition.y, 
@@ -612,7 +637,7 @@ export default function ComingSoonClient() {
               {[
                 { text: '> INIT Vitality Engine v2.1', delay: 0 },
                 { text: '> Locating WINGERT_VITALITY_FEED...', delay: 0.5 },
-                { text: '> Handshake OK — Biometric stream detected', delay: 1.2 },
+                { text: '> Handshake OK - Biometric stream detected', delay: 1.2 },
                 { text: `> Syncing heart rate... ${heartbeat} BPM`, delay: 1.8 },
                 { text: `> Energy state: ${energyState}`, delay: 2.3 },
               ].map((line, i) => (
@@ -785,7 +810,7 @@ export default function ComingSoonClient() {
           </motion.p>
         </motion.div>
 
-        {/* Scroll Indicator — appears after 3s idle, vanishes on scroll */}
+        {/* Scroll Indicator appears after 3s idle, vanishes on scroll */}
         <AnimatePresence>
           {showScrollHint && phase >= 3 && (
             <motion.div
@@ -951,7 +976,7 @@ export default function ComingSoonClient() {
               style={{ backgroundColor: isConnected ? '#00ff00' : themeColor, boxShadow: `0 0 10px ${isConnected ? '#00ff00' : themeColor}` }}
             />
             <h2 className="font-mono text-xs tracking-[0.5em] text-white/50 uppercase">
-              {isConnected ? 'Live Biometrics' : 'Biometric Data'} — {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase()}
+              {isConnected ? 'Live Biometrics' : 'Biometric Data'} - {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase()}
             </h2>
             <div className="flex-1 h-px bg-white/10" />
           </div>
@@ -966,7 +991,14 @@ export default function ComingSoonClient() {
                 color: whoopStats.recovery !== null ? (whoopStats.recovery >= 67 ? '#00e676' : whoopStats.recovery >= 34 ? '#ffab00' : '#ff5252') : themeColor,
                 delay: 0,
                 condition: true,
-                tooltip: 'Body readiness to perform. Green = well recovered (67-100%). Yellow = maintaining (34-66%). Red = rest needed (0-33%).',
+                tooltip: (
+                  <>
+                    Body readiness score.<br/>
+                    <span style={{ color: '#00e676' }}>Green</span> = well recovered (67-100%).<br/>
+                    <span style={{ color: '#ffab00' }}>Yellow</span> = maintaining (34-66%).<br/>
+                    <span style={{ color: '#ff5252' }}>Red</span> = rest needed.
+                  </>
+                ),
               },
               {
                 label: 'DAILY STRAIN',
@@ -995,7 +1027,7 @@ export default function ComingSoonClient() {
                 color: themeColor,
                 delay: 0.3,
                 condition: true,
-                tooltip: 'Heart rate variability in milliseconds. A key recovery indicator — higher generally means better recovery.',
+                tooltip: 'Heart rate variability in milliseconds. A key recovery indicator - higher generally means better recovery.',
               },
               {
                 label: 'BLOOD OXYGEN',
