@@ -132,6 +132,15 @@ function BiometricCard({ label, value, unit, color, delay, subtext, tooltip, ani
   const ValueTag = animateValue ? motion.span : 'span';
   const valueProps = animateValue ? animateValue : {};
   const [tooltipOpen, setTooltipOpen] = useState(false);
+  const touchHandled = useRef(false);
+
+  // Close tooltip if tapping anywhere outside
+  useEffect(() => {
+    if (!tooltipOpen) return;
+    const handleOutsideClick = () => setTooltipOpen(false);
+    window.addEventListener('click', handleOutsideClick);
+    return () => window.removeEventListener('click', handleOutsideClick);
+  }, [tooltipOpen]);
 
   return (
     <motion.div
@@ -139,18 +148,32 @@ function BiometricCard({ label, value, unit, color, delay, subtext, tooltip, ani
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.5, delay }}
-      className="bg-white/[0.03] border border-white/10 rounded-lg p-5 backdrop-blur-sm relative"
+      className="bg-white/[0.03] border border-white/10 rounded-lg p-5 backdrop-blur-sm relative transition-colors duration-300 cursor-pointer active:bg-white/[0.06] hover:bg-white/[0.05]"
+      onClick={(e) => {
+        if (tooltip) {
+          e.stopPropagation();
+          setTooltipOpen(prev => !prev);
+        }
+      }}
+      onMouseEnter={() => { touchHandled.current = false; }} // Reset on mouse enter
     >
       {tooltip && (
         <div
           className="absolute top-3 right-3 z-50"
-          onMouseEnter={() => setTooltipOpen(true)}
-          onMouseLeave={() => setTooltipOpen(false)}
+          onMouseEnter={() => {
+            if (!touchHandled.current) setTooltipOpen(true);
+          }}
+          onMouseLeave={() => {
+            if (!touchHandled.current) setTooltipOpen(false);
+          }}
         >
           <button
             type="button"
-            onClick={() => setTooltipOpen(prev => !prev)}
-            className="w-5 h-5 rounded-full flex items-center justify-center transition-all duration-300 cursor-pointer group bg-black/40 border border-white/10 backdrop-blur-md"
+            onClick={(e) => {
+              e.stopPropagation();
+              setTooltipOpen(prev => !prev);
+            }}
+            className="w-5 h-5 rounded-full flex items-center justify-center transition-all duration-300 cursor-pointer group border border-white/10 backdrop-blur-md"
             style={{
               boxShadow: tooltipOpen ? `0 0 12px ${color}30` : 'none',
               borderColor: tooltipOpen ? `${color}80` : undefined,

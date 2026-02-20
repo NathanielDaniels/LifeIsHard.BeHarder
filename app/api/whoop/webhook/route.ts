@@ -84,9 +84,9 @@ async function handleWebhookEvent(payload: WhoopWebhookPayload): Promise<void> {
     case 'workout.updated':
       console.log(`[webhook] Workout updated: ${payload.id}`);
       break;
-    case 'sleep.updated':
-      console.log(`[webhook] Sleep updated: ${payload.id}`);
-      break;
+    // case 'sleep.updated':
+    //   console.log(`[webhook] Sleep updated: ${payload.id}`);
+    //   break;
     case 'recovery.updated':
       console.log(`[webhook] Recovery updated: ${payload.id}`);
       break;

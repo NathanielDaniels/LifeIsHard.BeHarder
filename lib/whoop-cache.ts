@@ -69,16 +69,16 @@ export async function getCachedStats(): Promise<WhoopStats | null> {
  * Returns stale cached stats regardless of TTL.
  * Used as a last resort when WHOOP API is unreachable.
  */
-export async function getStaleStats(): Promise<WhoopStats | null> {
+export async function getStaleStats(): Promise<{ stats: WhoopStats; fetchedAt: string } | null> {
   try {
     const { data, error } = await supabase
       .from(TABLE)
-      .select('stats')
+      .select('stats, fetched_at')
       .eq('id', CACHE_ID)
       .single();
 
     if (error || !data) return null;
-    return data.stats as WhoopStats;
+    return { stats: data.stats as WhoopStats, fetchedAt: data.fetched_at };
   } catch (err) {
     console.error('[whoop-cache] getStaleStats error:', err);
     return null;
@@ -188,10 +188,11 @@ export async function getStatsWithCache(
   }
 
   // 3. Rate-limited — return stale rather than nothing
-  const stale = await getStaleStats();
-  if (stale) {
-    console.warn('[whoop-cache] Rate-limited, returning stale cache');
-    return stale;
+  const staleResult = await getStaleStats();
+  if (staleResult) {
+    const ageMinutes = Math.round((Date.now() - new Date(staleResult.fetchedAt).getTime()) / 60000);
+    console.warn(`[whoop-cache] Serving stale data — last fresh fetch was ${ageMinutes}m ago`);
+    return staleResult.stats;
   }
 
   // 4. Nothing available
@@ -208,11 +209,11 @@ export async function updateCacheFromWebhook(
   data: Partial<WhoopStats>
 ): Promise<void> {
   try {
-    const stale = await getStaleStats();
-    if (!stale) return; // Nothing to merge into
+    const staleResult = await getStaleStats();
+    if (!staleResult) return; // Nothing to merge into
 
     const merged: WhoopStats = {
-      ...stale,
+      ...staleResult.stats,
       ...data,
       lastUpdated: new Date().toISOString(),
     };

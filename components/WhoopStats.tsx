@@ -266,14 +266,14 @@ function FullStats({
       </div>
       
       {/* Sleep Stats */}
-      <div className="grid grid-cols-3 gap-4 mb-6 pt-4 border-t border-white/10">
+      {/* <div className="grid grid-cols-3 gap-4 mb-6 pt-4 border-t border-white/10">
         <MiniStat label="Sleep" value={stats.sleepPerformance} unit="%" />
         <MiniStat 
           label="Duration" 
           value={stats.sleepDuration ? formatDuration(stats.sleepDuration) : null} 
         />
         <MiniStat label="Consistency" value={stats.sleepConsistency} unit="%" />
-      </div>
+      </div> */}
       
       {/* Last Workout */}
       {stats.lastWorkout && (
@@ -292,10 +292,10 @@ function FullStats({
             </div>
             <div className="text-right">
               <p className="text-sm text-white/40">
-                Avg HR: {stats.lastWorkout.averageHeartRate}
+                Avg HR: {stats.lastWorkout.averageHeartRate ?? '--'}
               </p>
               <p className="text-sm text-white/40">
-                Max HR: {stats.lastWorkout.maxHeartRate}
+                Max HR: {stats.lastWorkout.maxHeartRate ?? '--'}
               </p>
             </div>
           </div>

@@ -176,17 +176,17 @@ export interface WhoopStats {
   maxHeartRate: number | null;       // BPM
   
   // Sleep metrics
-  sleepPerformance: number | null;   // percentage
-  sleepDuration: number | null;      // minutes
-  sleepConsistency: number | null;   // percentage
+  // sleepPerformance: number | null;   // percentage
+  // sleepDuration: number | null;      // minutes
+  // sleepConsistency: number | null;   // percentage
   
   // Last workout
   lastWorkout: {
     sport: string;
     strain: number;
     duration: number;                // minutes
-    averageHeartRate: number;
-    maxHeartRate: number;
+    averageHeartRate: number | null;
+    maxHeartRate: number | null;
     calories: number;
     completedAt: string;
   } | null;
@@ -215,9 +215,9 @@ export const DEMO_WHOOP_STATS: WhoopStats = {
   averageHeartRate: 72,
   maxHeartRate: 178,
   
-  sleepPerformance: 85,
-  sleepDuration: 442,
-  sleepConsistency: 88,
+  // sleepPerformance: 85,
+  // sleepDuration: 442,
+  // sleepConsistency: 88,
   
   lastWorkout: {
     sport: 'Swimming',

@@ -42,10 +42,10 @@ export async function GET(request: NextRequest) {
     if (err instanceof TokenRefreshError) {
       // Transient failure — return stale cache if available, otherwise demo
       const { getStaleStats } = await import('@/lib/whoop-cache');
-      const stale = await getStaleStats();
-      if (stale) {
+      const staleResult = await getStaleStats();
+      if (staleResult) {
         return NextResponse.json({
-          ...stale,
+          ...staleResult.stats,
           mode: 'stale',
           warning: 'Using cached data — token refresh temporarily failed',
         });
@@ -76,10 +76,10 @@ export async function GET(request: NextRequest) {
 
     // Try stale cache before giving up
     const { getStaleStats } = await import('@/lib/whoop-cache');
-    const stale = await getStaleStats();
-    if (stale) {
+    const staleResult = await getStaleStats();
+    if (staleResult) {
       return NextResponse.json({
-        ...stale,
+        ...staleResult.stats,
         mode: 'stale',
         warning: 'Using cached data — WHOOP API temporarily unavailable',
       });

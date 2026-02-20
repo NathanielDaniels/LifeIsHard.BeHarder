@@ -8,7 +8,7 @@ import {
   WhoopProfile,
   WhoopRecovery,
   WhoopCycle,
-  WhoopSleep,
+  // WhoopSleep,
   WhoopWorkout,
   WhoopStats,
   DEMO_WHOOP_STATS,
@@ -18,6 +18,10 @@ const WHOOP_API_BASE = 'https://api.prod.whoop.com';
 const WHOOP_AUTH_URL = `${WHOOP_API_BASE}/oauth/oauth2/auth`;
 const WHOOP_TOKEN_URL = `${WHOOP_API_BASE}/oauth/oauth2/token`;
 const WHOOP_API_URL = `${WHOOP_API_BASE}/developer`;
+
+// Minimum workout duration to show as "Last Workout" (in minutes)
+// Skips low-effort activities like stretching, dog walking
+const MIN_WORKOUT_DURATION_MINUTES = 10;
 
 // ============================================
 // Configuration
@@ -182,20 +186,51 @@ export async function getLatestCycle(accessToken: string): Promise<WhoopCycle | 
   return response.records[0] || null;
 }
 
-export async function getLatestSleep(accessToken: string): Promise<WhoopSleep | null> {
-  const response = await whoopFetch<{ records: WhoopSleep[] }>(
-    '/v2/activity/sleep?limit=1',
-    accessToken
-  );
-  return response.records[0] || null;
-}
+// export async function getLatestSleep(accessToken: string): Promise<WhoopSleep | null> {
+//   const response = await whoopFetch<{ records: WhoopSleep[] }>(
+//     '/v2/activity/sleep?limit=1',
+//     accessToken
+//   );
+//   return response.records[0] || null;
+// }
 
+/**
+ * Fetches recent workouts and returns the most recent one
+ * that meets the minimum duration threshold.
+ * 
+ * Fetches 5 at a time to skip short/passive activities
+ * (stretching, dog walking) that WHOOP logs but don't 
+ * generate meaningful training data.
+ */
 export async function getLatestWorkout(accessToken: string): Promise<WhoopWorkout | null> {
   const response = await whoopFetch<{ records: WhoopWorkout[] }>(
-    '/v2/activity/workout?limit=1',
+    '/v2/activity/workout?limit=5',
     accessToken
   );
-  console.log('[WHOOP workout raw]', JSON.stringify(response));
+
+  console.log('[whoop] workout response:', JSON.stringify(response.records?.map(w => ({
+    sport: w.sport_name,
+    start: w.start,
+    end: w.end,
+    hasScore: !!w.score,
+  }))));
+
+  if (!response.records?.length) return null;
+
+  // Find the first workout that meets the minimum duration
+  for (const workout of response.records) {
+    if (!workout.start || !workout.end) continue;
+
+    const durationMs = new Date(workout.end).getTime() - new Date(workout.start).getTime();
+    const durationMinutes = durationMs / 60000;
+
+    if (durationMinutes >= MIN_WORKOUT_DURATION_MINUTES) {
+      return workout;
+    }
+  }
+
+  // All recent workouts are short — return the most recent anyway
+  // so the card still shows something rather than nothing
   return response.records[0] || null;
 }
 
@@ -206,11 +241,13 @@ export async function getLatestWorkout(accessToken: string): Promise<WhoopWorkou
 export async function fetchWhoopStats(accessToken: string): Promise<WhoopStats> {
   try {
     // Fetch all data in parallel
-    const [recovery, cycle, sleep, workout] = await Promise.all([
+    const [recovery, cycle, workout] = await Promise.all([
       getLatestRecovery(accessToken).catch(() => null),
       getLatestCycle(accessToken).catch(() => null),
-      getLatestSleep(accessToken).catch(() => null),
-      getLatestWorkout(accessToken).catch(() => null),
+      getLatestWorkout(accessToken).catch((err) => {
+        console.error('[whoop] workout fetch failed:', err);
+        return null;
+      }),
     ]);
     
     // Calculate current heart rate with decay
@@ -220,8 +257,8 @@ export async function fetchWhoopStats(accessToken: string): Promise<WhoopStats> 
     );
     
     // Convert sleep duration from milliseconds to minutes
-    const sleepDurationMs = sleep?.score?.stage_summary?.total_in_bed_time_milli || 0;
-    const sleepDurationMinutes = Math.round(sleepDurationMs / 60000);
+    // const sleepDurationMs = sleep?.score?.stage_summary?.total_in_bed_time_milli || 0;
+    // const sleepDurationMinutes = Math.round(sleepDurationMs / 60000);
     
     // Convert workout duration
     let workoutDurationMinutes: number | null = null;
@@ -257,17 +294,17 @@ export async function fetchWhoopStats(accessToken: string): Promise<WhoopStats> 
       maxHeartRate: cycle?.score?.max_heart_rate ?? null,
       
       // Sleep
-      sleepPerformance: sleep?.score?.sleep_performance_percentage ?? null,
-      sleepDuration: sleepDurationMinutes || null,
-      sleepConsistency: sleep?.score?.sleep_consistency_percentage ?? null,
+      // sleepPerformance: sleep?.score?.sleep_performance_percentage ?? null,
+      // sleepDuration: sleepDurationMinutes || null,
+      // sleepConsistency: sleep?.score?.sleep_consistency_percentage ?? null,
       
-      // Last workout
-      lastWorkout: workout?.score ? {
+      // Last workout — show even if score is null (low-intensity activities don't score)
+      lastWorkout: workout ? {
         sport: workout.sport_name || 'Activity',
-        strain: workout.score.strain,
+        strain: workout.score?.strain ?? 0,
         duration: workoutDurationMinutes || 0,
-        averageHeartRate: workout.score.average_heart_rate,
-        maxHeartRate: workout.score.max_heart_rate,
+        averageHeartRate: workout.score?.average_heart_rate ?? null,
+        maxHeartRate: workout.score?.max_heart_rate ?? null,
         calories: workoutCals || 0,
         completedAt: workout.end,
       } : null,
@@ -291,7 +328,8 @@ export async function fetchWhoopStats(accessToken: string): Promise<WhoopStats> 
  * - Last workout average HR
  * - Time since workout ended
  * 
- * Heart rate decays from workout avg back to resting over ~2 hours
+ * Heart rate decays from workout avg back to resting over ~2 hours.
+ * Falls back gracefully when workout has no score (unscored activities).
  */
 function calculateCurrentHeartRate(
   restingHR: number | null,
@@ -300,7 +338,13 @@ function calculateCurrentHeartRate(
   const defaultResting = 65;
   const resting = restingHR ?? defaultResting;
   
-  if (!workout?.score || !workout.end) {
+  // No workout end time — just use resting
+  if (!workout?.end) {
+    return { currentHeartRate: resting, heartRateSource: 'resting' };
+  }
+
+  // Workout has no HR score (e.g. stretching) — can't decay from unknown HR
+  if (!workout.score?.average_heart_rate) {
     return { currentHeartRate: resting, heartRateSource: 'resting' };
   }
   
@@ -333,6 +377,74 @@ function calculateCurrentHeartRate(
   const currentHR = Math.round(workoutHR - (workoutHR - resting) * easedProgress);
   
   return { currentHeartRate: currentHR, heartRateSource: 'decay' };
+}
+
+// ============================================
+// Token Health Check
+// ============================================
+
+interface EndpointHealthResult {
+  status: number;
+  ok: boolean;
+}
+
+export interface TokenHealthReport {
+  recovery: EndpointHealthResult;
+  cycle: EndpointHealthResult;
+  // sleep: EndpointHealthResult;
+  workout: EndpointHealthResult;
+  allHealthy: boolean;
+}
+
+/**
+ * Hits all 4 WHOOP data endpoints in parallel to verify the token
+ * has working access. Logs per-endpoint results but never throws.
+ * Use after token refresh or initial OAuth to catch scope issues early.
+ */
+export async function verifyTokenHealth(accessToken: string): Promise<TokenHealthReport> {
+  const endpoints = {
+    recovery: '/v2/recovery?limit=1',
+    cycle: '/v2/cycle?limit=1',
+    // sleep: '/v2/activity/sleep?limit=1',
+    workout: '/v2/activity/workout?limit=1',
+  } as const;
+
+  const results = await Promise.all(
+    (Object.entries(endpoints) as [keyof typeof endpoints, string][]).map(
+      async ([name, path]): Promise<[keyof typeof endpoints, EndpointHealthResult]> => {
+        try {
+          const response = await fetch(`${WHOOP_API_URL}${path}`, {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+              'Content-Type': 'application/json',
+            },
+          });
+          const result: EndpointHealthResult = { status: response.status, ok: response.ok };
+          const label = response.ok ? 'OK' : 'FAILED';
+          console.log(`[whoop-health] ${name}: ${response.status} ${label}`);
+          return [name, result];
+        } catch (err) {
+          console.warn(`[whoop-health] ${name}: NETWORK ERROR`, err instanceof Error ? err.message : err);
+          return [name, { status: 0, ok: false }];
+        }
+      }
+    )
+  );
+
+  const report = Object.fromEntries(results) as Record<keyof typeof endpoints, EndpointHealthResult>;
+  const allHealthy = Object.values(report).every(r => r.ok);
+
+  if (!allHealthy) {
+    const failed = Object.entries(report)
+      .filter(([, r]) => !r.ok)
+      .map(([name, r]) => `${name}:${r.status}`)
+      .join(', ');
+    console.warn(`[whoop-health] Unhealthy endpoints: ${failed}`);
+  } else {
+    console.log('[whoop-health] All endpoints healthy');
+  }
+
+  return { ...report, allHealthy };
 }
 
 // ============================================

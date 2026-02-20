@@ -4,7 +4,7 @@
 // ============================================
 
 import { NextRequest, NextResponse } from 'next/server';
-import { exchangeCodeForTokens, getProfile } from '@/lib/whoop-client';
+import { exchangeCodeForTokens, getProfile, verifyTokenHealth } from '@/lib/whoop-client';
 import { storeTokens } from '@/lib/whoop-token-storage';
 import { invalidateCache } from '@/lib/whoop-cache';
 import { supabase } from '@/lib/supabase';
@@ -72,6 +72,9 @@ export async function GET(request: NextRequest) {
         new URL(`/?error=${encodeURIComponent('token_storage_failed')}`, request.url)
       );
     }
+
+    // Verify all endpoints work with the fresh token
+    verifyTokenHealth(tokens.access_token).catch(() => {}); // fire-and-forget
 
     // Clear any cached data
     invalidateCache();
