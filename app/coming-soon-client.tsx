@@ -125,14 +125,15 @@ interface BiometricCardProps {
   delay: number;
   subtext?: string;
   tooltip?: React.ReactNode;
+  tooltipTitle?: string;
   animateValue?: { animate: Record<string, unknown>; transition: Record<string, unknown> };
+  index?: number;
 }
 
-function BiometricCard({ label, value, unit, color, delay, subtext, tooltip, animateValue }: BiometricCardProps) {
+function BiometricCard({ label, value, unit, color, delay, subtext, tooltip, tooltipTitle, animateValue, index }: BiometricCardProps) {
   const ValueTag = animateValue ? motion.span : 'span';
   const valueProps = animateValue ? animateValue : {};
   const [tooltipOpen, setTooltipOpen] = useState(false);
-  const touchHandled = useRef(false);
 
   // Close tooltip if tapping anywhere outside
   useEffect(() => {
@@ -142,86 +143,103 @@ function BiometricCard({ label, value, unit, color, delay, subtext, tooltip, ani
     return () => window.removeEventListener('click', handleOutsideClick);
   }, [tooltipOpen]);
 
+  // Only one tooltip open at a time
+  useEffect(() => {
+    const handleClose = (e: CustomEvent) => {
+      if (e.detail !== label) setTooltipOpen(false);
+    };
+    window.addEventListener('single-tooltip', handleClose as EventListener);
+    return () => window.removeEventListener('single-tooltip', handleClose as EventListener);
+  }, [label]);
+
+  const toggleTooltip = (e: React.MouseEvent) => {
+    if (tooltip) {
+      e.stopPropagation();
+      const nextState = !tooltipOpen;
+      setTooltipOpen(nextState);
+      if (nextState) {
+        window.dispatchEvent(new CustomEvent('single-tooltip', { detail: label }));
+      }
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.5, delay }}
-      className="bg-white/[0.03] border border-white/10 rounded-lg p-5 backdrop-blur-sm relative transition-colors duration-300 cursor-pointer active:bg-white/[0.06] hover:bg-white/[0.05]"
-      onClick={(e) => {
-        if (tooltip) {
-          e.stopPropagation();
-          setTooltipOpen(prev => !prev);
-        }
-      }}
-      onMouseEnter={() => { touchHandled.current = false; }} // Reset on mouse enter
+      className={`bg-white/[0.03] border border-white/10 rounded-lg p-5 backdrop-blur-sm relative transition-colors duration-300 cursor-pointer active:bg-white/[0.06] hover:bg-white/[0.05] ${
+        tooltipOpen ? 'z-50' : 'z-10'
+      }`}
+      onClick={toggleTooltip}
     >
       {tooltip && (
         <div
-          className="absolute top-3 right-3 z-50"
-          onMouseEnter={() => {
-            if (!touchHandled.current) setTooltipOpen(true);
+          className="absolute top-3 right-3 z-50 flex items-center justify-center w-5 h-5 rounded-full transition-all duration-300 cursor-pointer group border border-white/10 backdrop-blur-md"
+          onClick={toggleTooltip}
+          style={{
+            boxShadow: tooltipOpen ? `0 0 12px ${color}30` : 'none',
+            borderColor: tooltipOpen ? `${color}80` : undefined,
           }}
-          onMouseLeave={() => {
-            if (!touchHandled.current) setTooltipOpen(false);
-          }}
+          aria-label={`Info: ${label}`}
         >
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              setTooltipOpen(prev => !prev);
-            }}
-            className="w-5 h-5 rounded-full flex items-center justify-center transition-all duration-300 cursor-pointer group border border-white/10 backdrop-blur-md"
-            style={{
-              boxShadow: tooltipOpen ? `0 0 12px ${color}30` : 'none',
-              borderColor: tooltipOpen ? `${color}80` : undefined,
-            }}
-            aria-label={`Info: ${label}`}
+          <span 
+            className="font-mono text-[9px] font-bold transition-colors duration-300"
+            style={{ color: tooltipOpen ? color : 'rgba(255,255,255,0.4)' }}
           >
-            <span 
-              className="font-mono text-[9px] font-bold transition-colors duration-300"
-              style={{ color: tooltipOpen ? color : 'rgba(255,255,255,0.4)' }}
-            >
-              i
-            </span>
-          </button>
-          <AnimatePresence>
-            {tooltipOpen && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95, y: 8, filter: 'blur(4px)' }}
-                animate={{ opacity: 1, scale: 1, y: 0, filter: 'blur(0px)' }}
-                exit={{ opacity: 0, scale: 0.95, y: 4, filter: 'blur(4px)' }}
-                transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-                className="absolute top-full right-0 mt-3 rounded-xl overflow-hidden min-w-[220px] max-w-[260px] z-[9999]"
-                style={{
-                  boxShadow: `0 10px 40px -10px rgba(0,0,0,0.8), 0 0 20px ${color}10`,
-                }}
-              >
-                {/* Glassy Background & Borders */}
-                <div className="absolute inset-0 bg-black/95 backdrop-blur-xl border border-white/10 rounded-xl" />
-                
-                {/* Glowing Top Border */}
-                <div 
-                  className="absolute top-0 left-0 w-full h-[2px]" 
-                  style={{ 
-                    background: `linear-gradient(90deg, transparent, ${color}, transparent)`, 
-                    opacity: 0.8 
-                  }} 
-                />
-                
-                {/* Content */}
-                <div className="relative z-10 p-3.5">
-                  <span className="font-sans text-[11px] leading-[1.6] text-white/80 block break-words">
-                    {tooltip}
-                  </span>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+            i
+          </span>
         </div>
       )}
+
+      {/* Full Card Tooltip Overlay */}
+      <AnimatePresence>
+        {tooltip && tooltipOpen && (
+          <motion.div
+            initial={{ opacity: 0, backdropFilter: 'blur(0px)' }}
+            animate={{ opacity: 1, backdropFilter: 'blur(16px)' }}
+            exit={{ opacity: 0, backdropFilter: 'blur(0px)' }}
+            transition={{ duration: 0.3 }}
+            className="absolute inset-0 z-[60] rounded-lg overflow-hidden flex flex-col p-3.5 md:p-4 cursor-pointer bg-black/95 text-left"
+            onClick={toggleTooltip}
+            style={{
+              boxShadow: `inset 0 0 40px ${color}15`,
+              border: `1px solid ${color}40`,
+            }}
+          >
+            {/* Glowing Effects */}
+            <div 
+              className="absolute top-0 left-0 w-full h-[1px] opacity-70" 
+              style={{ background: `linear-gradient(90deg, transparent, ${color}, transparent)` }} 
+            />
+            <div
+              className="absolute inset-0 opacity-10 pointer-events-none"
+              style={{ background: `radial-gradient(circle at center, ${color} 0%, transparent 70%)` }}
+            />
+            
+            {/* Overlay Content */}
+            <div className="relative z-10 w-full flex flex-col h-full items-start overflow-hidden pt-1">
+              <div className="flex w-full justify-between items-start mb-2 shrink-0">
+                <span className="font-mono text-[0.60rem] tracking-[0.2em] uppercase opacity-90" style={{ color }}>
+                  {tooltipTitle || `${label} Details`}
+                </span>
+                <span className="text-white/40 group-hover:text-white/70 transition-colors ml-2 cursor-pointer mt-0.5" onClick={toggleTooltip}>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
+                </span>
+              </div>
+              <div className="w-full flex-1 overflow-y-auto pr-1 pb-1">
+                <span className="font-sans text-[11px] md:text-xs leading-[1.6] text-white/90 block break-words">
+                  {tooltip}
+                </span>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       <span className="font-mono text-[0.75rem] tracking-[0.3em] text-white/60 block mb-3">{label}</span>
       <div className="flex items-end gap-1">
         <ValueTag
@@ -1014,9 +1032,9 @@ export default function ComingSoonClient() {
                 color: whoopStats.recovery !== null ? (whoopStats.recovery >= 67 ? '#00e676' : whoopStats.recovery >= 34 ? '#ffab00' : '#ff5252') : themeColor,
                 delay: 0,
                 condition: true,
+                tooltipTitle: 'Body readiness score',
                 tooltip: (
                   <>
-                    Body readiness score.<br/>
                     <span style={{ color: '#00e676' }}>Green</span> = well recovered (67-100%).<br/>
                     <span style={{ color: '#ffab00' }}>Yellow</span> = maintaining (34-66%).<br/>
                     <span style={{ color: '#ff5252' }}>Red</span> = rest needed.
@@ -1088,7 +1106,7 @@ export default function ComingSoonClient() {
                 condition: whoopStats.averageHeartRate !== null,
                 tooltip: 'Average heart rate across all activity today.',
               },
-            ].filter(card => card.condition).map((card) => (
+            ].filter(card => card.condition).map((card, i) => (
               <BiometricCard
                 key={card.label}
                 label={card.label}
@@ -1098,7 +1116,9 @@ export default function ComingSoonClient() {
                 delay={card.delay}
                 subtext={card.subtext}
                 tooltip={card.tooltip}
+                tooltipTitle={card.tooltipTitle}
                 animateValue={card.animateValue}
+                index={i}
               />
             ))}
           </div>
