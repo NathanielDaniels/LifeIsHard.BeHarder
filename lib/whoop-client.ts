@@ -195,6 +195,7 @@ export async function getLatestWorkout(accessToken: string): Promise<WhoopWorkou
     '/v2/activity/workout?limit=1',
     accessToken
   );
+  console.log('[WHOOP workout raw]', JSON.stringify(response));
   return response.records[0] || null;
 }
 
