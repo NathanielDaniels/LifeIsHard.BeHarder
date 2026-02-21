@@ -334,11 +334,13 @@ const bodyTextMuted: React.CSSProperties = {
 
 // --- Stats Card ---
 const statsCard: React.CSSProperties = {
-  margin: '0 40px 32px',
+  margin: '0 auto 32px',
+  width: '86%',
+  maxWidth: '500px',
   backgroundColor: cardBg,
   border: '1px solid rgba(255,255,255,0.08)',
   borderRadius: '8px',
-  padding: '24px 16px 20px',
+  padding: '24px 8px 20px',
   textAlign: 'center' as const,
 };
 
@@ -372,7 +374,7 @@ const statDividerText: React.CSSProperties = {
 
 const statNumber: React.CSSProperties = {
   fontFamily: '"Bebas Neue", Arial, sans-serif',
-  fontSize: '32px',
+  fontSize: '28px',
   color: '#ffffff',
   margin: '0 0 6px',
   lineHeight: '1',
