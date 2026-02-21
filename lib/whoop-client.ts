@@ -208,13 +208,6 @@ export async function getLatestWorkout(accessToken: string): Promise<WhoopWorkou
     accessToken
   );
 
-  console.log('[whoop] workout response:', JSON.stringify(response.records?.map(w => ({
-    sport: w.sport_name,
-    start: w.start,
-    end: w.end,
-    hasScore: !!w.score,
-  }))));
-
   if (!response.records?.length) return null;
 
   // Find the first workout that meets the minimum duration
@@ -239,27 +232,20 @@ export async function getLatestWorkout(accessToken: string): Promise<WhoopWorkou
 // ============================================
 
 export async function fetchWhoopStats(accessToken: string): Promise<WhoopStats> {
-  console.log('[fetchWhoopStats] called', new Date().toISOString());
   try {
     // Fetch all data in parallel
     const [recovery, cycle, workout] = await Promise.all([
       getLatestRecovery(accessToken).catch(() => null),
       getLatestCycle(accessToken).catch(() => null),
-      getLatestWorkout(accessToken).catch((err) => {
-        console.error('[whoop] workout fetch failed:', err);
-        return null;
-      }),
+      // getLatestSleep(accessToken).catch(() => null),
+      getLatestWorkout(accessToken).catch(() => null),
     ]);
-    
+
     // Calculate current heart rate with decay
     const { currentHeartRate, heartRateSource } = calculateCurrentHeartRate(
       recovery?.score?.resting_heart_rate || null,
       workout
     );
-    
-    // Convert sleep duration from milliseconds to minutes
-    // const sleepDurationMs = sleep?.score?.stage_summary?.total_in_bed_time_milli || 0;
-    // const sleepDurationMinutes = Math.round(sleepDurationMs / 60000);
     
     // Convert workout duration
     let workoutDurationMinutes: number | null = null;

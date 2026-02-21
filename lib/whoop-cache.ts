@@ -205,7 +205,7 @@ export async function getStatsWithCache(
 // ============================================
 
 export async function updateCacheFromWebhook(
-  _type: 'workout' | 'sleep' | 'recovery',
+  _type: 'workout' | 'recovery',
   data: Partial<WhoopStats>
 ): Promise<void> {
   try {
