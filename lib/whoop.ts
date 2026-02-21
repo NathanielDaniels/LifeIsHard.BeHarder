@@ -5,7 +5,7 @@
 interface WhoopCycle {
   strain: number;
   recovery_score: number;
-  sleep_performance_percentage: number;
+  // sleep_performance_percentage: number;
   hrv_rmssd_milli: number;
 }
 
@@ -49,7 +49,7 @@ export function formatWhoopData(cycle: WhoopCycle | null) {
     return {
       strain: 16.8,
       recovery: 87,
-      sleep: 8.2,
+      // sleep: 8.2,
       hrv: 72
     };
   }
@@ -57,7 +57,7 @@ export function formatWhoopData(cycle: WhoopCycle | null) {
   return {
     strain: cycle.strain,
     recovery: cycle.recovery_score,
-    sleep: cycle.sleep_performance_percentage / 100 * 12, // Convert percentage to hours estimate
+    // sleep: cycle.sleep_performance_percentage / 100 * 12, // Convert percentage to hours estimate
     hrv: cycle.hrv_rmssd_milli
   };
 }

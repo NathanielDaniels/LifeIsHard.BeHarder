@@ -8,7 +8,7 @@ import {
   WhoopProfile,
   WhoopRecovery,
   WhoopCycle,
-  WhoopSleep,
+  // WhoopSleep,
   WhoopWorkout,
   WhoopStats,
   DEMO_WHOOP_STATS,
@@ -186,13 +186,13 @@ export async function getLatestCycle(accessToken: string): Promise<WhoopCycle | 
   return response.records[0] || null;
 }
 
-export async function getLatestSleep(accessToken: string): Promise<WhoopSleep | null> {
-  const response = await whoopFetch<{ records: WhoopSleep[] }>(
-    '/v2/activity/sleep?limit=1',
-    accessToken
-  );
-  return response.records[0] || null;
-}
+// export async function getLatestSleep(accessToken: string): Promise<WhoopSleep | null> {
+//   const response = await whoopFetch<{ records: WhoopSleep[] }>(
+//     '/v2/activity/sleep?limit=1',
+//     accessToken
+//   );
+//   return response.records[0] || null;
+// }
 
 /**
  * Fetches recent workouts and returns the most recent one
@@ -234,22 +234,18 @@ export async function getLatestWorkout(accessToken: string): Promise<WhoopWorkou
 export async function fetchWhoopStats(accessToken: string): Promise<WhoopStats> {
   try {
     // Fetch all data in parallel
-    const [recovery, cycle, sleep, workout] = await Promise.all([
+    const [recovery, cycle, workout] = await Promise.all([
       getLatestRecovery(accessToken).catch(() => null),
       getLatestCycle(accessToken).catch(() => null),
-      getLatestSleep(accessToken).catch(() => null),
+      // getLatestSleep(accessToken).catch(() => null),
       getLatestWorkout(accessToken).catch(() => null),
     ]);
-    
+
     // Calculate current heart rate with decay
     const { currentHeartRate, heartRateSource } = calculateCurrentHeartRate(
       recovery?.score?.resting_heart_rate || null,
       workout
     );
-    
-    // Convert sleep duration from milliseconds to minutes
-    const sleepDurationMs = sleep?.score?.stage_summary?.total_in_bed_time_milli || 0;
-    const sleepDurationMinutes = Math.round(sleepDurationMs / 60000);
     
     // Convert workout duration
     let workoutDurationMinutes: number | null = null;
@@ -285,9 +281,9 @@ export async function fetchWhoopStats(accessToken: string): Promise<WhoopStats> 
       maxHeartRate: cycle?.score?.max_heart_rate ?? null,
       
       // Sleep
-      sleepPerformance: sleep?.score?.sleep_performance_percentage ?? null,
-      sleepDuration: sleepDurationMinutes || null,
-      sleepConsistency: sleep?.score?.sleep_consistency_percentage ?? null,
+      // sleepPerformance: sleep?.score?.sleep_performance_percentage ?? null,
+      // sleepDuration: sleepDurationMinutes || null,
+      // sleepConsistency: sleep?.score?.sleep_consistency_percentage ?? null,
       
       // Last workout — show even if score is null (low-intensity activities don't score)
       lastWorkout: workout ? {
@@ -368,6 +364,74 @@ function calculateCurrentHeartRate(
   const currentHR = Math.round(workoutHR - (workoutHR - resting) * easedProgress);
   
   return { currentHeartRate: currentHR, heartRateSource: 'decay' };
+}
+
+// ============================================
+// Token Health Check
+// ============================================
+
+interface EndpointHealthResult {
+  status: number;
+  ok: boolean;
+}
+
+export interface TokenHealthReport {
+  recovery: EndpointHealthResult;
+  cycle: EndpointHealthResult;
+  // sleep: EndpointHealthResult;
+  workout: EndpointHealthResult;
+  allHealthy: boolean;
+}
+
+/**
+ * Hits all 4 WHOOP data endpoints in parallel to verify the token
+ * has working access. Logs per-endpoint results but never throws.
+ * Use after token refresh or initial OAuth to catch scope issues early.
+ */
+export async function verifyTokenHealth(accessToken: string): Promise<TokenHealthReport> {
+  const endpoints = {
+    recovery: '/v2/recovery?limit=1',
+    cycle: '/v2/cycle?limit=1',
+    // sleep: '/v2/activity/sleep?limit=1',
+    workout: '/v2/activity/workout?limit=1',
+  } as const;
+
+  const results = await Promise.all(
+    (Object.entries(endpoints) as [keyof typeof endpoints, string][]).map(
+      async ([name, path]): Promise<[keyof typeof endpoints, EndpointHealthResult]> => {
+        try {
+          const response = await fetch(`${WHOOP_API_URL}${path}`, {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+              'Content-Type': 'application/json',
+            },
+          });
+          const result: EndpointHealthResult = { status: response.status, ok: response.ok };
+          const label = response.ok ? 'OK' : 'FAILED';
+          console.log(`[whoop-health] ${name}: ${response.status} ${label}`);
+          return [name, result];
+        } catch (err) {
+          console.warn(`[whoop-health] ${name}: NETWORK ERROR`, err instanceof Error ? err.message : err);
+          return [name, { status: 0, ok: false }];
+        }
+      }
+    )
+  );
+
+  const report = Object.fromEntries(results) as Record<keyof typeof endpoints, EndpointHealthResult>;
+  const allHealthy = Object.values(report).every(r => r.ok);
+
+  if (!allHealthy) {
+    const failed = Object.entries(report)
+      .filter(([, r]) => !r.ok)
+      .map(([name, r]) => `${name}:${r.status}`)
+      .join(', ');
+    console.warn(`[whoop-health] Unhealthy endpoints: ${failed}`);
+  } else {
+    console.log('[whoop-health] All endpoints healthy');
+  }
+
+  return { ...report, allHealthy };
 }
 
 // ============================================
