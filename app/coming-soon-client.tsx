@@ -1166,14 +1166,14 @@ export default function ComingSoonClient() {
           )}
 
           {/* Data source footer */}
-          <div className="flex items-center justify-center gap-2 mt-8 font-mono text-[0.75rem] tracking-[0.2em] text-white/50">
-            <span>POWERED BY WHOOP</span>
-            <span>•</span>
-            <span>{isConnected ? 'LIVE DATA' : 'DEMO DATA'}</span>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3 mt-8 font-mono text-[0.65rem] md:text-[0.75rem] tracking-[0.2em] text-white/50">
+            <span className="whitespace-nowrap">POWERED BY WHOOP</span>
+            <span className="hidden sm:inline opacity-50">•</span>
+            <span className="whitespace-nowrap">{isConnected ? 'LIVE DATA' : 'DEMO DATA'}</span>
             {whoopStats.lastUpdated && (
               <>
-                <span>•</span>
-                <span>UPDATED {new Date(whoopStats.lastUpdated).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</span>
+                <span className="hidden sm:inline opacity-50">•</span>
+                <span className="whitespace-nowrap">UPDATED {new Date(whoopStats.lastUpdated).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</span>
               </>
             )}
           </div>
@@ -1244,11 +1244,11 @@ export default function ComingSoonClient() {
                 {message}
               </motion.div>
             ) : (
-              <form onSubmit={handleSubmit} className="relative group">
+              <form onSubmit={handleSubmit} className="relative group w-full max-w-md mx-auto">
                 <div 
-                  className="relative flex bg-white/[0.03] border border-white/10 rounded-xl p-1.5 backdrop-blur-sm transition-shadow duration-500"
+                  className="relative flex flex-col sm:flex-row gap-3 sm:gap-0 sm:bg-white/[0.03] sm:border sm:border-white/10 sm:rounded-xl sm:p-1.5 sm:backdrop-blur-sm transition-shadow duration-500"
                   style={{
-                    boxShadow: isFocused 
+                    boxShadow: isFocused && window.innerWidth >= 640
                       ? `0 0 25px ${themeColor}99, 0 0 60px ${themeColor}33` 
                       : `0 0 0px ${themeColor}00`
                   }}
@@ -1260,12 +1260,12 @@ export default function ComingSoonClient() {
                     onFocus={() => { setIsFocused(true); setIsHovering(true); }}
                     onBlur={() => { setIsFocused(false); setIsHovering(false); }}
                     placeholder="Enter your email"
-                    className="flex-1 bg-transparent px-5 py-4 text-white placeholder:text-white/30 focus:outline-none font-mono text-base"
+                    className="w-full sm:flex-1 bg-white/[0.03] sm:bg-transparent border border-white/10 sm:border-none rounded-xl sm:rounded-none px-5 py-4 text-white placeholder:text-white/30 focus:outline-none font-mono text-base text-center sm:text-left transition-colors"
                   />
                   <button
                     type="submit"
                     disabled={submitState === 'loading'}
-                    className="px-10 py-4 font-display font-bold uppercase tracking-wider text-base rounded-lg transition-all duration-300 hover:scale-105"
+                    className="w-full sm:w-auto px-6 sm:px-10 py-4 font-display font-bold uppercase tracking-wider text-base rounded-xl sm:rounded-lg transition-all duration-300 hover:scale-[1.02] sm:hover:scale-105"
                     style={{ 
                       backgroundColor: themeColor,
                       color: 'white',
