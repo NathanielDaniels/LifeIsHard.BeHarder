@@ -239,6 +239,7 @@ export async function getLatestWorkout(accessToken: string): Promise<WhoopWorkou
 // ============================================
 
 export async function fetchWhoopStats(accessToken: string): Promise<WhoopStats> {
+  console.log('[fetchWhoopStats] called', new Date().toISOString());
   try {
     // Fetch all data in parallel
     const [recovery, cycle, workout] = await Promise.all([
