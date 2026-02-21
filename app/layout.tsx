@@ -39,6 +39,7 @@ export const metadata: Metadata = {
 };
 
 import SoundController from "@/components/SoundController";
+import { Analytics } from "@vercel/analytics/next";
 
 export default function RootLayout({
   children,
@@ -54,6 +55,7 @@ export default function RootLayout({
             <SoundController />
           </SmoothScroll>
         </Providers>
+        <Analytics />
       </body>
     </html>
   );
