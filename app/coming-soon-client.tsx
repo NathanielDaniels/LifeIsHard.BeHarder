@@ -535,9 +535,37 @@ export default function ComingSoonClient() {
   }
 
   const socialLinks = [
-    { name: 'Instagram', href: 'https://www.instagram.com/patwingzzz' },
-    { name: 'Strava', href: 'https://strava.app.link/gVriWQZiL0b' },
-    { name: 'Dare2tri', href: 'https://give.dare2tri.org/fundraiser/6928347' },
+    { 
+      name: 'Instagram', 
+      href: 'https://www.instagram.com/patwingzzz',
+      icon: (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 md:w-6 md:h-6">
+          <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+          <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+          <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+        </svg>
+      )
+    },
+    { 
+      name: 'Strava', 
+      href: 'https://strava.app.link/gVriWQZiL0b',
+      icon: (
+        <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 md:w-6 md:h-6">
+          <path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169"></path>
+        </svg>
+      ) 
+    },
+    { 
+      name: 'Dare2tri', 
+      href: 'https://give.dare2tri.org/fundraiser/6928347',
+      icon: (
+        <svg viewBox="0 0 45 77" fill="currentColor" className="h-5 md:h-6 w-auto opacity-90">
+          <path d="M9.237 58.4116H0l16.5349-50.89h9.2314l-16.5292 50.89z" />
+          <path d="M34.8944 67.8667h-9.2428l16.5349-50.89h9.2371l-16.5292 50.89z" />
+          <path d="M42.5709 0h-9.2371L8.4108 76.7022h9.2429L42.5709 0z" />
+        </svg>
+      )
+    },
   ];
 
   return (
@@ -1296,18 +1324,80 @@ export default function ComingSoonClient() {
               <a
                 key={link.name}
                 href={link.href}
-                className="relative font-mono text-[0.75rem] md:text-[0.85rem] tracking-[0.2em] text-white/60 hover:text-white transition-colors duration-300 group font-medium"
+                target="_blank"
+                rel="noopener noreferrer"
+                title={link.name}
+                className="relative text-white transition-all duration-300 opacity-60 hover:opacity-100 hover:scale-110 flex items-center justify-center outline-none"
                 onMouseEnter={() => setIsHovering(true)}
                 onMouseLeave={() => setIsHovering(false)}
               >
-                {link.name}
-                <span 
-                  className="absolute -bottom-1 left-0 w-full h-px scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"
-                  style={{ backgroundColor: themeColor }}
-                />
+                {link.icon}
               </a>
             ))}
           </motion.div>
+        </motion.div>
+      </section>
+
+      {/* ==========================================
+          SECTION 4: SPONSORS & PARTNERS
+          ========================================== */}
+      <section className="relative pb-24 px-6 border-t border-white/5 bg-black">
+        <motion.div 
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 1 }}
+          className="max-w-6xl mx-auto"
+        >
+          <div className="flex items-center justify-center gap-4 md:gap-6 mb-16 w-full opacity-80">
+            <div className="h-px bg-gradient-to-r from-transparent to-white/20 flex-1 max-w-[60px] md:max-w-[150px]" />
+            <div className="flex items-center gap-3">
+              <div 
+                className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full animate-pulse flex-shrink-0"
+                style={{ backgroundColor: themeColor, boxShadow: `0 0 10px ${themeColor}` }}
+              />
+              <h2 className="font-mono text-[0.65rem] md:text-sm tracking-[0.4em] md:tracking-[0.5em] text-white/70 uppercase text-center mt-0.5">
+                SPONSORED BY
+              </h2>
+            </div>
+            <div className="h-px bg-gradient-to-l from-transparent to-white/20 flex-1 max-w-[60px] md:max-w-[150px]" />
+          </div>
+
+          <div className="flex flex-wrap justify-center items-center gap-10 md:gap-16 lg:gap-20 pr-8 md:pr-16">
+            {[
+              { src: '/sponsors/ATF_logo.png', link: 'https://www.adaptivetrainingfoundation.org/', alt: 'Adaptive Training Foundation', className: 'h-28 md:h-36 lg:h-44 invert brightness-200' },
+              // { src: '/sponsors/Logo_Dare2Tri.png', alt: 'Dare2tri', className: 'h-20 md:h-28 invert brightness-200' },
+              // Invert turns the white background black and logo white. Mix-blend-screen then makes the black background invisible!
+              { src: '/sponsors/IMG_8440.JPG', link: 'https://www.challengedathletes.org/', alt: 'Sponsor 3', className: 'h-24 md:h-32 mix-blend-screen invert grayscale opacity-100 rounded-[50%] object-cover' },
+              { src: '/sponsors/david-rotter-logo_orig.png', link: 'https://www.davidrotter.com/', alt: 'David Rotter Prosthetics', className: 'h-16 md:h-20 grayscale brightness-200' },
+            ].map((sponsor, i) => (
+              <motion.div
+                key={sponsor.alt}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: i * 0.15 }}
+                className="relative cursor-pointer transition-opacity duration-500 opacity-40 hover:opacity-100"
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                {sponsor.link ? (
+                  <a href={sponsor.link} target="_blank" rel="noopener noreferrer" className="block outline-none">
+                    <img 
+                      src={sponsor.src} 
+                      alt={sponsor.alt}
+                      className={`object-contain transition-all duration-500 ${sponsor.className}`}
+                    />
+                  </a>
+                ) : (
+                  <img 
+                    src={sponsor.src} 
+                    alt={sponsor.alt}
+                    className={`object-contain transition-all duration-500 ${sponsor.className}`}
+                  />
+                )}
+              </motion.div>
+            ))}
+          </div>
         </motion.div>
       </section>
 
