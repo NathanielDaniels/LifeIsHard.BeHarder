@@ -566,6 +566,16 @@ export default function ComingSoonClient() {
         </svg>
       )
     },
+    { 
+      name: 'Linktree', 
+      href: 'https://linktr.ee/patrickwingert',
+      icon: (
+        <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 md:w-6 md:h-6">
+          <path d="M13.435 5.589c-.198-.444-.619-.444-.817 0l-3.376 7.552h-2.93l4.632-6.525c.29-.408.29-1.07 0-1.478l-3.793-5.342h9.529l-3.794 5.342c-.29.408-.29 1.07 0 1.478l4.632 6.525h-2.93l-3.376-7.552z" />
+          <path d="M12.026 15.65c-.482 0-.872.417-.872.932v7.418h1.745v-7.418c0-.515-.39-.932-.873-.932z" />
+        </svg>
+      )
+    },
   ];
 
   return (
