@@ -191,6 +191,12 @@ async function refreshWithRetry(refreshToken: string): Promise<string> {
 
 function isAuthError(message: string): boolean {
   const lower = message.toLowerCase();
+  
+  // If it's a 500 server error, it's a WHOOP outage, NOT a dead token
+  if (lower.includes('500') || lower.includes('server_error')) {
+    return false;
+  }
+
   return (
     lower.includes('401') ||
     lower.includes('400') ||

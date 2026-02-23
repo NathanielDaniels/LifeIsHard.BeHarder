@@ -1061,7 +1061,7 @@ export default function ComingSoonClient() {
           </div>
 
           {/* Vitals Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
             {[
               {
                 label: 'RECOVERY',
@@ -1114,7 +1114,7 @@ export default function ComingSoonClient() {
                 unit: '%',
                 color: themeColor,
                 delay: 0.4,
-                condition: whoopStats.spo2 !== null,
+                condition: false, // Hidden per user request
                 tooltip: 'Blood oxygen saturation (SpO2). Healthy range is typically 95-100%.',
               },
               {
@@ -1123,7 +1123,7 @@ export default function ComingSoonClient() {
                 unit: '°C',
                 color: themeColor,
                 delay: 0.5,
-                condition: whoopStats.skinTemp !== null,
+                condition: false, // Hidden per user request
                 tooltip: 'Skin temperature in Celsius, monitored continuously by WHOOP.',
               },
               {
