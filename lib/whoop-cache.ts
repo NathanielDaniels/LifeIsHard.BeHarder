@@ -19,8 +19,8 @@ import { WhoopStats } from '@/types/whoop';
 const TABLE = 'whoop_cache';
 const CACHE_ID = 'primary';
 
-// How long cached data is considered fresh (5 minutes)
-const CACHE_TTL_MS = parseInt(process.env.WHOOP_CACHE_TTL || '300000', 10);
+// How long cached data is considered fresh (1 minute for near real-time updates)
+const CACHE_TTL_MS = parseInt(process.env.WHOOP_CACHE_TTL || '60000', 10);
 
 // Minimum gap between WHOOP API calls regardless of cache state (30 seconds)
 // Protects against stampedes on cold starts

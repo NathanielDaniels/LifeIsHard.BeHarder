@@ -20,8 +20,8 @@ const WHOOP_TOKEN_URL = `${WHOOP_API_BASE}/oauth/oauth2/token`;
 const WHOOP_API_URL = `${WHOOP_API_BASE}/developer`;
 
 // Minimum workout duration to show as "Last Workout" (in minutes)
-// Skips low-effort activities like stretching, dog walking
-const MIN_WORKOUT_DURATION_MINUTES = 10;
+// Set to 0 to capture all logged activities immediately
+const MIN_WORKOUT_DURATION_MINUTES = 0;
 
 // ============================================
 // Configuration
@@ -114,6 +114,7 @@ export async function refreshAccessToken(refreshToken: string): Promise<WhoopTok
       refresh_token: refreshToken,
       client_id: config.clientId,
       client_secret: config.clientSecret,
+      redirect_uri: config.redirectUri,
       scope: 'offline',
     }),
   });
@@ -154,6 +155,10 @@ async function whoopFetch<T>(
     throw new Error('Rate limited by WHOOP API');
   }
   
+  if (response.status === 401) {
+    throw new Error('WHOOP_UNAUTHORIZED');
+  }
+
   if (!response.ok) {
     const error = await response.text();
     throw new Error(`WHOOP API error: ${response.status} - ${error}`);
@@ -167,20 +172,21 @@ async function whoopFetch<T>(
 // ============================================
 
 export async function getProfile(accessToken: string): Promise<WhoopProfile> {
-  return whoopFetch<WhoopProfile>('/v2/user/profile/basic', accessToken);
+  return whoopFetch<WhoopProfile>('/v1/user/profile/basic', accessToken);
 }
 
 export async function getLatestRecovery(accessToken: string): Promise<WhoopRecovery | null> {
   const response = await whoopFetch<{ records: WhoopRecovery[] }>(
-    '/v2/recovery?limit=1',
+    '/v1/recovery?limit=3&order=descending',
     accessToken
   );
+  console.log('[DEBUG] Recovery records:', JSON.stringify(response.records, null, 2));
   return response.records[0] || null;
 }
 
 export async function getLatestCycle(accessToken: string): Promise<WhoopCycle | null> {
   const response = await whoopFetch<{ records: WhoopCycle[] }>(
-    '/v2/cycle?limit=1',
+    '/v1/cycle?limit=1&order=descending',
     accessToken
   );
   return response.records[0] || null;
@@ -188,7 +194,7 @@ export async function getLatestCycle(accessToken: string): Promise<WhoopCycle | 
 
 // export async function getLatestSleep(accessToken: string): Promise<WhoopSleep | null> {
 //   const response = await whoopFetch<{ records: WhoopSleep[] }>(
-//     '/v2/activity/sleep?limit=1',
+//     '/v1/activity/sleep?limit=1&order=descending',
 //     accessToken
 //   );
 //   return response.records[0] || null;
@@ -204,7 +210,7 @@ export async function getLatestCycle(accessToken: string): Promise<WhoopCycle | 
  */
 export async function getLatestWorkout(accessToken: string): Promise<WhoopWorkout | null> {
   const response = await whoopFetch<{ records: WhoopWorkout[] }>(
-    '/v2/activity/workout?limit=5',
+    '/v1/activity/workout?limit=5&order=descending',
     accessToken
   );
 
@@ -235,10 +241,19 @@ export async function fetchWhoopStats(accessToken: string): Promise<WhoopStats> 
   try {
     // Fetch all data in parallel
     const [recovery, cycle, workout] = await Promise.all([
-      getLatestRecovery(accessToken).catch(() => null),
-      getLatestCycle(accessToken).catch(() => null),
+      getLatestRecovery(accessToken).catch((e) => { 
+        if (e.message === 'WHOOP_UNAUTHORIZED') throw e;
+        console.error('Recovery fetch error:', e); return null; 
+      }),
+      getLatestCycle(accessToken).catch((e) => { 
+        if (e.message === 'WHOOP_UNAUTHORIZED') throw e;
+        console.error('Cycle fetch error:', e); return null; 
+      }),
       // getLatestSleep(accessToken).catch(() => null),
-      getLatestWorkout(accessToken).catch(() => null),
+      getLatestWorkout(accessToken).catch((e) => { 
+        if (e.message === 'WHOOP_UNAUTHORIZED') throw e;
+        console.error('Workout fetch error:', e); return null; 
+      }),
     ]);
 
     // Calculate current heart rate with decay
@@ -390,10 +405,10 @@ export interface TokenHealthReport {
  */
 export async function verifyTokenHealth(accessToken: string): Promise<TokenHealthReport> {
   const endpoints = {
-    recovery: '/v2/recovery?limit=1',
-    cycle: '/v2/cycle?limit=1',
-    // sleep: '/v2/activity/sleep?limit=1',
-    workout: '/v2/activity/workout?limit=1',
+    recovery: '/v1/recovery?limit=1',
+    cycle: '/v1/cycle?limit=1',
+    // sleep: '/v1/activity/sleep?limit=1',
+    workout: '/v1/activity/workout?limit=1',
   } as const;
 
   const results = await Promise.all(

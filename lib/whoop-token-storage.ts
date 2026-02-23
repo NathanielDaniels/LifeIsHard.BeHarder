@@ -125,6 +125,14 @@ export async function getValidAccessToken(): Promise<string | null> {
   if (!tokens) return null; // Never connected
 
   const isExpired = Date.now() >= tokens.expires_at - EXPIRY_BUFFER_MS;
+  console.log('[DEBUG] Token Expiry Check:', {
+    now: Date.now(),
+    expiresAt: tokens.expires_at,
+    expiresAtType: typeof tokens.expires_at,
+    buffer: EXPIRY_BUFFER_MS,
+    isExpired
+  });
+  
   if (!isExpired) return tokens.access_token;
 
   // Token expired — attempt refresh

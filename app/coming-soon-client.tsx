@@ -1351,7 +1351,7 @@ export default function ComingSoonClient() {
       {/* ==========================================
           SECTION 4: SPONSORS & PARTNERS
           ========================================== */}
-      <section className="relative pb-24 px-6 border-t border-white/5 bg-black">
+      <section className="relative py-24 px-6 bg-black">
         <motion.div 
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
@@ -1367,7 +1367,7 @@ export default function ComingSoonClient() {
                 style={{ backgroundColor: themeColor, boxShadow: `0 0 10px ${themeColor}` }}
               />
               <h2 className="font-mono text-[0.65rem] md:text-sm tracking-[0.4em] md:tracking-[0.5em] text-white/70 uppercase text-center mt-0.5">
-                SPONSORED BY
+                SPONSORS
               </h2>
             </div>
             <div className="h-px bg-gradient-to-l from-transparent to-white/20 flex-1 max-w-[60px] md:max-w-[150px]" />
@@ -1378,8 +1378,8 @@ export default function ComingSoonClient() {
               { src: '/sponsors/ATF_logo.png', link: 'https://www.adaptivetrainingfoundation.org/', alt: 'Adaptive Training Foundation', className: 'h-28 md:h-36 lg:h-44 invert brightness-200' },
               // { src: '/sponsors/Logo_Dare2Tri.png', alt: 'Dare2tri', className: 'h-20 md:h-28 invert brightness-200' },
               // Invert turns the white background black and logo white. Mix-blend-screen then makes the black background invisible!
-              { src: '/sponsors/IMG_8440.JPG', link: 'https://www.challengedathletes.org/', alt: 'Sponsor 3', className: 'h-24 md:h-32 mix-blend-screen invert grayscale opacity-100 rounded-[50%] object-cover' },
-              { src: '/sponsors/david-rotter-logo_orig.png', link: 'https://www.davidrotter.com/', alt: 'David Rotter Prosthetics', className: 'h-16 md:h-20 grayscale brightness-200' },
+              { src: '/sponsors/CAF_logo.png', link: 'https://www.challengedathletes.org/', alt: 'Sponsor 3', className: 'h-24 md:h-32 mix-blend-screen invert grayscale group-hover:grayscale-0 group-hover:invert-0 opacity-100 rounded-[50%] object-cover' },
+              { src: '/sponsors/david-rotter-logo_orig.png', link: 'https://www.rotterprosthetics.com/', alt: 'David Rotter Prosthetics', className: 'h-16 md:h-20 grayscale group-hover:grayscale-0 brightness-200 group-hover:brightness-100' },
             ].map((sponsor, i) => (
               <motion.div
                 key={sponsor.alt}
@@ -1387,7 +1387,7 @@ export default function ComingSoonClient() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: i * 0.15 }}
-                className="relative cursor-pointer transition-opacity duration-500 opacity-40 hover:opacity-100"
+                className="relative cursor-pointer transition-opacity duration-500 opacity-40 hover:opacity-100 group"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 {sponsor.link ? (

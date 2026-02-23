@@ -71,8 +71,20 @@ export async function GET(request: NextRequest) {
       fetchWhoopStats(accessToken!)
     );
     return NextResponse.json({ ...stats, mode: 'live' });
-  } catch (err) {
+  } catch (err: any) {
     console.error('[stats] fetchWhoopStats error:', err);
+
+    if (err.message === 'WHOOP_UNAUTHORIZED') {
+      // Token was revoked or rotated manually in Whoop. 
+      // Clear our DB so the UI goes back to "Connect Whoop" state.
+      const { clearTokens } = await import('@/lib/whoop-token-storage');
+      await clearTokens().catch(() => {});
+      
+      return NextResponse.json(
+        { ...getDemoStats(), mode: 'unauthorized', authRequired: true },
+        { status: 200 }
+      );
+    }
 
     // Try stale cache before giving up
     const { getStaleStats } = await import('@/lib/whoop-cache');
