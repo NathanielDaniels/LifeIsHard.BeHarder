@@ -114,8 +114,6 @@ export async function refreshAccessToken(refreshToken: string): Promise<WhoopTok
       refresh_token: refreshToken,
       client_id: config.clientId,
       client_secret: config.clientSecret,
-      redirect_uri: config.redirectUri,
-      scope: 'offline',
     }),
   });
   
