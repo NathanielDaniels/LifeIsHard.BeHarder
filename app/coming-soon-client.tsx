@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useRef, useMemo, FormEvent } from 'react';
+import Image from 'next/image';
 import { motion, AnimatePresence, useSpring, useTransform, useScroll } from 'framer-motion';
 import { useVitality } from '@/contexts/VitalityContext';
 import { useWhoop } from '@/contexts/WhoopContext';
@@ -270,6 +271,7 @@ export default function ComingSoonClient() {
   const [isFocused, setIsFocused] = useState(false);
   
   // Date counters
+  const [mounted, setMounted] = useState(false);
   const [daysSinceAccident, setDaysSinceAccident] = useState(0);
   const [daysSober, setDaysSober] = useState(0);
   const [daysUntilRace, setDaysUntilRace] = useState(0);
@@ -279,6 +281,8 @@ export default function ComingSoonClient() {
   const hasScrolledRef = useRef(false);
 
   useEffect(() => {
+    setMounted(true);
+    
     const timer = setTimeout(() => {
       if (!hasScrolledRef.current) setShowScrollHint(true);
     }, 8000);
@@ -1055,7 +1059,7 @@ export default function ComingSoonClient() {
               style={{ backgroundColor: isConnected ? '#00ff00' : themeColor, boxShadow: `0 0 10px ${isConnected ? '#00ff00' : themeColor}` }}
             />
             <h2 className="font-mono text-xs tracking-[0.5em] text-white/50 uppercase">
-              {isConnected ? 'Live Biometrics' : 'Biometric Data'} - {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase()}
+              {isConnected ? 'Live Biometrics' : 'Biometric Data'} - {new Date().toLocaleDateString('en-US', { timeZone: 'America/Chicago', month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase()}
             </h2>
             <div className="flex-1 h-px bg-white/10" />
           </div>
@@ -1179,7 +1183,7 @@ export default function ComingSoonClient() {
                   </span>
                 </div>
                 <span className="ml-auto font-mono text-[0.75rem] text-white/40">
-                  {new Date(whoopStats.lastWorkout.completedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} • {whoopStats.lastWorkout.duration} min
+                  {new Date(whoopStats.lastWorkout.completedAt).toLocaleDateString('en-US', { timeZone: 'America/Chicago', month: 'short', day: 'numeric' })} • {whoopStats.lastWorkout.duration} min
                 </span>
               </div>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -1211,7 +1215,7 @@ export default function ComingSoonClient() {
             {whoopStats.lastUpdated && (
               <>
                 <span className="hidden sm:inline opacity-50">•</span>
-                <span className="whitespace-nowrap">UPDATED {new Date(whoopStats.lastUpdated).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</span>
+                <span className="whitespace-nowrap">UPDATED {new Date(whoopStats.lastUpdated).toLocaleTimeString('en-US', { timeZone: 'America/Chicago', hour: '2-digit', minute: '2-digit' })}</span>
               </>
             )}
           </div>
@@ -1415,13 +1419,19 @@ export default function ComingSoonClient() {
           FOOTER
           ========================================== */}
       <footer className="relative py-8 px-6 border-t border-white/5">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+        <div className="max-w-6xl mx-auto flex flex-row justify-between items-center gap-4">
           <span className="font-display text-base tracking-[0.2em] text-white/60">
             PATRICK WINGERT
           </span>
-          <span className="font-mono text-[0.65rem] tracking-[0.2em] text-white/50 font-medium">
-            DARE2TRI ELITE TEAM ATHLETE
-          </span>
+          <div className="flex items-center justify-end opacity-60 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-300 cursor-pointer">
+            <Image 
+              src="/sponsors/D2T_logo_short.webp" 
+              alt="Dare2Tri Elite Team Athlete." 
+              width={120} 
+              height={40} 
+              className="object-contain"
+            />
+          </div>
         </div>
       </footer>
     </div>
