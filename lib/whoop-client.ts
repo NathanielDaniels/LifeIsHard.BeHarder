@@ -20,8 +20,8 @@ const WHOOP_TOKEN_URL = `${WHOOP_API_BASE}/oauth/oauth2/token`;
 const WHOOP_API_URL = `${WHOOP_API_BASE}/developer`;
 
 // Minimum workout duration to show as "Last Workout" (in minutes)
-// Set to 0 to capture all logged activities immediately
-const MIN_WORKOUT_DURATION_MINUTES = 0;
+// Skips low-effort activities like stretching, dog walking
+const MIN_WORKOUT_DURATION_MINUTES = 19;
 
 // ============================================
 // Configuration
