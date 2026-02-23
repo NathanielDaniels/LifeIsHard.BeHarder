@@ -17,6 +17,10 @@ export const metadata: Metadata = {
   description: "Life is Hard. Be Harder. Follow Patrick Wingert's journey as a Dare2tri Elite Team athlete, record-setting trekker, and unstoppable force in adaptive-sports.",
   keywords: ["Patrick Wingert", "Dare2tri", "adaptive-athlete", "elite athlete", "Bhutan trek", "adaptive sports"],
   authors: [{ name: "Patrick Wingert" }],
+  icons: {
+    icon: '/pat-icon-orange.png',
+    apple: '/pat-icon-orange.png',
+  },
   openGraph: {
     title: "Patrick Wingert | Dare2tri Elite Team Athlete",
     description: "Life is Hard. Be Harder. Record-setting adaptive-athlete pushing limits and inspiring possibility.",
