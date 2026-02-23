@@ -403,10 +403,10 @@ export interface TokenHealthReport {
  */
 export async function verifyTokenHealth(accessToken: string): Promise<TokenHealthReport> {
   const endpoints = {
-    recovery: '/v1/recovery?limit=1',
-    cycle: '/v1/cycle?limit=1',
-    // sleep: '/v1/activity/sleep?limit=1',
-    workout: '/v1/activity/workout?limit=1',
+    recovery: '/v2/recovery?limit=1',
+    cycle: '/v2/cycle?limit=1',
+    // sleep: '/v2/activity/sleep?limit=1',
+    workout: '/v2/activity/workout?limit=1',
   } as const;
 
   const results = await Promise.all(
