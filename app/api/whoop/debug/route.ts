@@ -13,16 +13,16 @@ export async function GET() {
   const token = tokens.access_token;
 
   const [profile, workout, recovery, cycle] = await Promise.all([
-    fetch('https://api.prod.whoop.com/developer/v1/user/profile/basic', {
+    fetch('https://api.prod.whoop.com/developer/v2/user/profile/basic', {
       headers: { Authorization: `Bearer ${token}` },
     }).then(async r => ({ status: r.status, body: await r.text() })),
-    fetch('https://api.prod.whoop.com/developer/v1/activity/workout?limit=5', {
+    fetch('https://api.prod.whoop.com/developer/v2/activity/workout?limit=5', {
       headers: { Authorization: `Bearer ${token}` },
     }).then(async r => ({ status: r.status, body: await r.text() })),
-    fetch('https://api.prod.whoop.com/developer/v1/recovery?limit=1', {
+    fetch('https://api.prod.whoop.com/developer/v2/recovery?limit=1', {
       headers: { Authorization: `Bearer ${token}` },
     }).then(async r => ({ status: r.status, body: await r.text() })),
-    fetch('https://api.prod.whoop.com/developer/v1/cycle?limit=1', {
+    fetch('https://api.prod.whoop.com/developer/v2/cycle?limit=1', {
       headers: { Authorization: `Bearer ${token}` },
     }).then(async r => ({ status: r.status, body: await r.text() })),
   ]);

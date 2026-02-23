@@ -172,12 +172,12 @@ async function whoopFetch<T>(
 // ============================================
 
 export async function getProfile(accessToken: string): Promise<WhoopProfile> {
-  return whoopFetch<WhoopProfile>('/v1/user/profile/basic', accessToken);
+  return whoopFetch<WhoopProfile>('/v2/user/profile/basic', accessToken);
 }
 
 export async function getLatestRecovery(accessToken: string): Promise<WhoopRecovery | null> {
   const response = await whoopFetch<{ records: WhoopRecovery[] }>(
-    '/v1/recovery?limit=3&order=descending',
+    '/v2/recovery?limit=3&order=descending',
     accessToken
   );
   console.log('[DEBUG] Recovery records:', JSON.stringify(response.records, null, 2));
@@ -186,7 +186,7 @@ export async function getLatestRecovery(accessToken: string): Promise<WhoopRecov
 
 export async function getLatestCycle(accessToken: string): Promise<WhoopCycle | null> {
   const response = await whoopFetch<{ records: WhoopCycle[] }>(
-    '/v1/cycle?limit=1&order=descending',
+    '/v2/cycle?limit=1&order=descending',
     accessToken
   );
   return response.records[0] || null;
@@ -194,7 +194,7 @@ export async function getLatestCycle(accessToken: string): Promise<WhoopCycle | 
 
 // export async function getLatestSleep(accessToken: string): Promise<WhoopSleep | null> {
 //   const response = await whoopFetch<{ records: WhoopSleep[] }>(
-//     '/v1/activity/sleep?limit=1&order=descending',
+//     '/v2/activity/sleep?limit=1&order=descending',
 //     accessToken
 //   );
 //   return response.records[0] || null;
@@ -210,7 +210,7 @@ export async function getLatestCycle(accessToken: string): Promise<WhoopCycle | 
  */
 export async function getLatestWorkout(accessToken: string): Promise<WhoopWorkout | null> {
   const response = await whoopFetch<{ records: WhoopWorkout[] }>(
-    '/v1/activity/workout?limit=5&order=descending',
+    '/v2/activity/workout?limit=5&order=descending',
     accessToken
   );
 
