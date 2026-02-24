@@ -749,30 +749,78 @@ export default function ComingSoonClient() {
             </div>
 
             {/* Center Loader */}
-            <div className="w-full max-w-xs relative">
+            <div className="w-full max-w-xs relative mt-8">
                {/* Label above bar */}
                <motion.p
                  initial={{ opacity: 0 }}
                  animate={{ opacity: 1 }}
                  transition={{ delay: 0.8 }}
-                 className="font-mono text-xs md:text-sm tracking-[0.3em] text-white/70 mb-3 text-center font-medium"
+                 className="font-mono text-xs md:text-sm tracking-[0.3em] text-white/70 mb-6 text-center font-medium"
                >
                  CONNECTING TO PATRICK&apos;S BIOMETRICS
                </motion.p>
-
-               {/* Progress Line */}
-               <div className="h-[2px] w-full bg-white/10 overflow-hidden">
+               
+               {/* ------------------------------- */}
+               {/* Biometric Body Loading Outline  */}
+               {/* ------------------------------- */}
+               <div className="relative w-24 h-32 mx-auto mb-6 flex flex-col items-center justify-end">
+                 {/* Ghost/Empty state */}
+                 <svg 
+                   className="absolute bottom-0 w-full h-full text-white/10" 
+                   viewBox="0 0 100 250" 
+                   fill="currentColor"
+                   style={{ transform: 'scaleX(-1)' }}
+                 >
+                   {/* Custom Amputee Silhouette SVG */}
+                   <circle cx="50" cy="24" r="14" />
+                   {/* Body */}
+                   <path d="M 30,52 Q 50,48 70,52 Q 86,52 86,68 L 86,138 
+                            A 5,5 0 0,1 76,138 L 76,80 Q 76,72 70,72 L 70,160 
+                            A 8,8 0 0,1 54,160 L 54,140 A 4,4 0 0,0 46,140 L 46,238 
+                            A 8,8 0 0,1 30,238 L 30,72 Q 24,72 24,80 L 24,138 
+                            A 5,5 0 0,1 14,138 L 14,68 Q 14,52 30,52 Z" />
+                   {/* Prosthetic Rod */}
+                   <path d="M 60,166 L 60,185 L 58,188 L 58,196 L 60,199 
+                            L 60,220 L 58,222 L 58,228 L 60,230 L 60,240 
+                            L 55,242 L 55,246 L 69,246 L 69,242 L 64,240 
+                            L 64,230 L 66,228 L 66,222 L 64,220 L 64,199 
+                            L 66,196 L 66,188 L 64,185 L 64,166 Z" />
+                 </svg>
+                 
+                 {/* Filled state, clipped by height */}
                  <div 
-                   className="h-full transition-all duration-300 ease-out"
-                   style={{ 
-                     width: `${loadingProgress}%`,
-                     backgroundColor: themeColor 
-                   }}
-                 />
+                   className="absolute bottom-0 w-full overflow-hidden transition-all duration-300 ease-out flex justify-center"
+                   style={{ height: `${loadingProgress}%` }}
+                 >
+                   <svg 
+                     className="absolute bottom-0 w-full h-32" 
+                     viewBox="0 0 100 250" 
+                     fill={themeColor}
+                     style={{ 
+                       filter: `drop-shadow(0 0 6px ${themeColor})`,
+                       transform: 'scaleX(-1)' 
+                     }}
+                   >
+                     {/* Custom Amputee Silhouette SVG */}
+                     <circle cx="50" cy="24" r="14" />
+                     {/* Body */}
+                     <path d="M 30,52 Q 50,48 70,52 Q 86,52 86,68 L 86,138 
+                              A 5,5 0 0,1 76,138 L 76,80 Q 76,72 70,72 L 70,160 
+                              A 8,8 0 0,1 54,160 L 54,140 A 4,4 0 0,0 46,140 L 46,238 
+                              A 8,8 0 0,1 30,238 L 30,72 Q 24,72 24,80 L 24,138 
+                              A 5,5 0 0,1 14,138 L 14,68 Q 14,52 30,52 Z" />
+                     {/* Prosthetic Rod */}
+                     <path d="M 60,166 L 60,185 L 58,188 L 58,196 L 60,199 
+                              L 60,220 L 58,222 L 58,228 L 60,230 L 60,240 
+                              L 55,242 L 55,246 L 69,246 L 69,242 L 64,240 
+                              L 64,230 L 66,228 L 66,222 L 64,220 L 64,199 
+                              L 66,196 L 66,188 L 64,185 L 64,166 Z" />
+                   </svg>
+                 </div>
                </div>
                
-               {/* Status Text */}
-               <div className="flex justify-between items-end mt-3 font-mono text-sm tracking-widest text-white/80">
+               {/* Status Text under the outline */}
+               <div className="flex justify-between items-end mt-3 font-mono text-sm tracking-widest text-white/80 border-t border-white/10 pt-4">
                   {loadingProgress >= 99 ? (
                     <motion.span 
                       initial={{ opacity: 0 }}
