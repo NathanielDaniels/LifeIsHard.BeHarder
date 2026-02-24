@@ -157,6 +157,14 @@ async function refreshWithRetry(refreshToken: string): Promise<string> {
     // WHOOP returns 401/400 when refresh token is expired/revoked
     // Don't retry — re-auth is required
     if (isAuthError(message)) {
+      // Race condition mitigation: Wait 2 seconds for any concurrent worker's `upsert` to land in Supabase
+      await sleep(2000);
+      const dbTokens = await getStoredTokens();
+      if (dbTokens && dbTokens.refresh_token !== refreshToken) {
+        console.log('[whoop-token-storage] Concurrency race condition prevented. Returning new access token from DB.', { old: refreshToken.slice(-4), new: dbTokens.refresh_token.slice(-4) });
+        return dbTokens.access_token;
+      }
+
       console.error('[whoop-token-storage] Refresh token expired/revoked:', message);
       // Clear dead tokens so the UI doesn't keep trying
       await clearTokens().catch(() => {}); // swallow — best effort
@@ -180,6 +188,13 @@ async function refreshWithRetry(refreshToken: string): Promise<string> {
     const message = err instanceof Error ? err.message : String(err);
 
     if (isAuthError(message)) {
+      await sleep(2000);
+      const dbTokens = await getStoredTokens();
+      if (dbTokens && dbTokens.refresh_token !== refreshToken) {
+        console.log('[whoop-token-storage] Concurrency race condition prevented on retry. Returning new access token from DB.');
+        return dbTokens.access_token;
+      }
+
       await clearTokens().catch(() => {});
       throw new TokenExpiredError();
     }
