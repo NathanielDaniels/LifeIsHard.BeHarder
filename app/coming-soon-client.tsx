@@ -966,10 +966,13 @@ export default function ComingSoonClient() {
         </motion.div>
       </section>
 
+      {/* Cinematic Beat / Negative Space */}
+      <div className="w-full h-[20vh] pointer-events-none" />
+
       {/* ==========================================
           SECTION 2: THE STORY / STATS
           ========================================== */}
-      <section className="relative min-h-screen flex items-center justify-center py-24 px-6">
+      <section className="relative min-h-screen flex items-center justify-center py-16 md:py-20 px-6">
         <motion.div 
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
@@ -983,7 +986,7 @@ export default function ComingSoonClient() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
-            className="relative mb-16"
+            className="relative mb-8 md:mb-12"
           >
             <span 
               className="absolute -top-8 -left-4 text-[8rem] leading-none font-display opacity-20"
@@ -1007,6 +1010,31 @@ export default function ComingSoonClient() {
               <br />
               THEY WERE WRONG.
             </h2>
+          </motion.div>
+
+          {/* Pat Image */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="w-full flex justify-center mb-8 md:mb-10 pointer-events-none"
+          >
+            <div className="relative pointer-events-auto">
+              {/* Optional glow effect behind the image */}
+              <div 
+                className="absolute inset-0 blur-[100px] opacity-20 rounded-full"
+                style={{ backgroundColor: themeColor }}
+              />
+              <Image
+                src="/pat-crop.png"
+                alt="Patrick Wingert"
+                width={800}
+                height={800}
+                className="relative z-10 object-contain drop-shadow-2xl grayscale hover:grayscale-0 transition-all duration-700 max-h-[40vh] md:max-h-[45vh] w-auto"
+                priority
+              />
+            </div>
           </motion.div>
 
           {/* Stats Grid */}
@@ -1041,10 +1069,140 @@ export default function ComingSoonClient() {
         </motion.div>
       </section>
 
+            {/* ==========================================
+          SECTION 3: EMAIL CAPTURE
+          ========================================== */}
+      <section className="relative flex items-center justify-center py-32 md:py-48 px-6 min-h-[70vh]">
+        <motion.div 
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 1 }}
+          className="max-w-xl w-full text-center"
+        >
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="font-mono text-[0.7rem] md:text-[0.75rem] tracking-[0.5em] text-white/60 mb-4 font-medium"
+          >
+            THE FULL STORY DROPS SOON
+          </motion.p>
+
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+            className="font-display text-5xl md:text-7xl lg:text-8xl font-bold mb-6 tracking-tight leading-none"
+          >
+            DON'T MISS <span style={{ color: themeColor }}>THE MOMENT.</span>
+          </motion.h2>
+          
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 }}
+            className="text-lg text-white/50 mb-10 max-w-lg mx-auto leading-relaxed"
+          >
+            An immersive digital experience documenting the journey of breaking every limit. 
+            Be the first to witness it.
+          </motion.p>
+
+          {/* Email Form */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.3 }}
+            className="mb-12"
+          >
+            {submitState === 'success' ? (
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                className="p-6 rounded-xl border text-center"
+                style={{ 
+                  backgroundColor: `${themeColor}1A`, 
+                  borderColor: `${themeColor}4D`,
+                  color: themeColor
+                }}
+              >
+                <span className="text-2xl mb-2 block">✓</span>
+                {message}
+              </motion.div>
+            ) : (
+              <form onSubmit={handleSubmit} className="relative group w-full max-w-md mx-auto">
+                <div 
+                  className="relative flex flex-col sm:flex-row gap-3 sm:gap-0 sm:bg-white/[0.03] sm:border sm:border-white/10 sm:rounded-xl sm:p-1.5 sm:backdrop-blur-sm transition-shadow duration-500"
+                  style={{
+                    boxShadow: isFocused && window.innerWidth >= 640
+                      ? `0 0 25px ${themeColor}99, 0 0 60px ${themeColor}33` 
+                      : `0 0 0px ${themeColor}00`
+                  }}
+                >
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    onFocus={() => { setIsFocused(true); setIsHovering(true); }}
+                    onBlur={() => { setIsFocused(false); setIsHovering(false); }}
+                    placeholder="Enter your email"
+                    className="w-full sm:flex-1 bg-white/[0.03] sm:bg-transparent border border-white/10 sm:border-none rounded-xl sm:rounded-none px-5 py-4 text-white placeholder:text-white/30 focus:outline-none font-mono text-base text-center sm:text-left transition-colors"
+                  />
+                  <button
+                    type="submit"
+                    disabled={submitState === 'loading'}
+                    className="w-full sm:w-auto px-6 sm:px-10 py-4 font-display font-bold uppercase tracking-wider text-base rounded-xl sm:rounded-lg transition-all duration-300 hover:scale-[1.02] sm:hover:scale-105"
+                    style={{ 
+                      backgroundColor: themeColor,
+                      color: 'white',
+                      boxShadow: `0 0 30px ${themeColor}4D`
+                    }}
+                    onMouseEnter={() => setIsHovering(true)}
+                    onMouseLeave={() => setIsHovering(false)}
+                  >
+                    {submitState === 'loading' ? '...' : 'NOTIFY ME'}
+                  </button>
+                </div>
+              </form>
+            )}
+            {submitState === 'error' && (
+              <p className="text-red-500 text-sm mt-3">{message}</p>
+            )}
+          </motion.div>
+
+          {/* Social Links */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.5 }}
+            className="flex justify-center gap-8"
+          >
+            {socialLinks.map((link) => (
+              <a
+                key={link.name}
+                href={link.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                title={link.name}
+                className="relative text-white transition-all duration-300 opacity-60 hover:opacity-100 hover:scale-110 flex items-center justify-center outline-none"
+                onMouseEnter={() => setIsHovering(true)}
+                onMouseLeave={() => setIsHovering(false)}
+              >
+                {link.icon}
+              </a>
+            ))}
+          </motion.div>
+        </motion.div>
+      </section>
+
       {/* ==========================================
           SECTION 2.5: LIVE BIOMETRICS
           ========================================== */}
-      <section className="relative py-24 px-6">
+      <section className="relative py-32 md:py-48 px-6">
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0 }}
@@ -1222,140 +1380,83 @@ export default function ComingSoonClient() {
         </motion.div>
       </section>
 
-      {/* ==========================================
-          SECTION 3: EMAIL CAPTURE
-          ========================================== */}
-      <section className="relative min-h-screen flex items-center justify-center py-24 px-6 bg-gradient-to-b from-transparent via-black/50 to-black">
-        <motion.div 
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 1 }}
-          className="max-w-xl w-full text-center"
-        >
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
+      {/* Pat Image 2 (Cinematic Reveal) */}
+      <section className="relative w-full flex justify-center py-32 md:py-48 overflow-hidden">
+        {/* Background Massive Text */}
+        {/* <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0 select-none">
+          <motion.h2 
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
-            className="font-mono text-[0.7rem] md:text-[0.75rem] tracking-[0.5em] text-white/60 mb-4 font-medium"
+            transition={{ duration: 2, ease: "easeOut" }}
+            className="font-display text-[clamp(5rem,15vw,20rem)] font-bold whitespace-nowrap text-white/[0.03]"
           >
-            THE FULL STORY DROPS SOON
-          </motion.p>
-
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.1 }}
-            className="font-display text-5xl md:text-7xl lg:text-8xl font-bold mb-6 tracking-tight leading-none"
-          >
-            DON'T MISS <span style={{ color: themeColor }}>THE MOMENT.</span>
+            RELENTLESS
           </motion.h2>
-          
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.2 }}
-            className="text-lg text-white/50 mb-10 max-w-lg mx-auto leading-relaxed"
-          >
-            An immersive digital experience documenting the journey of breaking every limit. 
-            Be the first to witness it.
-          </motion.p>
+        </div> */}
 
-          {/* Email Form */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.3 }}
-            className="mb-12"
-          >
-            {submitState === 'success' ? (
-              <motion.div
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                className="p-6 rounded-xl border text-center"
-                style={{ 
-                  backgroundColor: `${themeColor}1A`, 
-                  borderColor: `${themeColor}4D`,
-                  color: themeColor
-                }}
-              >
-                <span className="text-2xl mb-2 block">✓</span>
-                {message}
-              </motion.div>
-            ) : (
-              <form onSubmit={handleSubmit} className="relative group w-full max-w-md mx-auto">
-                <div 
-                  className="relative flex flex-col sm:flex-row gap-3 sm:gap-0 sm:bg-white/[0.03] sm:border sm:border-white/10 sm:rounded-xl sm:p-1.5 sm:backdrop-blur-sm transition-shadow duration-500"
-                  style={{
-                    boxShadow: isFocused && window.innerWidth >= 640
-                      ? `0 0 25px ${themeColor}99, 0 0 60px ${themeColor}33` 
-                      : `0 0 0px ${themeColor}00`
-                  }}
-                >
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    onFocus={() => { setIsFocused(true); setIsHovering(true); }}
-                    onBlur={() => { setIsFocused(false); setIsHovering(false); }}
-                    placeholder="Enter your email"
-                    className="w-full sm:flex-1 bg-white/[0.03] sm:bg-transparent border border-white/10 sm:border-none rounded-xl sm:rounded-none px-5 py-4 text-white placeholder:text-white/30 focus:outline-none font-mono text-base text-center sm:text-left transition-colors"
-                  />
-                  <button
-                    type="submit"
-                    disabled={submitState === 'loading'}
-                    className="w-full sm:w-auto px-6 sm:px-10 py-4 font-display font-bold uppercase tracking-wider text-base rounded-xl sm:rounded-lg transition-all duration-300 hover:scale-[1.02] sm:hover:scale-105"
-                    style={{ 
-                      backgroundColor: themeColor,
-                      color: 'white',
-                      boxShadow: `0 0 30px ${themeColor}4D`
-                    }}
-                    onMouseEnter={() => setIsHovering(true)}
-                    onMouseLeave={() => setIsHovering(false)}
-                  >
-                    {submitState === 'loading' ? '...' : 'NOTIFY ME'}
-                  </button>
-                </div>
-              </form>
-            )}
-            {submitState === 'error' && (
-              <p className="text-red-500 text-sm mt-3">{message}</p>
-            )}
-          </motion.div>
-
-          {/* Social Links */}
-          <motion.div
+        {/* Ambient Backlight Glow */}
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
+          <motion.div 
             initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
+            whileInView={{ opacity: 0.15 }}
             viewport={{ once: true }}
-            transition={{ delay: 0.5 }}
-            className="flex justify-center gap-8"
+            transition={{ duration: 1.5, delay: 0.5 }}
+            className="w-[60vw] h-[60vw] max-w-[600px] max-h-[600px] rounded-full blur-[100px] md:blur-[120px]"
+            style={{ backgroundColor: themeColor }}
+          />
+        </div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 1, ease: "easeOut" }}
+          className="relative pointer-events-auto z-10 w-full max-w-5xl px-6"
+        >
+          {/* Background: Black and white original image */}
+          <motion.div
+            initial={{ scale: 1 }}
+            whileInView={{ scale: 1.05 }}
+            viewport={{ once: true, margin: "-30% 0px -30% 0px", amount: 0.3 }}
+            transition={{ duration: 2, ease: "easeOut" }}
           >
-            {socialLinks.map((link) => (
-              <a
-                key={link.name}
-                href={link.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                title={link.name}
-                className="relative text-white transition-all duration-300 opacity-60 hover:opacity-100 hover:scale-110 flex items-center justify-center outline-none"
-                onMouseEnter={() => setIsHovering(true)}
-                onMouseLeave={() => setIsHovering(false)}
-              >
-                {link.icon}
-              </a>
-            ))}
+            <Image
+              src="/pat-run.jpg"
+              alt="Patrick Wingert running background"
+              width={1200}
+              height={1200}
+              className="relative z-0 object-contain drop-shadow-2xl grayscale max-h-[85vh] w-full"
+              priority
+            />
           </motion.div>
+          
+          {/* Foreground: Color cropped image that reveals dynamically on scroll */}
+          {mounted && (
+            <motion.div
+              initial={{ opacity: 0, scale: 1 }}
+              whileInView={{ opacity: 1, scale: 1.05 }}
+              viewport={{ once: true, margin: "-30% 0px -30% 0px", amount: 0.3 }}
+              transition={{ duration: 2, ease: "easeOut" }}
+              className="absolute inset-0 top-0 left-0 px-6 z-10"
+            >
+              <Image
+                src="/pat-crop-run.png"
+                alt="Patrick Wingert running color overlay"
+                width={1200}
+                height={1200}
+                className="w-full h-full object-contain drop-shadow-2xl"
+                priority
+              />
+            </motion.div>
+          )}
         </motion.div>
       </section>
 
       {/* ==========================================
           SECTION 4: SPONSORS & PARTNERS
           ========================================== */}
-      <section className="relative py-24 px-6 bg-black">
+      <section className="relative z-20 py-32 md:py-40 px-6 backdrop-blur-2xl border-t border-white/5">
         <motion.div 
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
@@ -1418,12 +1519,17 @@ export default function ComingSoonClient() {
       {/* ==========================================
           FOOTER
           ========================================== */}
-      <footer className="relative py-8 px-6 border-t border-white/5">
+      <footer className="relative z-20 py-8 px-6 border-t border-white/5 bg-black">
         <div className="max-w-6xl mx-auto flex flex-row justify-between items-center gap-4">
           <span className="font-display text-base tracking-[0.2em] text-white/60">
             PATRICK WINGERT
           </span>
-          <div className="flex items-center justify-end opacity-60 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-300 cursor-pointer">
+          <a 
+            href="https://dare2tri.org/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-end opacity-60 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-300 cursor-pointer outline-none"
+          >
             <Image 
               src="/sponsors/D2T_logo_short.webp" 
               alt="Dare2Tri Elite Team Athlete." 
@@ -1431,7 +1537,7 @@ export default function ComingSoonClient() {
               height={40} 
               className="object-contain"
             />
-          </div>
+          </a>
         </div>
       </footer>
     </div>
