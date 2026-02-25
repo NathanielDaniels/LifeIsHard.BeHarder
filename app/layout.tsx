@@ -44,6 +44,7 @@ export const metadata: Metadata = {
 
 import SoundController from "@/components/SoundController";
 import { Analytics } from "@vercel/analytics/next";
+import { GoogleAnalytics } from '@next/third-parties/google';
 
 export default function RootLayout({
   children,
@@ -60,6 +61,7 @@ export default function RootLayout({
           </SmoothScroll>
         </Providers>
         <Analytics />
+        <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID || ''} />
       </body>
     </html>
   );
