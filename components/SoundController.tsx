@@ -31,7 +31,6 @@ export default function SoundController() {
   // Initialize Audio Context (must be user triggered partially, but we setup ref first)
   const initAudio = () => {
     if (!audioContextRef.current) {
-        // @ts-expect-error - webkitAudioContext fallback
         const AudioContextClass = window.AudioContext || window.webkitAudioContext;
         audioContextRef.current = new AudioContextClass();
         
