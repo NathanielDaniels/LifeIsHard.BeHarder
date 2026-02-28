@@ -151,12 +151,12 @@ export default function SoundController() {
           audioContextRef.current.currentTime,
           0.5,
         );
+        if (droneOscRef.current) {
+          droneOscRef.current.stop(audioContextRef.current.currentTime + 1);
+          droneOscRef.current = null;
+        }
       }
       if (timerIDRef.current) clearTimeout(timerIDRef.current);
-      if (droneOscRef.current) {
-        droneOscRef.current.stop(audioContextRef.current!.currentTime + 1);
-        droneOscRef.current = null;
-      }
       setIsPlaying(false);
     } else {
       // Init and Fade in
