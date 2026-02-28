@@ -13,14 +13,14 @@
 //   updated_at  timestamptz       (last write)
 // ============================================
 
-import { supabase } from './supabase';
-import { WhoopStats } from '@/types/whoop';
+import { supabase } from "./supabase";
+import { WhoopStats } from "@/types/whoop";
 
-const TABLE = 'whoop_cache';
-const CACHE_ID = 'primary';
+const TABLE = "whoop_cache";
+const CACHE_ID = "primary";
 
 // How long cached data is considered fresh (1 minute for near real-time updates)
-const CACHE_TTL_MS = parseInt(process.env.WHOOP_CACHE_TTL || '60000', 10);
+const CACHE_TTL_MS = parseInt(process.env.WHOOP_CACHE_TTL || "60000", 10);
 
 // Minimum gap between WHOOP API calls regardless of cache state (30 seconds)
 // Protects against stampedes on cold starts
@@ -49,9 +49,9 @@ export async function getCachedStats(): Promise<WhoopStats | null> {
   try {
     const { data, error } = await supabase
       .from(TABLE)
-      .select('stats, fetched_at')
-      .eq('id', CACHE_ID)
-      .single();
+      .select("stats, fetched_at")
+      .eq("id", CACHE_ID)
+      .maybeSingle();
 
     if (error || !data) return null;
 
@@ -60,7 +60,7 @@ export async function getCachedStats(): Promise<WhoopStats | null> {
 
     return data.stats as WhoopStats;
   } catch (err) {
-    console.error('[whoop-cache] getCachedStats error:', err);
+    console.error("[whoop-cache] getCachedStats error:", err);
     return null;
   }
 }
@@ -69,18 +69,21 @@ export async function getCachedStats(): Promise<WhoopStats | null> {
  * Returns stale cached stats regardless of TTL.
  * Used as a last resort when WHOOP API is unreachable.
  */
-export async function getStaleStats(): Promise<{ stats: WhoopStats; fetchedAt: string } | null> {
+export async function getStaleStats(): Promise<{
+  stats: WhoopStats;
+  fetchedAt: string;
+} | null> {
   try {
     const { data, error } = await supabase
       .from(TABLE)
-      .select('stats, fetched_at')
-      .eq('id', CACHE_ID)
-      .single();
+      .select("stats, fetched_at")
+      .eq("id", CACHE_ID)
+      .maybeSingle();
 
     if (error || !data) return null;
     return { stats: data.stats as WhoopStats, fetchedAt: data.fetched_at };
   } catch (err) {
-    console.error('[whoop-cache] getStaleStats error:', err);
+    console.error("[whoop-cache] getStaleStats error:", err);
     return null;
   }
 }
@@ -92,23 +95,21 @@ export async function getStaleStats(): Promise<{ stats: WhoopStats; fetchedAt: s
 export async function setCachedStats(stats: WhoopStats): Promise<void> {
   try {
     const now = new Date().toISOString();
-    const { error } = await supabase
-      .from(TABLE)
-      .upsert(
-        {
-          id: CACHE_ID,
-          stats,
-          fetched_at: now,
-          updated_at: now,
-        },
-        { onConflict: 'id' }
-      );
+    const { error } = await supabase.from(TABLE).upsert(
+      {
+        id: CACHE_ID,
+        stats,
+        fetched_at: now,
+        updated_at: now,
+      },
+      { onConflict: "id" },
+    );
 
     if (error) {
-      console.error('[whoop-cache] setCachedStats error:', error);
+      console.error("[whoop-cache] setCachedStats error:", error);
     }
   } catch (err) {
-    console.error('[whoop-cache] setCachedStats exception:', err);
+    console.error("[whoop-cache] setCachedStats exception:", err);
   }
 }
 
@@ -124,13 +125,13 @@ export async function invalidateCache(): Promise<void> {
         fetched_at: new Date(0).toISOString(), // epoch = always expired
         updated_at: new Date().toISOString(),
       })
-      .eq('id', CACHE_ID);
+      .eq("id", CACHE_ID);
 
     if (error) {
-      console.error('[whoop-cache] invalidateCache error:', error);
+      console.error("[whoop-cache] invalidateCache error:", error);
     }
   } catch (err) {
-    console.error('[whoop-cache] invalidateCache exception:', err);
+    console.error("[whoop-cache] invalidateCache exception:", err);
   }
 }
 
@@ -146,9 +147,9 @@ export async function canFetch(): Promise<boolean> {
   try {
     const { data, error } = await supabase
       .from(TABLE)
-      .select('fetched_at')
-      .eq('id', CACHE_ID)
-      .single();
+      .select("fetched_at")
+      .eq("id", CACHE_ID)
+      .maybeSingle();
 
     if (error || !data) return true; // No record = definitely can fetch
 
@@ -173,7 +174,7 @@ export async function canFetch(): Promise<boolean> {
  * 4. Rate-limited, no cache → throw (caller falls back to demo)
  */
 export async function getStatsWithCache(
-  fetchFn: () => Promise<WhoopStats>
+  fetchFn: () => Promise<WhoopStats>,
 ): Promise<WhoopStats> {
   // 1. Fresh cache hit
   const cached = await getCachedStats();
@@ -190,13 +191,17 @@ export async function getStatsWithCache(
   // 3. Rate-limited — return stale rather than nothing
   const staleResult = await getStaleStats();
   if (staleResult) {
-    const ageMinutes = Math.round((Date.now() - new Date(staleResult.fetchedAt).getTime()) / 60000);
-    console.warn(`[whoop-cache] Serving stale data — last fresh fetch was ${ageMinutes}m ago`);
+    const ageMinutes = Math.round(
+      (Date.now() - new Date(staleResult.fetchedAt).getTime()) / 60000,
+    );
+    console.warn(
+      `[whoop-cache] Serving stale data — last fresh fetch was ${ageMinutes}m ago`,
+    );
     return staleResult.stats;
   }
 
   // 4. Nothing available
-  throw new Error('Rate-limited and no cached data available');
+  throw new Error("Rate-limited and no cached data available");
 }
 
 // ============================================
@@ -205,8 +210,8 @@ export async function getStatsWithCache(
 // ============================================
 
 export async function updateCacheFromWebhook(
-  _type: 'workout' | 'recovery',
-  data: Partial<WhoopStats>
+  _type: "workout" | "recovery",
+  data: Partial<WhoopStats>,
 ): Promise<void> {
   try {
     const staleResult = await getStaleStats();
@@ -220,10 +225,9 @@ export async function updateCacheFromWebhook(
 
     await setCachedStats(merged);
   } catch (err) {
-    console.error('[whoop-cache] updateCacheFromWebhook error:', err);
+    console.error("[whoop-cache] updateCacheFromWebhook error:", err);
   }
 }
-
 
 // // ============================================
 // // WHOOP Stats Cache
@@ -255,12 +259,12 @@ export async function updateCacheFromWebhook(
 
 // export function getCachedStats(): WhoopStats | null {
 //   if (!cache) return null;
-  
+
 //   const age = Date.now() - cache.timestamp;
 //   if (age > CACHE_TTL) {
 //     return null; // Cache expired
 //   }
-  
+
 //   return cache.stats;
 // }
 
@@ -297,7 +301,7 @@ export async function updateCacheFromWebhook(
 //   if (cached) {
 //     return cached;
 //   }
-  
+
 //   // Rate limit protection
 //   if (!canFetch()) {
 //     // Return stale cache if available, otherwise throw
@@ -306,11 +310,11 @@ export async function updateCacheFromWebhook(
 //     }
 //     throw new Error('Rate limited - please wait before retrying');
 //   }
-  
+
 //   // Fetch fresh data
 //   const stats = await fetchFn();
 //   setCachedStats(stats);
-  
+
 //   return stats;
 // }
 
@@ -324,7 +328,7 @@ export async function updateCacheFromWebhook(
 //   data: Partial<WhoopStats>
 // ): void {
 //   if (!cache) return;
-  
+
 //   // Merge new data into cache
 //   cache.stats = {
 //     ...cache.stats,
