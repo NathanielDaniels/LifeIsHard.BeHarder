@@ -10,11 +10,11 @@
 //   updated_at      timestamptz
 // ============================================
 
-import { supabase } from './supabase';
-import { WhoopTokens } from '@/types/whoop';
+import { supabase } from "./supabase";
+import { WhoopTokens } from "@/types/whoop";
 
-const TABLE = 'whoop_tokens';
-const SINGLE_USER_ID = 'primary';
+const TABLE = "whoop_tokens";
+const SINGLE_USER_ID = "primary";
 
 // Refresh token 10 minutes before expiry (was 5 — more headroom)
 const EXPIRY_BUFFER_MS = 10 * 60 * 1000;
@@ -27,9 +27,9 @@ export async function getStoredTokens(): Promise<WhoopTokens | null> {
   try {
     const { data, error } = await supabase
       .from(TABLE)
-      .select('access_token, refresh_token, expires_at')
-      .eq('id', SINGLE_USER_ID)
-      .single();
+      .select("access_token, refresh_token, expires_at")
+      .eq("id", SINGLE_USER_ID)
+      .maybeSingle();
 
     if (error || !data) return null;
 
@@ -39,14 +39,14 @@ export async function getStoredTokens(): Promise<WhoopTokens | null> {
       expires_at: data.expires_at,
     };
   } catch (err) {
-    console.error('[whoop-token-storage] getStoredTokens error:', err);
+    console.error("[whoop-token-storage] getStoredTokens error:", err);
     return null;
   }
 }
 
 export async function storeTokens(
   tokens: WhoopTokens,
-  userId?: number
+  userId?: number,
 ): Promise<void> {
   const row: Record<string, unknown> = {
     id: SINGLE_USER_ID,
@@ -62,10 +62,10 @@ export async function storeTokens(
 
   const { error } = await supabase
     .from(TABLE)
-    .upsert(row, { onConflict: 'id' });
+    .upsert(row, { onConflict: "id" });
 
   if (error) {
-    console.error('[whoop-token-storage] storeTokens error:', error);
+    console.error("[whoop-token-storage] storeTokens error:", error);
     throw new Error(`Token storage failed: ${error.message}`);
   }
 }
@@ -74,10 +74,10 @@ export async function clearTokens(): Promise<void> {
   const { error } = await supabase
     .from(TABLE)
     .delete()
-    .eq('id', SINGLE_USER_ID);
+    .eq("id", SINGLE_USER_ID);
 
   if (error) {
-    console.error('[whoop-token-storage] clearTokens error:', error);
+    console.error("[whoop-token-storage] clearTokens error:", error);
     throw new Error(`Token clear failed: ${error.message}`);
   }
 }
@@ -93,15 +93,17 @@ export async function isAuthorized(): Promise<boolean> {
 
 export class TokenExpiredError extends Error {
   constructor() {
-    super('WHOOP refresh token is expired or revoked. Re-authorization required.');
-    this.name = 'TokenExpiredError';
+    super(
+      "WHOOP refresh token is expired or revoked. Re-authorization required.",
+    );
+    this.name = "TokenExpiredError";
   }
 }
 
 export class TokenRefreshError extends Error {
   constructor(cause: string) {
     super(`Token refresh failed: ${cause}`);
-    this.name = 'TokenRefreshError';
+    this.name = "TokenRefreshError";
   }
 }
 
@@ -125,31 +127,44 @@ export async function getValidAccessToken(): Promise<string | null> {
   if (!tokens) return null; // Never connected
 
   const isExpired = Date.now() >= tokens.expires_at - EXPIRY_BUFFER_MS;
-  console.log('[DEBUG] Token Expiry Check:', {
+  console.log("[DEBUG] Token Expiry Check:", {
     now: Date.now(),
     expiresAt: tokens.expires_at,
     expiresAtType: typeof tokens.expires_at,
     buffer: EXPIRY_BUFFER_MS,
-    isExpired
+    isExpired,
   });
-  
+
   if (!isExpired) return tokens.access_token;
 
   // Token expired — attempt refresh
   return refreshWithRetry(tokens.refresh_token);
 }
 
+/**
+ * Forcefully refreshes the access token, bypassing the local expiry check.
+ * Useful when the WHOOP API returns 401 indicating the token is dead despite our local timestamp.
+ */
+export async function forceRefreshToken(): Promise<string | null> {
+  const tokens = await getStoredTokens();
+  if (!tokens) return null;
+  console.log("[whoop-token-storage] Forcing token refresh due to API 401...");
+  return refreshWithRetry(tokens.refresh_token);
+}
+
 async function refreshWithRetry(refreshToken: string): Promise<string> {
-  const { refreshAccessToken } = await import('./whoop-client');
+  const { refreshAccessToken } = await import("./whoop-client");
 
   // Attempt 1
   try {
     const newTokens = await refreshAccessToken(refreshToken);
     await storeTokens(newTokens);
     // Fire-and-forget health check after successful refresh
-    import('./whoop-client').then(({ verifyTokenHealth }) =>
-      verifyTokenHealth(newTokens.access_token)
-    ).catch(() => {}); // swallow — observability only
+    import("./whoop-client")
+      .then(({ verifyTokenHealth }) =>
+        verifyTokenHealth(newTokens.access_token),
+      )
+      .catch(() => {}); // swallow — observability only
     return newTokens.access_token;
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
@@ -161,17 +176,29 @@ async function refreshWithRetry(refreshToken: string): Promise<string> {
       await sleep(2000);
       const dbTokens = await getStoredTokens();
       if (dbTokens && dbTokens.refresh_token !== refreshToken) {
-        console.log('[whoop-token-storage] Concurrency race condition prevented. Returning new access token from DB.', { old: refreshToken.slice(-4), new: dbTokens.refresh_token.slice(-4) });
+        console.log(
+          "[whoop-token-storage] Concurrency race condition prevented. Returning new access token from DB.",
+          {
+            old: refreshToken.slice(-4),
+            new: dbTokens.refresh_token.slice(-4),
+          },
+        );
         return dbTokens.access_token;
       }
 
-      console.error('[whoop-token-storage] Refresh token expired/revoked:', message);
+      console.error(
+        "[whoop-token-storage] Refresh token expired/revoked:",
+        message,
+      );
       // Clear dead tokens so the UI doesn't keep trying
       await clearTokens().catch(() => {}); // swallow — best effort
       throw new TokenExpiredError();
     }
 
-    console.warn('[whoop-token-storage] Refresh attempt 1 failed, retrying in 1.5s:', message);
+    console.warn(
+      "[whoop-token-storage] Refresh attempt 1 failed, retrying in 1.5s:",
+      message,
+    );
   }
 
   // Attempt 2 — 1.5s delay for transient network issues
@@ -180,9 +207,11 @@ async function refreshWithRetry(refreshToken: string): Promise<string> {
     const newTokens = await refreshAccessToken(refreshToken);
     await storeTokens(newTokens);
     // Fire-and-forget health check after successful retry
-    import('./whoop-client').then(({ verifyTokenHealth }) =>
-      verifyTokenHealth(newTokens.access_token)
-    ).catch(() => {}); // swallow — observability only
+    import("./whoop-client")
+      .then(({ verifyTokenHealth }) =>
+        verifyTokenHealth(newTokens.access_token),
+      )
+      .catch(() => {}); // swallow — observability only
     return newTokens.access_token;
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
@@ -191,7 +220,9 @@ async function refreshWithRetry(refreshToken: string): Promise<string> {
       await sleep(2000);
       const dbTokens = await getStoredTokens();
       if (dbTokens && dbTokens.refresh_token !== refreshToken) {
-        console.log('[whoop-token-storage] Concurrency race condition prevented on retry. Returning new access token from DB.');
+        console.log(
+          "[whoop-token-storage] Concurrency race condition prevented on retry. Returning new access token from DB.",
+        );
         return dbTokens.access_token;
       }
 
@@ -199,33 +230,42 @@ async function refreshWithRetry(refreshToken: string): Promise<string> {
       throw new TokenExpiredError();
     }
 
-    console.error('[whoop-token-storage] Refresh attempt 2 failed:', message);
+    console.error("[whoop-token-storage] Refresh attempt 2 failed:", message);
     throw new TokenRefreshError(message);
   }
 }
 
 function isAuthError(message: string): boolean {
   const lower = message.toLowerCase();
-  
+
   // If it's a 500 server error, it's a WHOOP outage, NOT a dead token
-  if (lower.includes('500') || lower.includes('server_error')) {
+  if (lower.includes("500") || lower.includes("server_error")) {
     return false;
   }
 
-  return (
-    lower.includes('401') ||
-    lower.includes('400') ||
-    lower.includes('invalid_grant') ||
-    lower.includes('invalid grant') ||
-    lower.includes('token has been revoked') ||
-    lower.includes('unauthorized')
-  );
+  // A 401 on the token endpoint definitively means the token/client is bad
+  if (lower.includes("401") || lower.includes("unauthorized")) {
+    return true;
+  }
+
+  // Explicitly check for definitive OAuth2 invalidation signals
+  if (
+    lower.includes("invalid_grant") ||
+    lower.includes("invalid grant") ||
+    lower.includes("invalid_client") ||
+    lower.includes("token has been revoked")
+  ) {
+    return true;
+  }
+
+  // A generic 400 could be rate limiting, malformed request, or temporary API weirdness.
+  // We should NOT clear tokens just for a generic 400 unless it has invalid_grant.
+  return false;
 }
 
 function sleep(ms: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
-
 
 // // ============================================
 // // WHOOP Token Storage (Supabase)
