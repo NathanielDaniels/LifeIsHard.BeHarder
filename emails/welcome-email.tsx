@@ -203,7 +203,7 @@ export default function WelcomeEmail({ email }: WelcomeEmailProps) {
             {/* Social links */}
             <Text style={socialRow}>
               <Link
-                href="https://www.instagram.com/patrick.wingert"
+                href="https://www.instagram.com/patwingzzz"
                 style={socialLink}
               >
                 INSTAGRAM
