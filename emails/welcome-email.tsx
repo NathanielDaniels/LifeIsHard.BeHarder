@@ -208,7 +208,7 @@ export default function WelcomeEmail({ email }: WelcomeEmailProps) {
               >
                 INSTAGRAM
               </Link>
-              <span style={socialDot}> • </span>
+              {/* <span style={socialDot}> • </span>
               <Link
                 href="https://strava.app.link/gVriWQZiL0b"
                 style={socialLink}
@@ -221,7 +221,7 @@ export default function WelcomeEmail({ email }: WelcomeEmailProps) {
                 style={socialLink}
               >
                 DARE2TRI
-              </Link>
+              </Link> */}
             </Text>
 
             {/* Muted footer text */}
