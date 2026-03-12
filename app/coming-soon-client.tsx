@@ -1,10 +1,17 @@
 'use client';
 
-import { useEffect, useState, useRef, useMemo, FormEvent } from 'react';
+import { useEffect, useState, useRef, useMemo } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence, useSpring, useTransform, useScroll } from 'framer-motion';
 import { useVitality } from '@/contexts/VitalityContext';
 import { useWhoop } from '@/contexts/WhoopContext';
+import GlitchText from '@/components/shared/GlitchText';
+import AnimatedCounter from '@/components/shared/AnimatedCounter';
+import FloatingParticles from '@/components/shared/FloatingParticles';
+import BiometricCard from '@/components/shared/BiometricCard';
+import EmailCapture from '@/components/shared/EmailCapture';
+import SocialLinks from '@/components/shared/SocialLinks';
+import CustomCursor from '@/components/shared/CustomCursor';
 
 // ============================================
 // UPDATE THESE DATES WITH ACTUAL VALUES
@@ -14,262 +21,11 @@ const SOBRIETY_DATE = new Date('2020-1-20');
 const NEXT_RACE_DATE = new Date('2026-4-11');
 // ============================================
 
-// --- Sub-components ---
-
-function FloatingParticles({ themeColor }: { themeColor: string }) {
-  const [particles, setParticles] = useState<Array<{ id: number; left: string; delay: string; duration: string; size: number }>>([]);
-
-  useEffect(() => {
-    const newParticles = Array.from({ length: 30 }).map((_, i) => ({
-      id: i,
-      left: `${Math.random() * 100}%`,
-      delay: `${Math.random() * 5}s`,
-      duration: `${10 + Math.random() * 10}s`,
-      size: Math.random() * 3 + 1,
-    }));
-    setParticles(newParticles);
-  }, []);
-
-  return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none z-10">
-      {particles.map((p) => (
-        <div
-          key={p.id}
-          className="absolute bottom-0 rounded-full blur-[1px] animate-float-particle"
-          style={{
-            backgroundColor: themeColor,
-            left: p.left,
-            width: p.size,
-            height: p.size,
-            opacity: 0.4,
-            // @ts-expect-error custom css vars
-            '--delay': p.delay,
-            '--duration': p.duration,
-            '--particle-opacity': 0.3 + Math.random() * 0.4,
-          }}
-        />
-      ))}
-    </div>
-  );
-}
-
-// Glitch text effect for "BE HARDER."
-function GlitchText({ text, themeColor }: { text: string; themeColor: string }) {
-  return (
-    <span className="relative inline-block">
-      <span 
-        className="relative z-10"
-        style={{ 
-          color: themeColor,
-          textShadow: `0 0 30px ${themeColor}66, 3px 3px 0 rgba(0,0,0,0.4)`
-        }}
-      >
-        {text}
-      </span>
-      {/* Cyan ghost */}
-      <span 
-        className="absolute top-0 left-0 z-0 opacity-80"
-        style={{ 
-          color: '#0ff',
-          animation: 'glitch-1 3s infinite'
-        }}
-        aria-hidden="true"
-      >
-        {text}
-      </span>
-      {/* Magenta ghost */}
-      <span 
-        className="absolute top-0 left-0 z-0 opacity-80"
-        style={{ 
-          color: '#f0f',
-          animation: 'glitch-2 3s infinite'
-        }}
-        aria-hidden="true"
-      >
-        {text}
-      </span>
-    </span>
-  );
-}
-
-// Animated counter that counts up
-function AnimatedCounter({ value, duration = 2000 }: { value: number; duration?: number }) {
-  const [displayValue, setDisplayValue] = useState(0);
-  const [hasAnimated, setHasAnimated] = useState(false);
-
-  useEffect(() => {
-    if (hasAnimated) return;
-    const startTime = Date.now();
-    const animate = () => {
-      const elapsed = Date.now() - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-      const eased = 1 - Math.pow(1 - progress, 3); // ease-out cubic
-      setDisplayValue(Math.floor(eased * value));
-      
-      if (progress < 1) {
-        requestAnimationFrame(animate);
-      } else {
-        setHasAnimated(true);
-      }
-    };
-    requestAnimationFrame(animate);
-  }, [value, duration, hasAnimated]);
-
-  return <>{displayValue.toLocaleString()}</>;
-}
-
-interface BiometricCardProps {
-  label: string;
-  value: string | number | null;
-  unit: string;
-  color: string;
-  delay: number;
-  subtext?: string;
-  tooltip?: React.ReactNode;
-  tooltipTitle?: string;
-  animateValue?: { animate: Record<string, unknown>; transition: Record<string, unknown> };
-  index?: number;
-}
-
-function BiometricCard({ label, value, unit, color, delay, subtext, tooltip, tooltipTitle, animateValue, index }: BiometricCardProps) {
-  const ValueTag = animateValue ? motion.span : 'span';
-  const valueProps = animateValue ? animateValue : {};
-  const [tooltipOpen, setTooltipOpen] = useState(false);
-
-  // Close tooltip if tapping anywhere outside
-  useEffect(() => {
-    if (!tooltipOpen) return;
-    const handleOutsideClick = () => setTooltipOpen(false);
-    window.addEventListener('click', handleOutsideClick);
-    return () => window.removeEventListener('click', handleOutsideClick);
-  }, [tooltipOpen]);
-
-  // Only one tooltip open at a time
-  useEffect(() => {
-    const handleClose = (e: CustomEvent) => {
-      if (e.detail !== label) setTooltipOpen(false);
-    };
-    window.addEventListener('single-tooltip', handleClose as EventListener);
-    return () => window.removeEventListener('single-tooltip', handleClose as EventListener);
-  }, [label]);
-
-  const toggleTooltip = (e: React.MouseEvent) => {
-    if (tooltip) {
-      e.stopPropagation();
-      const nextState = !tooltipOpen;
-      setTooltipOpen(nextState);
-      if (nextState) {
-        window.dispatchEvent(new CustomEvent('single-tooltip', { detail: label }));
-      }
-    }
-  };
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.5, delay }}
-      className={`bg-white/[0.03] border border-white/10 rounded-lg p-5 backdrop-blur-sm relative transition-colors duration-300 cursor-pointer active:bg-white/[0.06] hover:bg-white/[0.05] ${
-        tooltipOpen ? 'z-50' : 'z-10'
-      }`}
-      onClick={toggleTooltip}
-    >
-      {tooltip && (
-        <div
-          className="absolute top-3 right-3 z-50 flex items-center justify-center w-5 h-5 rounded-full transition-all duration-300 cursor-pointer group border border-white/10 backdrop-blur-md"
-          onClick={toggleTooltip}
-          style={{
-            boxShadow: tooltipOpen ? `0 0 12px ${color}30` : 'none',
-            borderColor: tooltipOpen ? `${color}80` : undefined,
-          }}
-          aria-label={`Info: ${label}`}
-        >
-          <span 
-            className="font-mono text-[9px] font-bold transition-colors duration-300"
-            style={{ color: tooltipOpen ? color : 'rgba(255,255,255,0.4)' }}
-          >
-            i
-          </span>
-        </div>
-      )}
-
-      {/* Full Card Tooltip Overlay */}
-      <AnimatePresence>
-        {tooltip && tooltipOpen && (
-          <motion.div
-            initial={{ opacity: 0, backdropFilter: 'blur(0px)' }}
-            animate={{ opacity: 1, backdropFilter: 'blur(16px)' }}
-            exit={{ opacity: 0, backdropFilter: 'blur(0px)' }}
-            transition={{ duration: 0.3 }}
-            className="absolute inset-0 z-[60] rounded-lg overflow-hidden flex flex-col p-3.5 md:p-4 cursor-pointer bg-black/95 text-left"
-            onClick={toggleTooltip}
-            style={{
-              boxShadow: `inset 0 0 40px ${color}15`,
-              border: `1px solid ${color}40`,
-            }}
-          >
-            {/* Glowing Effects */}
-            <div 
-              className="absolute top-0 left-0 w-full h-[1px] opacity-70" 
-              style={{ background: `linear-gradient(90deg, transparent, ${color}, transparent)` }} 
-            />
-            <div
-              className="absolute inset-0 opacity-10 pointer-events-none"
-              style={{ background: `radial-gradient(circle at center, ${color} 0%, transparent 70%)` }}
-            />
-            
-            {/* Overlay Content */}
-            <div className="relative z-10 w-full flex flex-col h-full items-start overflow-hidden pt-1">
-              <div className="flex w-full justify-between items-start mb-2 shrink-0">
-                <span className="font-mono text-[0.60rem] tracking-[0.2em] uppercase opacity-90" style={{ color }}>
-                  {tooltipTitle || `${label} Details`}
-                </span>
-                <span className="text-white/40 group-hover:text-white/70 transition-colors ml-2 cursor-pointer mt-0.5" onClick={toggleTooltip}>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                  </svg>
-                </span>
-              </div>
-              <div className="w-full flex-1 overflow-y-auto pr-1 pb-1">
-                <span className="font-sans text-[11px] md:text-xs leading-[1.6] text-white/90 block break-words">
-                  {tooltip}
-                </span>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-      <span className="font-mono text-[0.75rem] tracking-[0.3em] text-white/60 block mb-3">{label}</span>
-      <div className="flex items-end gap-1">
-        <ValueTag
-          className="font-display text-5xl md:text-6xl font-bold leading-none"
-          style={{ color }}
-          {...valueProps}
-        >
-          {value !== null ? value : '—'}
-        </ValueTag>
-        <span className="font-mono text-sm text-white/50 mb-1">{unit}</span>
-      </div>
-      {subtext && (
-        <span className="font-mono text-[0.65rem] text-white/40 mt-2 block">
-          {subtext}
-        </span>
-      )}
-    </motion.div>
-  );
-}
-
 // --- Main Component ---
 
 export default function ComingSoonClient() {
   const [phase, setPhase] = useState(0);
-  const [email, setEmail] = useState('');
-  const [submitState, setSubmitState] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
-  const [message, setMessage] = useState('');
-  const [isFocused, setIsFocused] = useState(false);
-  
+
   // Date counters
   const [mounted, setMounted] = useState(false);
   const [daysSinceAccident, setDaysSinceAccident] = useState(0);
@@ -300,10 +56,9 @@ export default function ComingSoonClient() {
     };
   }, []);
 
-  // Custom cursor
+  // Mouse tracking for cursor and parallax
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const mousePositionRef = useRef({ x: 0, y: 0 });
-  const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 });
   const [isHovering, setIsHovering] = useState(false);
 
   // Vitality Integration
@@ -396,19 +151,6 @@ export default function ComingSoonClient() {
     setDaysUntilRace(Math.max(0, Math.floor((NEXT_RACE_DATE.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))));
   }, []);
 
-  // Smooth cursor follow
-  useEffect(() => {
-    let animationId: number;
-    const animate = () => {
-      setCursorPosition(prev => ({
-        x: prev.x + (mousePositionRef.current.x - prev.x) * 0.15,
-        y: prev.y + (mousePositionRef.current.y - prev.y) * 0.15,
-      }));
-      animationId = requestAnimationFrame(animate);
-    };
-    animationId = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(animationId);
-  }, []);
 
     // ============================================
   // CONNECTION-SYNCED PROGRESS BAR
@@ -512,76 +254,6 @@ export default function ComingSoonClient() {
     document.body.style.overflow = phase < 1 ? 'hidden' : '';
   }, [phase]);
 
-  async function handleSubmit(e: FormEvent) {
-    e.preventDefault();
-    if (!email || submitState === 'loading') return;
-
-    setSubmitState('loading');
-    try {
-      const res = await fetch('/api/subscribe', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setSubmitState('success');
-        setMessage(data.message);
-        setEmail('');
-      } else {
-        setSubmitState('error');
-        setMessage(data.error);
-      }
-    } catch {
-      setSubmitState('error');
-      setMessage('Something went wrong. Try again.');
-    }
-  }
-
-  const socialLinks = [
-    { 
-      name: 'Instagram', 
-      href: 'https://www.instagram.com/patwingzzz',
-      icon: (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 md:w-6 md:h-6">
-          <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
-          <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
-          <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
-        </svg>
-      )
-    },
-    { 
-      name: 'Strava', 
-      href: 'https://strava.app.link/gVriWQZiL0b',
-      icon: (
-        <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 md:w-6 md:h-6">
-          <path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169"></path>
-        </svg>
-      ) 
-    },
-    { 
-      name: 'Dare2tri', 
-      href: 'https://give.dare2tri.org/fundraiser/6928347',
-      icon: (
-        <svg viewBox="0 0 45 77" fill="currentColor" className="h-5 md:h-6 w-auto opacity-90">
-          <path d="M9.237 58.4116H0l16.5349-50.89h9.2314l-16.5292 50.89z" />
-          <path d="M34.8944 67.8667h-9.2428l16.5349-50.89h9.2371l-16.5292 50.89z" />
-          <path d="M42.5709 0h-9.2371L8.4108 76.7022h9.2429L42.5709 0z" />
-        </svg>
-      )
-    },
-    { 
-      name: 'Linktree', 
-      href: 'https://linktr.ee/patrickwingert',
-      icon: (
-        <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 md:w-6 md:h-6">
-          <path d="M13.435 5.589c-.198-.444-.619-.444-.817 0l-3.376 7.552h-2.93l4.632-6.525c.29-.408.29-1.07 0-1.478l-3.793-5.342h9.529l-3.794 5.342c-.29.408-.29 1.07 0 1.478l4.632 6.525h-2.93l-3.376-7.552z" />
-          <path d="M12.026 15.65c-.482 0-.872.417-.872.932v7.418h1.745v-7.418c0-.515-.39-.932-.873-.932z" />
-        </svg>
-      )
-    },
-  ];
-
   return (
     <div 
       className="relative bg-[#050505] text-white overflow-x-hidden cursor-crosshair"
@@ -616,24 +288,7 @@ export default function ComingSoonClient() {
       `}</style>
 
       {/* Custom Cursor */}
-      <div
-        className="fixed w-5 h-5 border rounded-full pointer-events-none z-[9999] mix-blend-difference transition-transform duration-100 hidden md:block"
-        style={{ 
-          left: cursorPosition.x, 
-          top: cursorPosition.y, 
-          transform: `translate(-50%, -50%) scale(${isHovering ? 2 : 1})`,
-          borderColor: themeColor 
-        }}
-      />
-      <div
-        className="fixed w-1.5 h-1.5 rounded-full pointer-events-none z-[10000] hidden md:block"
-        style={{ 
-          left: mousePosition.x, 
-          top: mousePosition.y, 
-          transform: 'translate(-50%, -50%)',
-          backgroundColor: themeColor 
-        }}
-      />
+      <CustomCursor themeColor={themeColor} isHovering={isHovering} mousePosition={mousePosition} />
 
       {/* Noise Overlay */}
       <div
@@ -1166,59 +821,7 @@ export default function ComingSoonClient() {
             transition={{ delay: 0.3 }}
             className="mb-12"
           >
-            {submitState === 'success' ? (
-              <motion.div
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                className="p-6 rounded-xl border text-center"
-                style={{ 
-                  backgroundColor: `${themeColor}1A`, 
-                  borderColor: `${themeColor}4D`,
-                  color: themeColor
-                }}
-              >
-                <span className="text-2xl mb-2 block">✓</span>
-                {message}
-              </motion.div>
-            ) : (
-              <form onSubmit={handleSubmit} className="relative group w-full max-w-md mx-auto">
-                <div 
-                  className="relative flex flex-col sm:flex-row gap-3 sm:gap-0 sm:bg-white/[0.03] sm:border sm:border-white/10 sm:rounded-xl sm:p-1.5 sm:backdrop-blur-sm transition-shadow duration-500"
-                  style={{
-                    boxShadow: isFocused && window.innerWidth >= 640
-                      ? `0 0 25px ${themeColor}99, 0 0 60px ${themeColor}33` 
-                      : `0 0 0px ${themeColor}00`
-                  }}
-                >
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    onFocus={() => { setIsFocused(true); setIsHovering(true); }}
-                    onBlur={() => { setIsFocused(false); setIsHovering(false); }}
-                    placeholder="Enter your email"
-                    className="w-full sm:flex-1 bg-white/[0.03] sm:bg-transparent border border-white/10 sm:border-none rounded-xl sm:rounded-none px-5 py-4 text-white placeholder:text-white/30 focus:outline-none font-mono text-base text-center sm:text-left transition-colors"
-                  />
-                  <button
-                    type="submit"
-                    disabled={submitState === 'loading'}
-                    className="w-full sm:w-auto px-6 sm:px-10 py-4 font-display font-bold uppercase tracking-wider text-base rounded-xl sm:rounded-lg transition-all duration-300 hover:scale-[1.02] sm:hover:scale-105"
-                    style={{ 
-                      backgroundColor: themeColor,
-                      color: 'white',
-                      boxShadow: `0 0 30px ${themeColor}4D`
-                    }}
-                    onMouseEnter={() => setIsHovering(true)}
-                    onMouseLeave={() => setIsHovering(false)}
-                  >
-                    {submitState === 'loading' ? '...' : 'NOTIFY ME'}
-                  </button>
-                </div>
-              </form>
-            )}
-            {submitState === 'error' && (
-              <p className="text-red-500 text-sm mt-3">{message}</p>
-            )}
+            <EmailCapture themeColor={themeColor} onHoverChange={setIsHovering} />
           </motion.div>
 
           {/* Social Links */}
@@ -1227,22 +830,8 @@ export default function ComingSoonClient() {
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ delay: 0.5 }}
-            className="flex justify-center gap-8"
           >
-            {socialLinks.map((link) => (
-              <a
-                key={link.name}
-                href={link.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                title={link.name}
-                className="relative text-white transition-all duration-300 opacity-60 hover:opacity-100 hover:scale-110 flex items-center justify-center outline-none"
-                onMouseEnter={() => setIsHovering(true)}
-                onMouseLeave={() => setIsHovering(false)}
-              >
-                {link.icon}
-              </a>
-            ))}
+            <SocialLinks onHoverChange={setIsHovering} />
           </motion.div>
         </motion.div>
       </section>
