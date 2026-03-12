@@ -245,8 +245,8 @@ The tiered mountain metaphor (Base Camp / High Camp / Summit) is replaced with t
 
 | Element | Behavior |
 |---|---|
-| ECG heartbeat line | Always present in margin. Dims in S2 (flatlines at accident). Returns strong in S3. Expands to full-width in S5. Calm in S6-S8. Synced to resting HR. |
-| Orange journey line | Left edge, tracks scroll progress. Dims in S2, returns in S3. Pulsing orb at current position. Hidden on mobile. |
+| ECG heartbeat line | Always present in margin. S2: slows as user scrolls deeper, flatlines at accident date (straight line), then faint red glow. Returns faintly at S2→S3 transition, strengthens through S3. Expands to full-width in S5. Returns to subtle margin in S6-S8. Synced to resting HR. See S2 section for canonical flatline behavior. |
+| Orange journey line | Fixed position, left edge of viewport, 6px wide, 0px from left edge. Tracks overall scroll progress (height maps to scrollYProgress). Pulsing orb (12px diameter) at the bottom of the filled line. Glow: `0 0 20px rgba(249,115,22,0.8)`. S2: glow fades to 0, line color shifts to white/10. S3: glow and orange return. Hidden on mobile (≤1024px). Same component as current `page.full-site.tsx` journey line, enhanced with section-aware dimming. |
 | Custom crosshair cursor | Desktop only. Smooth follow with hover scaling. Same as coming-soon page. Hidden on touch devices. |
 | Film grain / noise | Fixed overlay, opacity ~3.5%. Same SVG noise from coming-soon. |
 | Scanlines | Fixed overlay, opacity ~20%. CRT monitor effect. |
@@ -274,6 +274,144 @@ The tiered mountain metaphor (Base Camp / High Camp / Summit) is replaced with t
 | Social links | `coming-soon-client.tsx` | S7 (The Ask) |
 | Custom cursor | `coming-soon-client.tsx` | Persistent layer |
 | Atmospheric overlays | `coming-soon-client.tsx` | Persistent layer |
+
+## Mobile Adaptations
+
+All sections must degrade gracefully on viewports ≤768px (tablet) and ≤375px (phone).
+
+| Section | Mobile Behavior |
+|---|---|
+| S1 Cold Open | Hero image uses `object-fit: cover` with focal point on Patrick. Title scales via `clamp()`. Bottom stats bar stacks vertically or reduces to 2 key stats (Recovery, Strain). Boot HUD text hidden on mobile. |
+| S2 The Fall | Works as-is — text-driven layout is inherently responsive. Date font scales down. Negative space reduced proportionally. |
+| S3 The Rebuild | Split-screen blocks stack vertically (image on top, text below). Prosthetic reveal becomes single-column. Counters stack to 1-column on phone, 3-column on tablet+. |
+| S4 Bhutan Trek | Horizontal scroll becomes a **vertical card stack** on mobile — each journey panel is a full-width card that scrolls normally. Telemetry overlay becomes inline between cards rather than fixed. Mountain profile SVG stays as a thin banner. |
+| S5 The Machine | Biometric grid goes to 2-column on tablet, 1-column on phone. Recovery hero stays full-width. Last workout card stacks its stats. |
+| S6 The Mission | Dare2Tri split stacks vertically. Race calendar goes single-column. Nationals card stays prominent. |
+| S7 The Ask | Two-path CTAs stack vertically. Email form stays single-column (already responsive from coming-soon). |
+| S8 Footer | Stays as-is — already a simple flex row. |
+
+**Global mobile rules:**
+- Custom crosshair cursor: hidden on touch devices (`@media (pointer: coarse)`)
+- Parallax effects: disabled on mobile (no `mouseMove` tracking)
+- Floating particles: count reduced to 10 on mobile, 0 if `prefers-reduced-motion`
+- Journey line: hidden on mobile (already specified)
+- Persistent ECG: moves from margin to a thin line above the bottom stats bar on mobile, or hidden
+
+---
+
+## Boot Sequence Timing Detail
+
+The 1.5-second boot is a concurrent sequence, not sequential steps:
+
+```
+0.0s ─ Hero image appears (desaturated, brightness: 0.7)
+0.0s ─ Boot text starts typing in top-left (3 lines, each 0.15s apart)
+0.3s ─ ECG line begins drawing left-to-right (0.4s duration)
+0.5s ─ Image begins saturating to full color (0.5s ease-out)
+0.7s ─ Boot text fades to 10% opacity
+0.8s ─ Bottom stats bar slides up and populates left-to-right (stagger: 0.1s per stat)
+1.2s ─ All elements at final state
+1.5s ─ Boot complete, scroll unlocked
+```
+
+Steps overlap — the image saturation happens WHILE the ECG draws and stats populate. The effect is everything "warming up" simultaneously, not sequentially.
+
+If WHOOP data hasn't loaded by 1.5s, stats show loading shimmer and populate when ready (no blocking).
+
+---
+
+## Section Transitions
+
+| Boundary | Transition |
+|---|---|
+| S1 → S2 | Continuous scroll. As S1 scrolls up, the hero image parallaxes away. Between sections: ~20vh of near-black negative space. S2 content fades in via `whileInView`. The bottom stats bar and HUD elements fade to 0 opacity over the last 20% of S1's scroll range. |
+| S2 → S3 | The ECG flatline holds through the negative space after the accident date. "SIGNAL RECOVERED" / "HEARTBEAT DETECTED..." text types in with 0.3s per line. A faint orange glow bleeds in from edges (radial gradient, opacity 0 → 0.15 over 1s). S3's opening headline fades in immediately after. No hard cut — the light returns gradually. |
+| S3 → S4 | ~15vh negative space. S4 intro text ("OCTOBER 2022. BHUTAN.") fades in. When user scrolls past the intro, the horizontal scroll container takes over. |
+| S4 → S5 | Horizontal scroll ends. "TRAIL COMPLETE" text sits centered. ~10vh space. S5 transition: the ECG line (which has been marginal) grows thicker and brighter, expanding across the full viewport width over 0.5s as the section enters view. |
+| S5 → S6 | Standard continuous scroll. ~15vh space. S5 data cards fade out as user scrolls past. ECG returns to subtle margin state. |
+| S6 → S7 | ~10vh space. Minimal transition — the narrative naturally flows from "here's the goal" to "here's how to help." |
+| S7 → S8 | S7 content ends. Footer appears with the ECG farewell line. No dramatic transition — the quiet ending is intentional. |
+
+---
+
+## Bhutan Trek Panel Content
+
+Panels are hardcoded with approximate data based on the Trans Bhutan Trail:
+
+| Panel | Days | Location | Altitude | Temp | Copy |
+|---|---|---|---|---|---|
+| 1 | Day 1-4 | Haa to Paro | 8,200ft | 62°F | "He flew to Bhutan alone. A country he'd dreamed of since reading about it as a sophomore in 2002. Twenty years later, he was standing at the trailhead." |
+| 2 | Day 5-10 | Paro to Thimphu | 9,800ft | 55°F | "The first passes tested the prosthetic on terrain it was never designed for. Mud, rock, switchbacks. He adjusted. The leg adjusted." |
+| 3 | Day 11-16 | Thimphu to Bumthang | 12,500ft | 42°F | "Above the treeline, the air thinned and the temperature dropped. Every step above 12,000 feet was a negotiation with the mountain." |
+| 4 | Day 17-22 | Bumthang Highlands | 14,000ft | 32°F | "The highest pass. 14,000 feet. Below-freezing wind. One leg of carbon fiber and titanium on a path most people wouldn't attempt with two." |
+| 5 | Day 23-26 | Descent to Trashigang | 9,500ft | 50°F | "The descent was its own challenge. Downhill punishes a prosthetic differently — every step is a controlled fall." |
+| 6 | Day 27-29 | Trashigang to Finish | 8,000ft | 60°F | "November 22, 2022. Trail complete. 250 miles. 12 passes. First American. First below-knee amputee." |
+
+**Data burst triggers:**
+- Panel 4 (highest pass): Burst shows "ALTITUDE: 14,000ft • ELEVATION GAIN: 6,200ft • ESTIMATED STRAIN: 19+"
+- Panel 6 (finish): Burst shows "TOTAL DISTANCE: 250mi • TOTAL PASSES: 12 • DURATION: 29 DAYS"
+
+**Mountain Profile SVG:** Hand-drawn approximation of the elevation cross-section. Not GPS-accurate — a stylized representation showing the general shape: gradual climb, multiple peaks in the middle section, descent at the end. Built as an inline SVG path, not an external asset. Reference waypoints: 8,200ft → 9,800ft → 12,500ft → 14,000ft → 9,500ft → 8,000ft.
+
+---
+
+## Loading & Skeleton States
+
+| Component | Loading State |
+|---|---|
+| S1 bottom stats bar | Shimmer/skeleton cards (gray pulse animation) until WHOOP data arrives. Stats populated individually as each value resolves. |
+| S5 biometric dashboard | Recovery hero shows a "—" with shimmer until data loads. Grid cards show skeleton state. Last workout card hidden until data available. If demo mode, demo data populates immediately (no loading state needed). |
+| S6 race countdown | Computed client-side from hardcoded dates — no loading state needed. |
+
+---
+
+## Assets Required
+
+Photography is confirmed available (strong library). Specific needs per section:
+
+| Section | Asset | Status | Notes |
+|---|---|---|---|
+| S1 | Hero action photo (Patrick racing/training) | Needed from library | Full-bleed, landscape preferred, high-res. Focal point should be on Patrick for mobile crop. |
+| S3 | Patrick with David Rotter / prosthetic fitting | Needed from library | Split-layout, can be portrait or landscape |
+| S3 | Prosthetic detail / macro shot | Needed from library | Product-reveal quality. Carbon fiber texture, dramatic lighting preferred. |
+| S3 | Dare2Tri training session | Needed from library | Early training or first adaptive sports moment |
+| S4 | 6 Bhutan trek photos | Needed from library | One per panel. Progressive: trailhead → valleys → highlands → summit → descent → finish |
+| S5 | None | N/A | Data-driven section, no photography |
+| S6 | Dare2Tri team photo | Needed from library | Group/team context |
+| S7 | None | N/A | CTA section, text-driven |
+
+**Existing assets in `/public`:**
+- `pat-crop.png` — usable in S3 or as fallback
+- `pat-run.jpg` — potential S1 hero candidate
+- `pat-crop-run.png` — potential S1 hero candidate
+- Sponsor logos in `/public/sponsors/` — confirmed for S7
+
+---
+
+## Data Sources
+
+| Data | Source | Update Method |
+|---|---|---|
+| WHOOP biometrics | WHOOP API via `/api/whoop/stats` | Automatic via server-side caching (5-min) + webhooks |
+| Race calendar | Hardcoded in component data file | Manual update by developer |
+| Race results | Hardcoded in component data file | Manual update as races complete |
+| Day counters | Computed client-side from constants | Automatic |
+| Bhutan trek data | Hardcoded in component | Static — historical data |
+| Strava link | `https://strava.app.link/gVriWQZiL0b` | From coming-soon page (confirmed) |
+
+---
+
+## Resolved Optionals
+
+These items were marked "optional" during design — resolved here:
+
+| Item | Decision | Rationale |
+|---|---|---|
+| S6: "DAYS UNTIL NATIONALS" card | **Yes — include** | Connects biometric thread to race calendar. Creates urgency. |
+| S7: Nationals countdown for urgency | **No — skip** | Redundant with S6. The ask section should feel earned, not pressured. |
+| S8: "BUILT WITH WHOOP DATA" credit | **Yes — include** | Subtle, honest, and acknowledges the tech that makes the site unique. |
+
+---
 
 ## Technical Notes
 
