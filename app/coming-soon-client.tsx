@@ -19,7 +19,24 @@ const SOBRIETY_DATE = new Date('2020-1-20');
 const NEXT_RACE_DATE = new Date('2026-4-11');
 
 export default function ComingSoonClient() {
-  const [phase, setPhase] = useState(0);
+  const { energyState, theme } = useVitality();
+
+  const {
+    stats: whoopStats,
+    connectionStatus,
+    isConnected,
+    currentHeartRate,
+    heartRateSource,
+    mode: whoopMode,
+  } = useWhoop();
+
+  const heartbeat = currentHeartRate || 60;
+  const heartbeatDuration = 60 / heartbeat;
+
+  // Skip boot sequence when WHOOP data is already loaded (navigating back from another page)
+  const dataAlreadyLoaded = connectionStatus === 'connected' || connectionStatus === 'error' || connectionStatus === 'unauthorized';
+
+  const [phase, setPhase] = useState(dataAlreadyLoaded ? 6 : 0);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
   useEffect(() => {
@@ -59,20 +76,6 @@ export default function ComingSoonClient() {
   }, []);
 
   const mousePositionRef = useRef({ x: 0, y: 0 });
-
-  const { energyState, theme } = useVitality();
-
-  const {
-    stats: whoopStats, 
-    connectionStatus, 
-    isConnected,
-    currentHeartRate,
-    heartRateSource,
-    mode: whoopMode,
-  } = useWhoop();
-  
-  const heartbeat = currentHeartRate;
-  const heartbeatDuration = 60 / heartbeat;
 
   const statusMessages = useMemo(() => {
     const messages = [
@@ -132,7 +135,7 @@ export default function ComingSoonClient() {
 
 
   // === CONNECTION-SYNCED PROGRESS BAR ===
-  const [loadingProgress, setLoadingProgress] = useState(0);
+  const [loadingProgress, setLoadingProgress] = useState(dataAlreadyLoaded ? 100 : 0);
   const targetProgressRef = useRef(0);
   const animFrameRef = useRef<number | null>(null);
 
@@ -174,7 +177,7 @@ export default function ComingSoonClient() {
   }, []);
 
   // Don't rush the boot even if API is instant
-  const [minTimeElapsed, setMinTimeElapsed] = useState(false);
+  const [minTimeElapsed, setMinTimeElapsed] = useState(dataAlreadyLoaded);
   useEffect(() => {
     const timer = setTimeout(() => setMinTimeElapsed(true), 2500);
     return () => clearTimeout(timer);
@@ -439,25 +442,27 @@ export default function ComingSoonClient() {
 
       {/* === HERO === */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        <div className="absolute top-1/2 left-0 w-full h-[200px] -translate-y-1/2 overflow-hidden opacity-10 pointer-events-none">
-          <svg
-            className="absolute top-1/2 left-0 w-[200%] h-[150px]"
-            viewBox="0 0 1200 150"
-            preserveAspectRatio="none"
-            style={{ animation: `heartbeat-ecg ${heartbeatDuration * 2}s linear infinite` }}
-          >
-            <path
-              d="M0,75 L100,75 L120,75 L140,20 L160,130 L180,40 L200,110 L220,75 L300,75 L320,75 L340,20 L360,130 L380,40 L400,110 L420,75 L500,75 L520,75 L540,20 L560,130 L580,40 L600,110 L620,75 L700,75 L720,75 L740,20 L760,130 L780,40 L800,110 L820,75 L900,75 L920,75 L940,20 L960,130 L980,40 L1000,110 L1020,75 L1100,75 L1120,75 L1140,20 L1160,130 L1180,40 L1200,110"
-              fill="none"
-              stroke={themeColor}
-              strokeWidth="2"
-              style={{ filter: `drop-shadow(0 0 10px ${themeColor}99)` }}
-            />
-          </svg>
-        </div>
+        {!prefersReducedMotion && (
+          <div className="absolute top-1/2 left-0 w-full h-[200px] -translate-y-1/2 overflow-hidden opacity-10 pointer-events-none">
+            <svg
+              className="absolute top-1/2 left-0 w-[200%] h-[150px]"
+              viewBox="0 0 1200 150"
+              preserveAspectRatio="none"
+              style={{ animation: `heartbeat-ecg ${heartbeatDuration * 2}s linear infinite` }}
+            >
+              <path
+                d="M0,75 L100,75 L120,75 L140,20 L160,130 L180,40 L200,110 L220,75 L300,75 L320,75 L340,20 L360,130 L380,40 L400,110 L420,75 L500,75 L520,75 L540,20 L560,130 L580,40 L600,110 L620,75 L700,75 L720,75 L740,20 L760,130 L780,40 L800,110 L820,75 L900,75 L920,75 L940,20 L960,130 L980,40 L1000,110 L1020,75 L1100,75 L1120,75 L1140,20 L1160,130 L1180,40 L1200,110"
+                fill="none"
+                stroke={themeColor}
+                strokeWidth="2"
+                style={{ filter: `drop-shadow(0 0 10px ${themeColor}99)` }}
+              />
+            </svg>
+          </div>
+        )}
 
         <motion.div
-          style={{ x: xLayer2, y: yLayer2 }}
+          style={prefersReducedMotion ? {} : { x: xLayer2, y: yLayer2 }}
           className="relative z-30 text-center px-6"
         >
           <motion.div
@@ -1005,6 +1010,7 @@ export default function ComingSoonClient() {
               // Invert turns the white background black and logo white. Mix-blend-screen then makes the black background invisible
               { src: '/sponsors/CAF_logo.png', link: 'https://www.challengedathletes.org/', alt: 'Sponsor 3', className: 'h-24 md:h-32 mix-blend-screen invert grayscale group-hover:grayscale-0 group-hover:invert-0 opacity-100 rounded-[50%] object-cover' },
               { src: '/sponsors/david-rotter-logo_orig.png', link: 'https://www.rotterprosthetics.com/', alt: 'David Rotter Prosthetics', className: 'h-16 md:h-20 grayscale group-hover:grayscale-0 brightness-200 group-hover:brightness-100' },
+              { src: '/sponsors/SEBCM_color.png', link: 'https://soeverybodycanmove.org', alt: 'So Every Body Can Move', className: 'h-10 md:h-12 grayscale group-hover:grayscale-0 brightness-200 group-hover:brightness-100' },
             ].map((sponsor, i) => (
               <motion.div
                 key={sponsor.alt}
