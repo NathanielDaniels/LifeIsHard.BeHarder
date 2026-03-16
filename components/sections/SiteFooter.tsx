@@ -8,7 +8,6 @@ export default function SiteFooter() {
 
   return (
     <footer className="relative z-20 py-8 px-6 border-t border-white/5 bg-black">
-      {/* ECG farewell line */}
       <div className="absolute top-0 left-0 right-0 h-[2px] overflow-hidden opacity-30">
         <svg
           className="absolute top-0 left-0 w-[200%] h-[2px]"

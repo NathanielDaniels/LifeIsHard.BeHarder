@@ -1,40 +1,29 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useWhoop, useHeartbeatDuration } from '@/contexts/WhoopContext';
 import { useVitality } from '@/contexts/VitalityContext';
 import GlitchText from '@/components/shared/GlitchText';
 
-// ============================================
-// COLDOPEN (Section 1)
-// Full-bleed cinematic hero with compressed boot sequence
-// ============================================
-
 export default function ColdOpen() {
   const { stats: whoopStats, currentHeartRate } = useWhoop();
   const { theme } = useVitality();
   const heartbeatDuration = useHeartbeatDuration();
 
-  // Boot sequence phases:
-  // 0: loading
-  // 1: image visible (desaturated)
-  // 2: HUD typing
-  // 3: saturating
-  // 4: stats appearing
-  // 5: complete
+  // Boot phases: 0=loading, 1=image visible, 2=HUD typing, 3=saturating, 4=stats, 5=complete
   const [bootPhase, setBootPhase] = useState(0);
   const [showScrollHint, setShowScrollHint] = useState(false);
+  const hasScrolledRef = useRef(false);
 
-  // Boot sequence timeline
   useEffect(() => {
     const sequence = [
-      { phase: 1, delay: 0 },      // 0.0s - Image appears
-      { phase: 2, delay: 0 },      // 0.0s - Boot text starts typing
-      { phase: 3, delay: 500 },    // 0.5s - Begin saturating
-      { phase: 4, delay: 800 },    // 0.8s - Stats bar slides up
-      { phase: 5, delay: 1200 },   // 1.2s - Boot complete
+      { phase: 1, delay: 0 },
+      { phase: 2, delay: 0 },
+      { phase: 3, delay: 500 },
+      { phase: 4, delay: 800 },
+      { phase: 5, delay: 1200 },
     ];
 
     const timers = sequence.map(({ phase, delay }) =>
@@ -44,13 +33,13 @@ export default function ColdOpen() {
     return () => timers.forEach(clearTimeout);
   }, []);
 
-  // Scroll indicator appears after 5s idle
   useEffect(() => {
     const timer = setTimeout(() => {
-      if (bootPhase >= 5) setShowScrollHint(true);
-    }, 5000);
+      if (!hasScrolledRef.current) setShowScrollHint(true);
+    }, 8000);
 
     const onScroll = () => {
+      hasScrolledRef.current = true;
       setShowScrollHint(false);
       window.removeEventListener('scroll', onScroll);
     };
@@ -60,23 +49,21 @@ export default function ColdOpen() {
       clearTimeout(timer);
       window.removeEventListener('scroll', onScroll);
     };
-  }, [bootPhase]);
+  }, []);
 
   const themeColor = theme.primaryColor;
 
-  // Recovery color logic
   const getRecoveryColor = (recovery: number | null) => {
     if (recovery === null) return themeColor;
-    if (recovery >= 67) return '#00e676'; // green
-    if (recovery >= 34) return '#ffab00'; // yellow
-    return '#ff5252'; // red
+    if (recovery >= 67) return '#00e676';
+    if (recovery >= 34) return '#ffab00';
+    return '#ff5252';
   };
 
   const recoveryColor = getRecoveryColor(whoopStats.recovery);
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Hero Image - Full Bleed */}
       <div className="absolute inset-0 z-0">
         <motion.div
           initial={{ opacity: 0, filter: 'brightness(0.7) saturate(0)' }}
@@ -104,11 +91,9 @@ export default function ColdOpen() {
           />
         </motion.div>
 
-        {/* Gradient scrim for text readability */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/60" />
       </div>
 
-      {/* Boot HUD - Top Left - Hidden on mobile */}
       <AnimatePresence>
         {bootPhase >= 2 && bootPhase < 5 && (
           <motion.div
@@ -136,21 +121,21 @@ export default function ColdOpen() {
         )}
       </AnimatePresence>
 
-      {/* Hero Content - Centered */}
       <div className="relative z-30 text-center px-6 max-w-7xl mx-auto">
-        {/* Eyebrow - Name */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
-          animate={bootPhase >= 4 ? { opacity: 0.4, y: 0 } : {}}
+          animate={bootPhase >= 4 ? { opacity: 0.7, y: 0 } : {}}
           transition={{ duration: 0.8, ease: 'easeOut' }}
           className="mb-6"
         >
-          <h2 className="font-mono text-sm md:text-base tracking-[0.5em] text-white uppercase">
+          <h2
+            className="font-mono text-sm md:text-base tracking-[0.5em] text-white uppercase"
+            style={{ textShadow: '0 2px 8px rgba(0,0,0,0.6)' }}
+          >
             PATRICK WINGERT
           </h2>
         </motion.div>
 
-        {/* Main Title */}
         <AnimatePresence>
           {bootPhase >= 1 && (
             <motion.div
@@ -170,33 +155,30 @@ export default function ColdOpen() {
           )}
         </AnimatePresence>
 
-        {/* Subtitle */}
         <motion.p
           initial={{ opacity: 0, y: 20 }}
-          animate={bootPhase >= 4 ? { opacity: 0.35, y: 0 } : {}}
+          animate={bootPhase >= 4 ? { opacity: 0.6, y: 0 } : {}}
           transition={{ duration: 1, delay: 0.2 }}
           className="mt-8 font-mono text-[clamp(0.65rem,1.5vw,0.85rem)] tracking-[0.5em] text-white uppercase"
+          style={{ textShadow: '0 2px 8px rgba(0,0,0,0.6)' }}
         >
           ADAPTIVE ATHLETE • DARE2TRI ELITE TEAM
         </motion.p>
       </div>
 
-      {/* Scroll Indicator */}
       <AnimatePresence>
-        {showScrollHint && bootPhase >= 5 && (
+        {showScrollHint && bootPhase >= 3 && (
           <motion.div
             key="scroll-hint"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.8 }}
-            className="absolute bottom-12 left-1/2 -translate-x-1/2 hidden md:flex flex-col items-center gap-3 z-30"
+            className="absolute bottom-8 left-1/2 -translate-x-1/2 hidden md:flex flex-col items-center gap-2 z-50"
           >
-            <span className="font-mono text-[0.7rem] tracking-[0.3em] text-white/50">
-              SCROLL
-            </span>
+            <span className="font-mono text-[0.7rem] tracking-[0.3em] text-white/50">SCROLL</span>
             <div
-              className="w-[1.5px] h-12 bg-gradient-to-b to-transparent"
+              className="w-[1.5px] h-8 bg-gradient-to-b to-transparent"
               style={{
                 background: `linear-gradient(to bottom, ${themeColor}, transparent)`,
                 animation: 'scroll-pulse 2s ease-in-out infinite',
@@ -206,14 +188,12 @@ export default function ColdOpen() {
         )}
       </AnimatePresence>
 
-      {/* Bottom Stats Bar */}
       <motion.div
         initial={{ opacity: 0, y: 40 }}
         animate={bootPhase >= 4 ? { opacity: 1, y: 0 } : {}}
         transition={{ duration: 0.8, ease: 'easeOut' }}
         className="absolute bottom-0 left-0 right-0 px-6 md:px-12 py-6 md:py-8 flex flex-col md:flex-row justify-between items-center gap-6 md:gap-8 border-t border-white/5 bg-gradient-to-t from-black/60 to-transparent backdrop-blur-sm z-40"
       >
-        {/* Heart Rate - Left */}
         <div className="flex items-center gap-4">
           <div className="w-10 h-10 md:w-12 md:h-12 relative flex-shrink-0">
             <motion.svg
@@ -244,9 +224,7 @@ export default function ColdOpen() {
           </div>
         </div>
 
-        {/* Stats - Right - Desktop: All 4, Mobile: Recovery + Strain */}
         <div className="flex items-center gap-6 md:gap-8">
-          {/* Recovery */}
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={bootPhase >= 4 ? { opacity: 1, x: 0 } : {}}
@@ -260,11 +238,10 @@ export default function ColdOpen() {
               className="font-display text-2xl md:text-3xl font-bold"
               style={{ color: recoveryColor }}
             >
-              {whoopStats.recovery !== null ? `${whoopStats.recovery}%` : '—'}
+              {whoopStats.recovery !== null ? `${whoopStats.recovery}%` : '--'}
             </span>
           </motion.div>
 
-          {/* Strain */}
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={bootPhase >= 4 ? { opacity: 1, x: 0 } : {}}
@@ -280,11 +257,10 @@ export default function ColdOpen() {
             >
               {whoopStats.strain !== null
                 ? whoopStats.strain.toFixed(1)
-                : '—'}
+                : '--'}
             </span>
           </motion.div>
 
-          {/* HRV - Desktop Only */}
           {whoopStats.hrv !== null && (
             <motion.div
               initial={{ opacity: 0, x: 20 }}
@@ -305,7 +281,6 @@ export default function ColdOpen() {
             </motion.div>
           )}
 
-          {/* Resting HR - Desktop Only */}
           {whoopStats.restingHeartRate !== null && (
             <motion.div
               initial={{ opacity: 0, x: 20 }}
@@ -328,18 +303,10 @@ export default function ColdOpen() {
         </div>
       </motion.div>
 
-      {/* Inline keyframe for scroll pulse */}
       <style jsx>{`
         @keyframes scroll-pulse {
-          0%,
-          100% {
-            opacity: 0.3;
-            height: 48px;
-          }
-          50% {
-            opacity: 1;
-            height: 60px;
-          }
+          0%, 100% { opacity: 0.3; height: 60px; }
+          50% { opacity: 1; height: 80px; }
         }
       `}</style>
     </section>

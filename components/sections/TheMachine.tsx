@@ -11,21 +11,20 @@ const RECOVERY_THRESHOLDS = {
 };
 
 const getRecoveryColor = (recovery: number | null): string => {
-  if (recovery === null) return '#f97316'; // Default theme color
-  if (recovery >= RECOVERY_THRESHOLDS.GREEN) return '#00e676'; // Green
-  if (recovery >= RECOVERY_THRESHOLDS.YELLOW) return '#ffab00'; // Yellow
-  return '#ff5252'; // Red
+  if (recovery === null) return '#f97316';
+  if (recovery >= RECOVERY_THRESHOLDS.GREEN) return '#00e676';
+  if (recovery >= RECOVERY_THRESHOLDS.YELLOW) return '#ffab00';
+  return '#ff5252';
 };
 
 export default function TheMachine() {
-  const { stats, isConnected, mode } = useWhoop();
+  const { stats, isConnected, mode, currentHeartRate, heartRateSource } = useWhoop();
   const { theme } = useVitality();
   const heartbeatDuration = useHeartbeatDuration();
 
   const themeColor = theme.primaryColor;
   const recoveryColor = getRecoveryColor(stats.recovery);
 
-  // Format date
   const today = new Date();
   const dateString = today.toLocaleDateString('en-US', {
     timeZone: 'America/Chicago',
@@ -37,7 +36,6 @@ export default function TheMachine() {
   return (
     <section className="relative w-full min-h-screen flex items-center justify-center py-24 md:py-32">
       <div className="container mx-auto px-6 md:px-12 max-w-7xl">
-        {/* Section Header */}
         <div className="flex items-center gap-4 mb-12">
           <motion.div
             initial={{ opacity: 0, scale: 0 }}
@@ -57,7 +55,7 @@ export default function TheMachine() {
             transition={{ duration: 0.6, delay: 0.1 }}
             className="font-mono text-xs tracking-[0.5em] text-white/50 uppercase"
           >
-            {isConnected ? "Today's Readout" : 'Biometric Data'} — {dateString}
+            {isConnected ? "Today's Readout" : 'Biometric Data'} // {dateString}
           </motion.h2>
           <motion.div
             initial={{ scaleX: 0 }}
@@ -68,7 +66,6 @@ export default function TheMachine() {
           />
         </div>
 
-        {/* Recovery Hero Metric */}
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           whileInView={{ opacity: 1, scale: 1 }}
@@ -80,17 +77,15 @@ export default function TheMachine() {
             Today&apos;s Recovery
           </span>
           <div className="relative flex items-center justify-center">
-            {/* Glow ring */}
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
               whileInView={{ opacity: 0.3, scale: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 1, delay: 0.2 }}
-              className="absolute w-64 h-64 md:w-80 md:h-80 rounded-full blur-[60px]"
-              style={{ backgroundColor: recoveryColor }}
+              className="absolute w-[28rem] h-[28rem] md:w-[36rem] md:h-[36rem] rounded-full"
+              style={{ background: `radial-gradient(circle, ${recoveryColor}40 0%, transparent 70%)` }}
             />
 
-            {/* Recovery percentage */}
             <div className="relative">
               {stats.recovery !== null ? (
                 <motion.span
@@ -112,13 +107,12 @@ export default function TheMachine() {
                   className="font-display text-[8rem] md:text-[12rem] font-bold leading-none"
                   style={{ color: themeColor }}
                 >
-                  —
+                  --
                 </motion.span>
               )}
             </div>
           </div>
 
-          {/* Recovery status text */}
           {stats.recovery !== null && (
             <motion.p
               initial={{ opacity: 0 }}
@@ -135,7 +129,6 @@ export default function TheMachine() {
           )}
         </motion.div>
 
-        {/* Biometric Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
           {[
             {
@@ -145,6 +138,18 @@ export default function TheMachine() {
               color: themeColor,
               delay: 0,
               tooltip: 'Cardiovascular load on a 0-21 scale. 14+ is High Strain, which builds fitness gains.',
+            },
+            {
+              label: 'HEART RATE',
+              value: currentHeartRate != null ? Math.round(currentHeartRate) : null,
+              unit: 'BPM',
+              color: themeColor,
+              delay: 0.05,
+              tooltip: heartRateSource === 'workout'
+                ? 'Current heart rate from the latest workout.'
+                : heartRateSource === 'decay'
+                  ? 'Heart rate recovering after a recent workout.'
+                  : 'Resting heart rate. No recent workout activity.',
             },
             {
               label: 'RESTING HR',
@@ -159,7 +164,7 @@ export default function TheMachine() {
               value: stats.hrv !== null ? Math.round(stats.hrv) : null,
               unit: 'ms',
               color: themeColor,
-              delay: 0.2,
+              delay: 0.15,
               tooltip: 'Heart rate variability in milliseconds. A key recovery indicator - higher generally means better recovery.',
             },
             {
@@ -167,7 +172,7 @@ export default function TheMachine() {
               value: stats.calories !== null ? stats.calories.toLocaleString() : null,
               unit: 'kcal',
               color: themeColor,
-              delay: 0.3,
+              delay: 0.2,
               tooltip: 'Total calories burned today based on continuous monitoring.',
               condition: stats.calories !== null,
             },
@@ -176,7 +181,7 @@ export default function TheMachine() {
               value: stats.averageHeartRate,
               unit: 'BPM',
               color: themeColor,
-              delay: 0.4,
+              delay: 0.25,
               tooltip: 'Average heart rate across all activity today.',
               condition: stats.averageHeartRate !== null,
             },
@@ -196,7 +201,6 @@ export default function TheMachine() {
             ))}
         </div>
 
-        {/* Last Workout Card */}
         {stats.lastWorkout && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -256,7 +260,6 @@ export default function TheMachine() {
           </motion.div>
         )}
 
-        {/* Data Source Footer */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3 mt-8 font-mono text-[0.65rem] md:text-[0.75rem] tracking-[0.2em] text-white/50">
           <span className="whitespace-nowrap">POWERED BY WHOOP</span>
           <span className="hidden sm:inline opacity-50">•</span>

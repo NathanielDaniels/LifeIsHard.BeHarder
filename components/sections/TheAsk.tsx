@@ -20,7 +20,7 @@ export default function TheAsk() {
       src: '/sponsors/CAF_logo.png',
       link: 'https://www.challengedathletes.org/',
       alt: 'Challenged Athletes Foundation',
-      className: 'h-24 md:h-32 mix-blend-screen invert grayscale hover:grayscale-0 hover:invert-0 opacity-100 rounded-[50%] object-cover'
+      className: 'h-28 md:h-36 mix-blend-screen invert grayscale hover:grayscale-0 hover:invert-0 opacity-100'
     },
     {
       src: '/sponsors/david-rotter-logo_orig.png',
@@ -28,29 +28,33 @@ export default function TheAsk() {
       alt: 'David Rotter Prosthetics',
       className: 'h-16 md:h-20 grayscale hover:grayscale-0 brightness-200 hover:brightness-100'
     },
+    {
+      src: '/sponsors/SEBCM_color.png',
+      link: 'https://soeverybodycanmove.org',
+      alt: 'SEBCM',
+      className: 'h-16 md:h-20 grayscale hover:grayscale-0 brightness-200 hover:brightness-100'
+    },
   ];
 
   return (
-    <section className="relative min-h-screen py-32 px-6 overflow-hidden">
-      {/* Background */}
+    <section className="relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-b from-black via-zinc-900/30 to-black" />
 
-      {/* Radial glow effect */}
       <div className="absolute inset-0 opacity-20">
         <div
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[1000px] rounded-full blur-3xl"
+          className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[1000px] rounded-full blur-3xl"
           style={{ backgroundColor: `${theme.primaryColor}33` }}
         />
       </div>
 
-      <div className="relative z-10 max-w-5xl mx-auto space-y-20">
-        {/* Header */}
+      {/* ── 1. FUEL THE MISSION ─────────────────────────────────────────── */}
+      <div className="relative z-10 max-w-5xl mx-auto px-6 py-24 md:py-32">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 1 }}
           viewport={{ once: true }}
-          className="text-center space-y-6"
+          className="text-center space-y-6 mb-16 md:mb-20"
         >
           <div className="font-mono text-sm tracking-[0.3em] text-white/40">
             YOU'VE SEEN THE STORY
@@ -65,7 +69,6 @@ export default function TheAsk() {
           </p>
         </motion.div>
 
-        {/* Two Paths */}
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -73,13 +76,12 @@ export default function TheAsk() {
           viewport={{ once: true }}
           className="grid md:grid-cols-2 gap-8"
         >
-          {/* Support Dare2Tri */}
-          <div className="p-8 md:p-10 rounded-2xl border backdrop-blur-sm space-y-6"
+          <div className="flex flex-col p-8 md:p-10 rounded-2xl border backdrop-blur-sm"
             style={{
               backgroundColor: `${theme.primaryColor}11`,
               borderColor: `${theme.primaryColor}44`
             }}>
-            <div className="space-y-4">
+            <div className="space-y-4 flex-1">
               <div className="flex items-start justify-between">
                 <h3 className="font-display text-2xl md:text-3xl tracking-wide text-white">
                   Support Dare2Tri
@@ -103,7 +105,7 @@ export default function TheAsk() {
               href="https://give.dare2tri.org/fundraiser/6928347"
               target="_blank"
               rel="noopener noreferrer"
-              className="block w-full px-8 py-4 rounded-xl font-display text-lg tracking-wider text-center transition-all duration-300 hover:scale-[1.02]"
+              className="block w-full mt-8 px-8 py-4 rounded-xl font-display text-lg tracking-wider text-center transition-all duration-300 hover:scale-[1.02]"
               style={{
                 backgroundColor: theme.primaryColor,
                 color: 'white',
@@ -114,9 +116,8 @@ export default function TheAsk() {
             </a>
           </div>
 
-          {/* Sponsor Patrick */}
-          <div className="p-8 md:p-10 rounded-2xl border border-white/20 bg-white/5 backdrop-blur-sm space-y-6 hover:border-white/40 transition-all duration-300">
-            <div className="space-y-4">
+          <div className="flex flex-col p-8 md:p-10 rounded-2xl border border-white/20 bg-white/5 backdrop-blur-sm hover:border-white/40 transition-all duration-300">
+            <div className="space-y-4 flex-1">
               <h3 className="font-display text-2xl md:text-3xl tracking-wide text-white">
                 Sponsor Patrick
               </h3>
@@ -127,7 +128,7 @@ export default function TheAsk() {
 
             <a
               href="mailto:patrick@patrickwingert.com"
-              className="block w-full px-8 py-4 rounded-xl border-2 font-display text-lg tracking-wider text-center text-white transition-all duration-300 hover:scale-[1.02]"
+              className="block w-full mt-8 px-8 py-4 rounded-xl border-2 font-display text-lg tracking-wider text-center text-white transition-all duration-300 hover:scale-[1.02]"
               style={{
                 borderColor: 'white',
                 backgroundColor: 'transparent'
@@ -137,19 +138,19 @@ export default function TheAsk() {
             </a>
           </div>
         </motion.div>
+      </div>
 
-        {/* Sponsor Logos */}
+      {/* ── 2. PROUDLY SUPPORTED BY ─────────────────────────────────────── */}
+      <div className="relative z-10 max-w-5xl mx-auto px-6 py-24 md:py-32">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.4 }}
+          transition={{ duration: 0.8 }}
           viewport={{ once: true }}
-          className="space-y-8"
+          className="text-center"
         >
-          <div className="text-center">
-            <div className="font-mono text-xs tracking-[0.3em] text-white/30 mb-8">
-              PROUDLY SUPPORTED BY
-            </div>
+          <div className="font-display text-2xl md:text-3xl tracking-[0.1em] text-white mb-12 md:mb-16">
+            PROUDLY SUPPORTED BY
           </div>
 
           <div className="flex flex-wrap justify-center items-center gap-12 md:gap-16 lg:gap-20">
@@ -177,17 +178,19 @@ export default function TheAsk() {
             ))}
           </div>
         </motion.div>
+      </div>
 
-        {/* Email Capture */}
+      {/* ── 3. FOLLOW THE JOURNEY ───────────────────────────────────────── */}
+      <div className="relative z-10 max-w-5xl mx-auto px-6 py-28 md:py-36">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.5 }}
+          transition={{ duration: 0.8 }}
           viewport={{ once: true }}
-          className="space-y-6"
+          className="space-y-12"
         >
           <div className="text-center">
-            <div className="font-display text-3xl md:text-4xl tracking-[0.1em] text-white mb-2">
+            <div className="font-display text-3xl md:text-4xl tracking-[0.1em] text-white mb-3">
               FOLLOW THE JOURNEY
             </div>
             <p className="font-mono text-sm tracking-[0.2em] text-white/40">
@@ -196,17 +199,16 @@ export default function TheAsk() {
           </div>
 
           <EmailCapture themeColor={theme.primaryColor} />
-        </motion.div>
 
-        {/* Social Links */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.6 }}
-          viewport={{ once: true }}
-          className="pt-8"
-        >
-          <SocialLinks />
+          <div className="flex items-center gap-4 pt-2">
+            <div className="flex-1 h-px bg-white/10" />
+            <span className="font-mono text-sm tracking-[0.2em] text-white/40">OR FOLLOW ALONG</span>
+            <div className="flex-1 h-px bg-white/10" />
+          </div>
+
+          <div>
+            <SocialLinks />
+          </div>
         </motion.div>
       </div>
     </section>

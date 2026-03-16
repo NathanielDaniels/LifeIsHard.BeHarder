@@ -4,7 +4,6 @@ import { useRef, useState, useEffect } from 'react';
 import { motion, useScroll, useTransform, useSpring, useMotionValueEvent } from 'framer-motion';
 import { useVitality } from '@/contexts/VitalityContext';
 
-// Panel data for the 6-stage journey
 const PANELS = [
   {
     days: 'DAY 1-4',
@@ -39,14 +38,14 @@ const PANELS = [
     location: 'DESCENT TO TRASHIGANG',
     altitude: '9,500',
     temp: '50',
-    copy: "The descent was its own challenge. Downhill punishes a prosthetic differently — every step is a controlled fall.",
+    copy: "The descent was its own challenge. Downhill punishes a prosthetic differently. Every step is a controlled fall.",
   },
   {
     days: 'DAY 27-29',
     location: 'TRASHIGANG TO FINISH',
     altitude: '8,000',
     temp: '60',
-    copy: 'November 22, 2022. Trail complete. 250 miles. 12 passes. First American. First below-knee amputee.',
+    copy: "The last miles weren't the hardest. They were the quietest. No more proving anything. Just finishing what he started in his head twenty years ago.",
   },
 ];
 
@@ -60,10 +59,8 @@ export default function TheProof() {
     offset: ['start start', 'end end'],
   });
 
-  // Horizontal translation — 6 panels means -(5 * 100)vw at the end
   const x = useTransform(scrollYProgress, [0, 1], ['0vw', '-500vw']);
 
-  // Telemetry values
   const altitude = useTransform(
     scrollYProgress,
     [0, 0.15, 0.35, 0.55, 0.75, 0.9, 1],
@@ -77,10 +74,8 @@ export default function TheProof() {
   const day = useTransform(scrollYProgress, [0, 1], [1, 29]);
   const progressWidth = useTransform(scrollYProgress, [0, 1], ['0%', '100%']);
 
-  // Mountain profile orange dot position
   const dotX = useTransform(scrollYProgress, [0, 1], ['0%', '100%']);
 
-  // Data bursts
   const burst1Opacity = useTransform(
     scrollYProgress,
     [0.5, 0.55, 0.6, 0.65],
@@ -94,7 +89,6 @@ export default function TheProof() {
 
   return (
     <section className="relative z-20">
-      {/* Vertical Intro */}
       <div className="min-h-screen flex flex-col items-center justify-center px-6 bg-black">
         <motion.div
           initial={{ opacity: 0, y: 50 }}
@@ -103,14 +97,12 @@ export default function TheProof() {
           viewport={{ once: true }}
           className="text-center space-y-12"
         >
-          {/* Title */}
           <h2 className="font-display text-6xl md:text-9xl text-white tracking-tight">
             OCTOBER 2022.
             <br />
             <span style={{ color: themeColor }}>BHUTAN.</span>
           </h2>
 
-          {/* Stats stagger */}
           <motion.div
             initial="hidden"
             whileInView="visible"
@@ -142,14 +134,13 @@ export default function TheProof() {
         </motion.div>
       </div>
 
-      {/* Horizontal Scroll Container — desktop only */}
+      {/* Desktop: horizontal scroll */}
       <div
         ref={containerRef}
         className="hidden md:block relative bg-black"
         style={{ height: '300vh' }}
       >
         <div className="sticky top-0 h-screen overflow-hidden">
-          {/* Telemetry overlay (fixed position within sticky) */}
           <TelemetryOverlay
             altitude={altitude}
             temperature={temperature}
@@ -158,25 +149,22 @@ export default function TheProof() {
             themeColor={themeColor}
           />
 
-          {/* Mountain profile SVG */}
           <MountainProfile dotX={dotX} themeColor={themeColor} />
 
-          {/* Data bursts */}
           <motion.div
-            style={{ opacity: burst1Opacity }}
-            className="fixed top-1/3 left-1/2 -translate-x-1/2 z-30 text-center font-mono text-sm md:text-base text-white/90 bg-black/80 backdrop-blur-sm px-6 py-3 border border-orange-500/50 rounded-lg"
+            className="absolute top-20 right-8 z-30 text-right font-mono text-sm md:text-base text-white/90 bg-black/80 backdrop-blur-sm px-6 py-3 border rounded-lg"
+            style={{ opacity: burst1Opacity, borderColor: `${themeColor}80` }}
           >
             ALTITUDE: 14,000ft • ELEVATION GAIN: 6,200ft • ESTIMATED STRAIN: 19+
           </motion.div>
 
           <motion.div
-            style={{ opacity: burst2Opacity }}
-            className="fixed top-1/3 left-1/2 -translate-x-1/2 z-30 text-center font-mono text-sm md:text-base text-white/90 bg-black/80 backdrop-blur-sm px-6 py-3 border border-orange-500/50 rounded-lg"
+            className="absolute top-20 right-8 z-30 text-right font-mono text-sm md:text-base text-white/90 bg-black/80 backdrop-blur-sm px-6 py-3 border rounded-lg"
+            style={{ opacity: burst2Opacity, borderColor: `${themeColor}80` }}
           >
             TOTAL DISTANCE: 250mi • TOTAL PASSES: 12 • DURATION: 29 DAYS
           </motion.div>
 
-          {/* Panels — flex row, translated by x */}
           <motion.div className="flex h-full" style={{ x }}>
             {PANELS.map((panel, i) => (
               <div
@@ -184,7 +172,6 @@ export default function TheProof() {
                 className="w-screen h-full flex-shrink-0 flex items-center justify-center p-8 md:p-16"
               >
                 <div className="max-w-4xl w-full grid md:grid-cols-2 gap-12 items-center">
-                  {/* Image placeholder */}
                   <div
                     className="aspect-[4/5] rounded-2xl overflow-hidden relative group"
                     style={{
@@ -194,14 +181,11 @@ export default function TheProof() {
                     <div className="absolute inset-0 flex items-center justify-center text-white/20 font-mono text-xs">
                       BHUTAN TREK IMAGE {i + 1}
                     </div>
-                    {/* Decorative corner frame */}
                     <div className="absolute top-4 left-4 w-12 h-12 border-t-2 border-l-2 border-white/20" />
                     <div className="absolute bottom-4 right-4 w-12 h-12 border-b-2 border-r-2 border-white/20" />
                   </div>
 
-                  {/* Content */}
                   <div className="space-y-6">
-                    {/* Days and location */}
                     <div>
                       <div
                         className="font-display text-5xl md:text-6xl mb-2"
@@ -214,7 +198,6 @@ export default function TheProof() {
                       </div>
                     </div>
 
-                    {/* Data */}
                     <div className="flex gap-8">
                       <div>
                         <div className="font-mono text-xs text-white/40 mb-1">ALTITUDE</div>
@@ -226,10 +209,8 @@ export default function TheProof() {
                       </div>
                     </div>
 
-                    {/* Copy */}
                     <p className="text-lg md:text-xl text-white/80 leading-relaxed">{panel.copy}</p>
 
-                    {/* Decorative line */}
                     <div
                       className="h-px w-24"
                       style={{ background: themeColor, opacity: 0.5 }}
@@ -242,7 +223,7 @@ export default function TheProof() {
         </div>
       </div>
 
-      {/* Mobile: Vertical card stack */}
+      {/* Mobile: vertical card stack */}
       <div className="md:hidden px-6 py-12 space-y-12 bg-black">
         {PANELS.map((panel, i) => (
           <motion.div
@@ -253,7 +234,6 @@ export default function TheProof() {
             viewport={{ once: true, margin: '-50px' }}
             className="space-y-6"
           >
-            {/* Image placeholder */}
             <div
               className="aspect-[4/3] rounded-xl overflow-hidden relative"
               style={{
@@ -265,9 +245,7 @@ export default function TheProof() {
               </div>
             </div>
 
-            {/* Content */}
             <div className="space-y-4">
-              {/* Days and location */}
               <div>
                 <div className="font-display text-4xl mb-1" style={{ color: themeColor }}>
                   {panel.days}
@@ -277,7 +255,6 @@ export default function TheProof() {
                 </div>
               </div>
 
-              {/* Data inline */}
               <div className="flex gap-6">
                 <div>
                   <div className="font-mono text-xs text-white/40 mb-1">ALTITUDE</div>
@@ -289,11 +266,9 @@ export default function TheProof() {
                 </div>
               </div>
 
-              {/* Copy */}
               <p className="text-base text-white/80 leading-relaxed">{panel.copy}</p>
             </div>
 
-            {/* Divider */}
             {i < PANELS.length - 1 && (
               <div className="h-px w-full bg-gradient-to-r from-transparent via-white/10 to-transparent mt-6" />
             )}
@@ -301,7 +276,6 @@ export default function TheProof() {
         ))}
       </div>
 
-      {/* Exit: Trail Complete */}
       <div className="min-h-[60vh] flex flex-col items-center justify-center px-6 bg-black">
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
@@ -322,7 +296,6 @@ export default function TheProof() {
             <div style={{ color: themeColor }}>250 MILES.</div>
           </div>
 
-          {/* Decorative element */}
           <div className="pt-8">
             <div
               className="h-1 w-48 mx-auto rounded-full"
@@ -337,7 +310,6 @@ export default function TheProof() {
   );
 }
 
-// Telemetry overlay component with reactive motion values
 function TelemetryOverlay({
   altitude,
   temperature,
@@ -368,7 +340,7 @@ function TelemetryOverlay({
   });
 
   return (
-    <div className="fixed top-8 left-8 z-30 font-mono text-xs md:text-sm text-white/70 space-y-3 bg-black/60 backdrop-blur-sm px-4 py-3 rounded-lg border border-white/10">
+    <div className="absolute top-8 left-8 z-30 font-mono text-xs md:text-sm text-white/70 space-y-3 bg-black/60 backdrop-blur-sm px-4 py-3 rounded-lg border border-white/10">
       <div className="flex items-center gap-4">
         <div>
           <div className="text-white/40 text-xs">DAY</div>
@@ -386,7 +358,6 @@ function TelemetryOverlay({
         </div>
       </div>
 
-      {/* Progress bar */}
       <div className="relative h-1 bg-white/10 rounded-full overflow-hidden w-64">
         <motion.div
           className="absolute inset-y-0 left-0 rounded-full"
@@ -403,34 +374,43 @@ function TelemetryOverlay({
   );
 }
 
-// Mountain profile SVG with tracking dot
+// Mountain profile SVG - y-coordinates derived from actual panel altitudes:
+// 8200→y87, 9800→y66, 12500→y30, 14000→y10, 9500→y70, 8000→y90
+// Each panel center at x = 50, 150, 250, 350, 450, 550
+const MOUNTAIN_PATH = 'M0,90 C25,90 25,87 50,87 C100,87 100,66 150,66 C200,66 200,30 250,30 C300,30 300,10 350,10 C400,10 400,70 450,70 C500,70 500,90 550,90 C575,90 590,92 600,92';
+
 function MountainProfile({ dotX, themeColor }: { dotX: any; themeColor: string }) {
+  const pathRef = useRef<SVGPathElement>(null);
+  const [dotPos, setDotPos] = useState({ x: 0, y: 90 });
+
+  useMotionValueEvent(dotX, 'change', (latest) => {
+    if (!pathRef.current) return;
+    const pathLength = pathRef.current.getTotalLength();
+    // dotX is a string like "45.2%" - parse the number
+    const progress = parseFloat(latest as string) / 100;
+    const point = pathRef.current.getPointAtLength(progress * pathLength);
+    setDotPos({ x: point.x, y: point.y });
+  });
+
   return (
-    <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-30 w-[600px] max-w-[90vw]">
+    <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-30 w-[600px] max-w-[90vw]">
       <svg viewBox="0 0 600 100" className="w-full h-16">
-        {/* Mountain path */}
         <path
-          d="M0,80 C50,80 80,60 120,45 C160,30 200,15 250,8 C300,15 330,30 350,45 C400,65 450,75 500,80 C550,82 580,85 600,85"
+          ref={pathRef}
+          d={MOUNTAIN_PATH}
           fill="none"
           stroke="rgba(255,255,255,0.2)"
           strokeWidth="2"
         />
 
-        {/* Tracking dot */}
-        <motion.circle
-          cx={dotX}
-          cy="50"
-          r="6"
-          fill={themeColor}
-          style={{
-            filter: `drop-shadow(0 0 8px ${themeColor})`,
-          }}
-        >
-          <animate attributeName="r" values="6;8;6" dur="2s" repeatCount="indefinite" />
-        </motion.circle>
+        <circle cx={dotPos.x} cy={dotPos.y} r="10" fill={themeColor} opacity={0.3}>
+          <animate attributeName="r" values="10;14;10" dur="2s" repeatCount="indefinite" />
+        </circle>
+        <circle cx={dotPos.x} cy={dotPos.y} r="5" fill={themeColor}>
+          <animate attributeName="r" values="5;6;5" dur="2s" repeatCount="indefinite" />
+        </circle>
       </svg>
 
-      {/* Altitude markers */}
       <div className="flex justify-between text-white/30 font-mono text-xs mt-2">
         <div>8,200ft</div>
         <div>9,800ft</div>

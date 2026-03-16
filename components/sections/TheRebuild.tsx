@@ -2,27 +2,27 @@
 
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useRef, useState } from 'react';
+import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { useVitality } from '@/contexts/VitalityContext';
 import AnimatedCounter from '@/components/shared/AnimatedCounter';
 import { KEY_DATES, getNextRace, getDaysSince, getDaysUntil } from '@/lib/race-data';
+
+// Three.js cannot run in SSR
+const ProstheticScene = dynamic(() => import('@/components/shared/ProstheticScene'), { ssr: false });
 
 export default function TheRebuild() {
   const { theme } = useVitality();
   const prostheticRef = useRef<HTMLDivElement>(null);
   const [countersTriggered, setCountersTriggered] = useState(false);
 
-  // Prosthetic scroll-driven animation
   const { scrollYProgress: prostheticScroll } = useScroll({
     target: prostheticRef,
     offset: ['start end', 'end start'],
   });
 
-  const rotateY = useTransform(prostheticScroll, [0, 0.5, 1], [15, 0, 0]);
-  const grayscale = useTransform(prostheticScroll, [0, 0.5], [1, 0]);
   const techOverlayOpacity = useTransform(prostheticScroll, [0.3, 0.6], [0, 1]);
 
-  // Calculate counter values
   const daysSinceAccident = getDaysSince(KEY_DATES.accident);
   const daysSober = getDaysSince(KEY_DATES.sobriety);
   const nextRace = getNextRace();
@@ -30,7 +30,6 @@ export default function TheRebuild() {
 
   return (
     <section className="relative z-20 bg-black">
-      {/* Opening Headline - First orange after the void */}
       <div className="min-h-screen flex items-center justify-center px-6">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
@@ -54,7 +53,6 @@ export default function TheRebuild() {
         </motion.div>
       </div>
 
-      {/* The Prosthetic - Split Screen (Image Left) */}
       <div className="max-w-7xl mx-auto px-6 py-32">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 items-center">
           <motion.div
@@ -62,13 +60,13 @@ export default function TheRebuild() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: "-20%" }}
             transition={{ duration: 1, ease: 'easeOut' }}
-            className="relative aspect-[4/5] overflow-hidden"
+            className="relative aspect-[2/3] overflow-hidden"
           >
             <Image
               src="/pat-crop.png"
               alt="Patrick Wingert with prosthetic"
               fill
-              className="object-cover"
+              className="object-cover object-top"
             />
             <div
               className="absolute inset-0"
@@ -90,10 +88,10 @@ export default function TheRebuild() {
             >
               NOT A REPLACEMENT. AN UPGRADE.
             </h3>
-            <p className="font-mono text-sm tracking-[0.15em] text-white/60 leading-relaxed mb-4">
-              Carbon fiber. Titanium. Engineering that doesn't just restore function — it amplifies it.
+            <p className="font-mono text-base md:text-lg tracking-[0.15em] text-white/60 leading-relaxed mb-4">
+              Carbon fiber. Titanium. Engineering that doesn't just restore function. It amplifies it.
             </p>
-            <p className="font-mono text-sm tracking-[0.15em] text-white/60 leading-relaxed mb-4">
+            <p className="font-mono text-base md:text-lg tracking-[0.15em] text-white/60 leading-relaxed mb-4">
               This isn't about getting back to who he was. It's about becoming someone better.
             </p>
             <p className="font-mono text-xs tracking-[0.2em] text-white/40 mt-8">
@@ -103,61 +101,37 @@ export default function TheRebuild() {
         </div>
       </div>
 
-      {/* The Prosthetic Reveal - Full Width Showpiece */}
-      <div ref={prostheticRef} className="relative py-32 overflow-hidden">
-        <div className="max-w-4xl mx-auto px-6">
-          <motion.div
-            className="relative aspect-[3/4] md:aspect-[16/10] overflow-hidden"
-            style={{
-              rotateY,
-              transformStyle: 'preserve-3d',
-              perspective: '1000px',
-            }}
-          >
-            <motion.div
-              className="relative w-full h-full"
-              style={{
-                filter: grayscale.get() ? `grayscale(${grayscale.get() * 100}%)` : 'grayscale(0%)',
-              }}
-              animate={{
-                boxShadow: [
-                  `0 0 20px ${theme.primaryColor}40`,
-                  `0 0 40px ${theme.primaryColor}80`,
-                  `0 0 20px ${theme.primaryColor}40`,
-                ],
-              }}
-              transition={{
-                duration: 3,
-                repeat: Infinity,
-                ease: 'easeInOut',
-              }}
-            >
-              <Image
-                src="/pat-crop.png"
-                alt="Prosthetic system"
-                fill
-                className="object-cover"
-              />
-            </motion.div>
+      <div ref={prostheticRef} className="relative py-16 md:py-32">
+        <div className="max-w-5xl mx-auto px-6">
+          <div className="relative aspect-square md:aspect-[16/10]">
+            <ProstheticScene
+              scrollProgress={prostheticScroll}
+              themeColor={theme.primaryColor}
+            />
 
-            {/* Tech Overlay Cards */}
             <motion.div
-              className="absolute top-8 left-8 bg-black/80 backdrop-blur-sm border px-4 py-3"
+              className="absolute top-6 left-6 md:top-8 md:left-8 bg-black/90 border px-4 py-3 pointer-events-none"
               style={{
                 borderColor: theme.primaryColor,
-                opacity: techOverlayOpacity.get() || 0,
+                opacity: techOverlayOpacity,
               }}
             >
-              <p className="font-mono text-xs tracking-[0.3em]" style={{ color: theme.primaryColor }}>
-                PROSTHETIC SYSTEM // ACTIVE
-              </p>
+              <div className="flex items-center gap-2">
+                <span
+                  className="w-2 h-2 rounded-full animate-pulse"
+                  style={{ backgroundColor: theme.primaryColor }}
+                />
+                <p className="font-mono text-xs tracking-[0.3em]" style={{ color: theme.primaryColor }}>
+                  PROSTHETIC SYSTEM // ACTIVE
+                </p>
+              </div>
             </motion.div>
 
             <motion.div
-              className="absolute bottom-8 right-8 bg-black/80 backdrop-blur-sm border px-4 py-3"
+              className="absolute bottom-6 right-6 md:bottom-8 md:right-8 bg-black/90 border px-4 py-3 pointer-events-none"
               style={{
                 borderColor: theme.primaryColor,
-                opacity: techOverlayOpacity.get() || 0,
+                opacity: techOverlayOpacity,
               }}
             >
               <p className="font-mono text-xs tracking-[0.2em] text-white/60 mb-2">
@@ -173,11 +147,10 @@ export default function TheRebuild() {
                 Dynamic Response System
               </p>
             </motion.div>
-          </motion.div>
+          </div>
         </div>
       </div>
 
-      {/* Dare2Tri Discovery - Split Screen Reversed (Text Left, Image Right) */}
       <div className="max-w-7xl mx-auto px-6 py-32">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 items-center">
           <motion.div
@@ -193,13 +166,13 @@ export default function TheRebuild() {
             >
               SOMEONE SAID 'TRY THIS.'
             </h3>
-            <p className="font-mono text-sm tracking-[0.15em] text-white/60 leading-relaxed mb-4">
+            <p className="font-mono text-base md:text-lg tracking-[0.15em] text-white/60 leading-relaxed mb-4">
               Keri introduced him to adaptive sports. First session at Dare2Tri.
             </p>
-            <p className="font-mono text-sm tracking-[0.15em] text-white/60 leading-relaxed mb-4">
+            <p className="font-mono text-base md:text-lg tracking-[0.15em] text-white/60 leading-relaxed mb-4">
               The catalyst. The spark. The moment everything changed direction.
             </p>
-            <p className="font-mono text-sm tracking-[0.15em] text-white/60 leading-relaxed">
+            <p className="font-mono text-base md:text-lg tracking-[0.15em] text-white/60 leading-relaxed">
               Patient became athlete.
             </p>
           </motion.div>
@@ -227,7 +200,6 @@ export default function TheRebuild() {
         </div>
       </div>
 
-      {/* The Counters - Centered Section */}
       <motion.div
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
@@ -237,7 +209,6 @@ export default function TheRebuild() {
         className="max-w-6xl mx-auto px-6 py-32"
       >
         <div className="grid grid-cols-1 md:grid-cols-3 gap-16">
-          {/* Days Since Accident */}
           <div className="text-center">
             <div
               className="font-display text-[clamp(4rem,12vw,8rem)] font-bold leading-none mb-4"
@@ -253,7 +224,6 @@ export default function TheRebuild() {
             </p>
           </div>
 
-          {/* Days Sober */}
           <div className="text-center">
             <div
               className="font-display text-[clamp(4rem,12vw,8rem)] font-bold leading-none mb-4"
@@ -269,7 +239,6 @@ export default function TheRebuild() {
             </p>
           </div>
 
-          {/* Days Until Next Race */}
           <div className="text-center">
             <div
               className="font-display text-[clamp(4rem,12vw,8rem)] font-bold leading-none mb-4"
@@ -289,7 +258,6 @@ export default function TheRebuild() {
         </div>
       </motion.div>
 
-      {/* Trailing space */}
       <div className="h-[20vh]" />
     </section>
   );
