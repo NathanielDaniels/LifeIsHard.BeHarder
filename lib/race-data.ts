@@ -1,10 +1,10 @@
 export interface Race {
-  date: string;       // ISO date string
+  date: string;
   name: string;
   location: string;
   type: 'triathlon' | 'running';
-  isTarget?: boolean; // USA Nationals
-  result?: string;    // e.g., "3rd Place" — added after race completes
+  isTarget?: boolean;
+  result?: string;
 }
 
 export const RACES_2026: Race[] = [
@@ -15,6 +15,7 @@ export const RACES_2026: Race[] = [
   { date: '2026-07-26', name: 'San Francisco Marathon', location: 'San Francisco, CA', type: 'running' },
   { date: '2026-08-09', name: 'USA Para Triathlon National Championships', location: 'Milwaukee, WI', type: 'triathlon', isTarget: true },
   { date: '2026-08-23', name: 'SuperTri Chicago Triathlon', location: 'IL State Championship', type: 'triathlon' },
+  { date: '2026-10-25', name: 'San Diego Triathlon', location: 'San Diego, CA', type: 'triathlon' },
   { date: '2026-11-15', name: 'Berkeley Half Marathon', location: 'Berkeley, CA', type: 'running' },
   { date: '2026-12-06', name: 'California International Marathon', location: 'Sacramento, CA', type: 'running' },
 ];

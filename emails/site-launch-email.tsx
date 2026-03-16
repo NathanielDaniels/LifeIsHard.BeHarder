@@ -12,13 +12,10 @@ import {
   Font,
 } from "@react-email/components";
 
-interface WelcomeEmailProps {
+interface SiteLaunchEmailProps {
   email?: string;
 }
 
-// ============================================
-// Calculate live counters (same as site)
-// ============================================
 const ACCIDENT_DATE = new Date("2020-11-01");
 const SOBRIETY_DATE = new Date("2020-01-20");
 const NEXT_RACE_DATE = new Date("2026-04-11");
@@ -33,7 +30,7 @@ function getDaysUntil(date: Date): number {
   );
 }
 
-export default function WelcomeEmail({ email }: WelcomeEmailProps) {
+export default function SiteLaunchEmail({ email }: SiteLaunchEmailProps) {
   const orange = "#f97316";
   const darkBg = "#050505";
   const cardBg = "#0a0a0a";
@@ -60,55 +57,72 @@ export default function WelcomeEmail({ email }: WelcomeEmailProps) {
       </Head>
 
       <Preview>
-        You're on the list. Something unstoppable is coming. patrickwingert.com
+        It's live. The full story of Patrick Wingert. patrickwingert.com
       </Preview>
 
       <Body style={body}>
         <Container style={wrapper}>
-          {/* ========== TOP ORANGE ACCENT BAR ========== */}
           <Section
             style={{ backgroundColor: orange, height: "3px", width: "100%" }}
           />
 
-          {/* ========== HEADER ZONE ========== */}
           <Section style={headerZone}>
-            {/* Monospace system tag */}
-            <Text style={systemTag}>{">"} TRANSMISSION RECEIVED</Text>
+            <Text style={systemTag}>{">"} SYSTEM UPDATE</Text>
             <Text style={systemTag}>
-              {">"} SIGNAL LOCKED // SUBSCRIBER VERIFIED
+              {">"} FULL SITE DEPLOYED // ALL SYSTEMS ONLINE
             </Text>
 
-            {/* Decorative ECG line (ASCII art) */}
             <Text style={ecgLine}>───────╱╲___╱╲───────</Text>
 
-            {/* Main headline */}
-            <Text style={headline}>LIFE IS HARD.</Text>
-            <Text style={headlineAccent}>BE HARDER.</Text>
+            <Text style={headline}>THE WAIT</Text>
+            <Text style={headlineAccent}>IS OVER.</Text>
 
-            {/* Thin divider */}
             <Section style={thinDivider} />
 
-            {/* Subtitle */}
-            <Text style={subtitle}>PATRICK WINGERT</Text>
+            <Text style={subtitle}>PATRICKWINGERT.COM</Text>
             <Text style={subtitleSmall}>
-              DARE2TRI ELITE TEAM ATHLETE • ADAPTIVE TRIATHLETE
+              THE FULL EXPERIENCE IS NOW LIVE
             </Text>
           </Section>
 
-          {/* ========== BODY CONTENT ========== */}
           <Section style={contentSection}>
-            <Text style={bodyText}>You just locked in your spot.</Text>
             <Text style={bodyText}>
-              An immersive digital experience is being built, documenting every
-              mile, every heartbeat, every moment of a journey that was never
-              supposed to happen. Live biometrics. Real data. No filter.
+              You signed up early. You believed before you saw it.
+            </Text>
+            <Text style={bodyText}>
+              Now it's here. The complete story of Patrick Wingert, from the
+              accident that took his leg to the races that proved everyone wrong.
+              Live biometrics. Cinematic storytelling. Every mile documented.
             </Text>
             <Text style={bodyTextMuted}>
-              When the full site drops, you'll be the first to know.
+              This is what you've been waiting for.
             </Text>
           </Section>
 
-          {/* ========== STATS PREVIEW CARD ========== */}
+          {/* What's Inside */}
+          <Section style={featuresCard}>
+            <Text style={featuresHeader}>WHAT'S INSIDE</Text>
+
+            {[
+              ["THE FALL", "January 20, 2020. The day everything changed."],
+              ["THE REBUILD", "From hospital bed to starting line. The prosthetic that made it possible."],
+              ["THE PROOF", "250 miles across Bhutan. First American. First below-knee amputee."],
+              ["THE MACHINE", "Live heart rate, recovery, and strain. Powered by WHOOP."],
+              ["THE MISSION", "2026 race calendar. The road to Para Triathlon Nationals."],
+              ["THE TEAM", "The people behind the athlete. Meet them all."],
+            ].map(([title, desc], i) => (
+              <Row key={i} style={{ width: "100%", marginBottom: i < 5 ? "14px" : "0" }}>
+                <Column style={featureTitleCol}>
+                  <Text style={featureTitle}>{title}</Text>
+                </Column>
+                <Column style={featureDescCol}>
+                  <Text style={featureDesc}>{desc}</Text>
+                </Column>
+              </Row>
+            ))}
+          </Section>
+
+          {/* Stats */}
           <Section style={statsCard}>
             <Text style={statsCardHeader}>CURRENT READINGS</Text>
 
@@ -120,14 +134,14 @@ export default function WelcomeEmail({ email }: WelcomeEmailProps) {
                 <Text style={statLabel}>DAYS SINCE{"\n"}ACCIDENT</Text>
               </Column>
               <Column style={statDividerCol}>
-                <Text style={statDividerText}>│</Text>
+                <Text style={statDividerText}>|</Text>
               </Column>
               <Column style={statCell}>
                 <Text style={statNumber}>{daysSober.toLocaleString()}</Text>
                 <Text style={statLabel}>DAYS{"\n"}SOBER</Text>
               </Column>
               <Column style={statDividerCol}>
-                <Text style={statDividerText}>│</Text>
+                <Text style={statDividerText}>|</Text>
               </Column>
               <Column style={statCell}>
                 <Text style={statNumber}>{daysUntilRace.toLocaleString()}</Text>
@@ -136,71 +150,39 @@ export default function WelcomeEmail({ email }: WelcomeEmailProps) {
             </Row>
 
             <Text style={statsFooterNote}>
-              LIVE DATA • UPDATED IN REAL-TIME ON SITE
+              LIVE DATA ON SITE • UPDATED IN REAL-TIME
             </Text>
           </Section>
 
-          {/* ========== CTA BUTTON ========== */}
+          {/* CTA */}
           <Section style={ctaSection}>
             <Link href="https://patrickwingert.com" style={ctaButton}>
-              VISIT PATRICKWINGERT.COM
+              EXPERIENCE THE FULL SITE
             </Link>
           </Section>
 
-          {/* ========== WHAT'S COMING TEASER ========== */}
-          <Section style={teaserSection}>
-            <Text style={teaserHeader}>WHAT'S COMING</Text>
-
-            <Row style={{ width: "100%", marginBottom: "12px" }}>
-              <Column style={teaserBulletCol}>
-                <Text style={teaserBullet}>▸</Text>
-              </Column>
-              <Column style={teaserTextCol}>
-                <Text style={teaserText}>
-                  Live heart rate & biometrics powered by WHOOP
-                </Text>
-              </Column>
-            </Row>
-            <Row style={{ width: "100%", marginBottom: "12px" }}>
-              <Column style={teaserBulletCol}>
-                <Text style={teaserBullet}>▸</Text>
-              </Column>
-              <Column style={teaserTextCol}>
-                <Text style={teaserText}>
-                  The full story from accident to elite athlete
-                </Text>
-              </Column>
-            </Row>
-            <Row style={{ width: "100%", marginBottom: "12px" }}>
-              <Column style={teaserBulletCol}>
-                <Text style={teaserBullet}>▸</Text>
-              </Column>
-              <Column style={teaserTextCol}>
-                <Text style={teaserText}>
-                  250-mile Trans Bhutan Trail documentary content
-                </Text>
-              </Column>
-            </Row>
-            <Row style={{ width: "100%", marginBottom: "0" }}>
-              <Column style={teaserBulletCol}>
-                <Text style={teaserBullet}>▸</Text>
-              </Column>
-              <Column style={teaserTextCol}>
-                <Text style={teaserText}>
-                  2026 race calendar & sponsorship opportunities
-                </Text>
-              </Column>
-            </Row>
+          {/* Support */}
+          <Section style={supportSection}>
+            <Text style={supportHeader}>FUEL THE MISSION</Text>
+            <Text style={supportText}>
+              Patrick trains full-time toward Nationals. Equipment, travel,
+              coaching, race fees. Every contribution powers the next mile.
+            </Text>
+            <Link
+              href="https://give.dare2tri.org/fundraiser/6928347"
+              style={supportLink}
+            >
+              SUPPORT DARE2TRI →
+            </Link>
           </Section>
 
-          {/* ========== FOOTER ========== */}
+          {/* Footer */}
           <Section style={footerDividerLine} />
 
           <Section style={footerSection}>
             <Text style={footerName}>PATRICK WINGERT</Text>
             <Text style={footerTagline}>DARE2TRI ELITE TEAM ATHLETE</Text>
 
-            {/* Social links */}
             <Text style={socialRow}>
               <Link
                 href="https://www.instagram.com/patwingzzz"
@@ -208,31 +190,30 @@ export default function WelcomeEmail({ email }: WelcomeEmailProps) {
               >
                 INSTAGRAM
               </Link>
-              {/* <span style={socialDot}> • </span>
-              <Link
-                href="https://strava.app.link/gVriWQZiL0b"
-                style={socialLink}
-              >
-                STRAVA
-              </Link>
-              <span style={socialDot}> • </span>
+              <span style={socialDot}> · </span>
               <Link
                 href="https://give.dare2tri.org/fundraiser/6928347"
                 style={socialLink}
               >
                 DARE2TRI
-              </Link> */}
+              </Link>
             </Text>
 
-            {/* Muted footer text */}
             <Text style={footerMuted}>
               You're receiving this because {email || "you"} signed up at
               patrickwingert.com.
             </Text>
+            <Text style={footerMuted}>
+              <Link
+                href={`https://patrickwingert.com/api/unsubscribe${email ? `?email=${encodeURIComponent(email)}` : ''}`}
+                style={unsubscribeLink}
+              >
+                Unsubscribe
+              </Link>
+            </Text>
             <Text style={footerMuted}>One inspires many.</Text>
           </Section>
 
-          {/* Bottom orange accent */}
           <Section
             style={{ backgroundColor: orange, height: "2px", width: "100%" }}
           />
@@ -241,10 +222,6 @@ export default function WelcomeEmail({ email }: WelcomeEmailProps) {
     </Html>
   );
 }
-
-// ============================================
-// STYLES
-// ============================================
 
 const orange = "#f97316";
 const darkBg = "#050505";
@@ -267,7 +244,6 @@ const wrapper: React.CSSProperties = {
   border: "1px solid rgba(255,255,255,0.06)",
 };
 
-// --- Header ---
 const headerZone: React.CSSProperties = {
   padding: "40px 40px 32px",
   textAlign: "center" as const,
@@ -311,7 +287,7 @@ const headlineAccent: React.CSSProperties = {
   margin: "0 0 20px",
   letterSpacing: "2px",
   textAlign: "center" as const,
-  textShadow: `0 0 40px rgba(249, 115, 22, 0.4)`,
+  textShadow: "0 0 40px rgba(249, 115, 22, 0.4)",
 };
 
 const thinDivider: React.CSSProperties = {
@@ -339,7 +315,6 @@ const subtitleSmall: React.CSSProperties = {
   textAlign: "center" as const,
 };
 
-// --- Content ---
 const contentSection: React.CSSProperties = {
   padding: "0 40px 32px",
 };
@@ -359,7 +334,51 @@ const bodyTextMuted: React.CSSProperties = {
   fontStyle: "italic" as const,
 };
 
-// --- Stats Card ---
+const featuresCard: React.CSSProperties = {
+  margin: "0 auto 32px",
+  width: "86%",
+  maxWidth: "500px",
+  backgroundColor: cardBg,
+  border: "1px solid rgba(255,255,255,0.08)",
+  borderRadius: "8px",
+  padding: "24px 20px",
+};
+
+const featuresHeader: React.CSSProperties = {
+  fontFamily: '"SF Mono", monospace',
+  fontSize: "9px",
+  letterSpacing: "3px",
+  color: "rgba(255,255,255,0.4)",
+  margin: "0 0 20px",
+  textAlign: "center" as const,
+};
+
+const featureTitleCol: React.CSSProperties = {
+  width: "110px",
+  verticalAlign: "top" as const,
+  paddingRight: "12px",
+};
+
+const featureTitle: React.CSSProperties = {
+  fontFamily: '"Bebas Neue", Arial, sans-serif',
+  fontSize: "15px",
+  letterSpacing: "1px",
+  color: orange,
+  margin: "0",
+  lineHeight: "1.4",
+};
+
+const featureDescCol: React.CSSProperties = {
+  verticalAlign: "top" as const,
+};
+
+const featureDesc: React.CSSProperties = {
+  fontSize: "12px",
+  lineHeight: "1.5",
+  color: "rgba(255,255,255,0.45)",
+  margin: "0",
+};
+
 const statsCard: React.CSSProperties = {
   margin: "0 auto 32px",
   width: "86%",
@@ -427,7 +446,6 @@ const statsFooterNote: React.CSSProperties = {
   textAlign: "center" as const,
 };
 
-// --- CTA ---
 const ctaSection: React.CSSProperties = {
   padding: "0 40px 36px",
   textAlign: "center" as const,
@@ -447,43 +465,36 @@ const ctaButton: React.CSSProperties = {
   boxShadow: "0 0 30px rgba(249, 115, 22, 0.3)",
 };
 
-// --- Teaser ---
-const teaserSection: React.CSSProperties = {
+const supportSection: React.CSSProperties = {
   padding: "0 40px 36px",
+  textAlign: "center" as const,
 };
 
-const teaserHeader: React.CSSProperties = {
-  fontFamily: '"SF Mono", monospace',
-  fontSize: "10px",
-  letterSpacing: "3px",
+const supportHeader: React.CSSProperties = {
+  fontFamily: '"Bebas Neue", Arial, sans-serif',
+  fontSize: "22px",
+  letterSpacing: "4px",
+  color: "rgba(255,255,255,0.5)",
+  margin: "0 0 8px",
+  textAlign: "center" as const,
+};
+
+const supportText: React.CSSProperties = {
+  fontSize: "13px",
+  lineHeight: "1.7",
   color: "rgba(255,255,255,0.4)",
   margin: "0 0 16px",
+  textAlign: "center" as const,
 };
 
-const teaserBulletCol: React.CSSProperties = {
-  width: "20px",
-  verticalAlign: "top" as const,
-};
-
-const teaserBullet: React.CSSProperties = {
+const supportLink: React.CSSProperties = {
+  fontFamily: '"SF Mono", monospace',
+  fontSize: "11px",
+  letterSpacing: "2px",
   color: orange,
-  fontSize: "12px",
-  margin: "0",
-  lineHeight: "1.6",
+  textDecoration: "none",
 };
 
-const teaserTextCol: React.CSSProperties = {
-  verticalAlign: "top" as const,
-};
-
-const teaserText: React.CSSProperties = {
-  fontSize: "13px",
-  lineHeight: "1.6",
-  color: "rgba(255,255,255,0.55)",
-  margin: "0",
-};
-
-// --- Footer ---
 const footerDividerLine: React.CSSProperties = {
   height: "1px",
   backgroundColor: "rgba(255,255,255,0.06)",
@@ -537,4 +548,10 @@ const footerMuted: React.CSSProperties = {
   color: "rgba(255,255,255,0.2)",
   margin: "0 0 4px",
   textAlign: "center" as const,
+};
+
+const unsubscribeLink: React.CSSProperties = {
+  color: "rgba(255,255,255,0.25)",
+  textDecoration: "underline",
+  fontSize: "11px",
 };
