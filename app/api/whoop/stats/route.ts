@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
   const { success, resetAt } = rateLimit(`stats:${ip}`, 30, 60 * 1000);
   if (!success) return rateLimitResponse(resetAt);
 
-  // WHOOP not configured — return demo
+  // WHOOP not configured - return demo
   if (!isWhoopEnabled()) {
     return NextResponse.json({ ...getDemoStats(), mode: "demo" });
   }
@@ -37,21 +37,21 @@ export async function GET(request: NextRequest) {
     accessToken = await getValidAccessToken();
   } catch (err) {
     if (err instanceof TokenExpiredError) {
-      // Refresh token is dead — tell the client to show re-auth UI
+      // Refresh token is dead - tell the client to show re-auth UI
       return NextResponse.json(
         { ...getDemoStats(), mode: "unauthorized", authRequired: true },
         { status: 200 },
       );
     }
     if (err instanceof TokenRefreshError) {
-      // Transient failure — return stale cache if available, otherwise demo
+      // Transient failure - return stale cache if available, otherwise demo
       const { getStaleStats } = await import("@/lib/whoop-cache");
       const staleResult = await getStaleStats();
       if (staleResult) {
         return NextResponse.json({
           ...staleResult.stats,
           mode: "stale",
-          warning: "Using cached data — token refresh temporarily failed",
+          warning: "Using cached data - token refresh temporarily failed",
         });
       }
       return NextResponse.json({
@@ -133,7 +133,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({
         ...staleResult.stats,
         mode: "stale",
-        warning: "Using cached data — WHOOP API temporarily unavailable",
+        warning: "Using cached data - WHOOP API temporarily unavailable",
       });
     }
 

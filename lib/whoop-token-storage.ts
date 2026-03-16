@@ -1,5 +1,5 @@
 // ============================================
-// WHOOP Token Storage — Supabase Backed
+// WHOOP Token Storage - Supabase Backed
 //
 // Table: whoop_tokens
 //   id              text PRIMARY KEY  (always 'primary')
@@ -16,7 +16,7 @@ import { WhoopTokens } from "@/types/whoop";
 const TABLE = "whoop_tokens";
 const SINGLE_USER_ID = "primary";
 
-// Refresh token 10 minutes before expiry (was 5 — more headroom)
+// Refresh token 10 minutes before expiry (was 5 - more headroom)
 const EXPIRY_BUFFER_MS = 10 * 60 * 1000;
 
 // ============================================
@@ -115,12 +115,12 @@ export class TokenRefreshError extends Error {
  * Returns a valid access token, refreshing if needed.
  *
  * Returns:
- *   string  — valid token, ready to use
- *   null    — no tokens stored (never authorized)
+ *   string  - valid token, ready to use
+ *   null    - no tokens stored (never authorized)
  *
  * Throws:
- *   TokenExpiredError   — refresh token is dead, need full re-auth
- *   TokenRefreshError   — transient failure, can retry later
+ *   TokenExpiredError   - refresh token is dead, need full re-auth
+ *   TokenRefreshError   - transient failure, can retry later
  */
 export async function getValidAccessToken(): Promise<string | null> {
   const tokens = await getStoredTokens();
@@ -137,7 +137,7 @@ export async function getValidAccessToken(): Promise<string | null> {
 
   if (!isExpired) return tokens.access_token;
 
-  // Token expired — attempt refresh
+  // Token expired - attempt refresh
   return refreshWithRetry(tokens.refresh_token);
 }
 
@@ -164,13 +164,13 @@ async function refreshWithRetry(refreshToken: string): Promise<string> {
       .then(({ verifyTokenHealth }) =>
         verifyTokenHealth(newTokens.access_token),
       )
-      .catch(() => {}); // swallow — observability only
+      .catch(() => {}); // swallow - observability only
     return newTokens.access_token;
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
 
     // WHOOP returns 401/400 when refresh token is expired/revoked
-    // Don't retry — re-auth is required
+    // Don't retry - re-auth is required
     if (isAuthError(message)) {
       // Race condition mitigation: Wait 2 seconds for any concurrent worker's `upsert` to land in Supabase
       await sleep(2000);
@@ -191,7 +191,7 @@ async function refreshWithRetry(refreshToken: string): Promise<string> {
         message,
       );
       // Clear dead tokens so the UI doesn't keep trying
-      await clearTokens().catch(() => {}); // swallow — best effort
+      await clearTokens().catch(() => {}); // swallow - best effort
       throw new TokenExpiredError();
     }
 
@@ -201,7 +201,7 @@ async function refreshWithRetry(refreshToken: string): Promise<string> {
     );
   }
 
-  // Attempt 2 — 1.5s delay for transient network issues
+  // Attempt 2 - 1.5s delay for transient network issues
   await sleep(1500);
   try {
     const newTokens = await refreshAccessToken(refreshToken);
@@ -211,7 +211,7 @@ async function refreshWithRetry(refreshToken: string): Promise<string> {
       .then(({ verifyTokenHealth }) =>
         verifyTokenHealth(newTokens.access_token),
       )
-      .catch(() => {}); // swallow — observability only
+      .catch(() => {}); // swallow - observability only
     return newTokens.access_token;
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
@@ -371,7 +371,7 @@ function sleep(ms: number): Promise<void> {
 //       return newTokens.access_token;
 //     } catch (retryError) {
 //       console.error('Token refresh retry also failed:', retryError);
-//       // Don't clear tokens — the refresh token may still be valid
+//       // Don't clear tokens - the refresh token may still be valid
 //       // for a future request. Only explicit disconnect should clear tokens.
 //       return null;
 //     }

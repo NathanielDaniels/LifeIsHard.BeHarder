@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  // Validate state (CSRF protection) — read from Supabase
+  // Validate state (CSRF protection) - read from Supabase
   const { data: stateRow, error: stateError } = await supabase
     .from('whoop_oauth_state')
     .select('state, created_at')
