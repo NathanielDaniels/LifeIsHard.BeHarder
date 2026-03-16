@@ -1,11 +1,5 @@
 'use client';
 
-// ============================================
-// Admin Page: WHOOP Connection Management
-// URL: /admin/whoop
-// Protected by ADMIN_SECRET
-// ============================================
-
 import { Suspense, useEffect, useState, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 
@@ -47,7 +41,6 @@ function WhoopAdminContent() {
   }, []);
 
   useEffect(() => {
-    // Check if we have a stored secret in session
     const stored = sessionStorage.getItem('admin_secret');
     if (stored) {
       setAdminSecret(stored);
@@ -84,7 +77,6 @@ function WhoopAdminContent() {
     }
   }
 
-  // --- Auth Gate ---
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-[#0a0a0a] text-white flex items-center justify-center p-8">
@@ -118,7 +110,6 @@ function WhoopAdminContent() {
         <h1 className="text-3xl font-bold mb-2">WHOOP Integration</h1>
         <p className="text-white/60 mb-8">Manage biometric data connection</p>
 
-        {/* Success/Error Messages */}
         {success && (
           <div className="bg-green-500/20 border border-green-500/50 rounded-lg p-4 mb-6">
             <p className="text-green-400">
@@ -135,7 +126,6 @@ function WhoopAdminContent() {
           </div>
         )}
 
-        {/* Status Card */}
         <div className="bg-white/5 rounded-xl p-6 mb-6">
           <div className="flex justify-between items-start mb-4">
             <h2 className="text-xl font-semibold">Connection Status</h2>
@@ -192,7 +182,6 @@ function WhoopAdminContent() {
           )}
         </div>
 
-        {/* Actions */}
         <div className="space-y-4">
           {status?.mode !== 'live' ? (
             <a
@@ -218,7 +207,6 @@ function WhoopAdminContent() {
           </button>
         </div>
 
-        {/* Setup Instructions */}
         <div className="mt-12 pt-8 border-t border-white/10">
           <h3 className="text-lg font-semibold mb-4">Setup Instructions</h3>
           <ol className="space-y-3 text-sm text-white/70">
@@ -245,7 +233,6 @@ function WhoopAdminContent() {
           </ol>
         </div>
 
-        {/* Back Link */}
         <div className="mt-8 text-center">
           <a href="/" className="text-white/40 hover:text-white text-sm">
             ← Back to site

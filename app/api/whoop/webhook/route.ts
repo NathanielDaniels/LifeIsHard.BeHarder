@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
       timestamp: payload.timestamp,
     });
 
-    // Respond to WHOOP immediately — do the async work after
+    // Respond to WHOOP immediately - do the async work after
     // (Vercel will keep the function alive long enough to finish)
     const processingPromise = handleWebhookEvent(payload);
 
@@ -171,7 +171,7 @@ export async function GET(request: NextRequest) {
 //     // Verify webhook signature
 //     const webhookSecret = process.env.WHOOP_WEBHOOK_SECRET;
 //     if (webhookSecret) {
-//       // Secret is configured — signature is REQUIRED
+//       // Secret is configured - signature is REQUIRED
 //       if (!signature) {
 //         console.error('Missing webhook signature');
 //         return NextResponse.json(
@@ -297,7 +297,7 @@ export async function GET(request: NextRequest) {
 //   const challenge = request.nextUrl.searchParams.get('challenge');
   
 //   if (challenge) {
-//     // Sanitize challenge — only allow alphanumeric and basic chars
+//     // Sanitize challenge - only allow alphanumeric and basic chars
 //     const sanitized = challenge.replace(/[^a-zA-Z0-9_-]/g, '');
 //     return NextResponse.json({ challenge: sanitized });
 //   }

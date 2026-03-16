@@ -8,7 +8,7 @@ export default function SupportCTA() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const isInView = useInView(sectionRef, { once: true, margin: "-100px" });
 
-  // Mock fundraising data - will connect to real API
+  // TODO: connect to real API
   const [fundingData] = useState({
     current: 12500,
     goal: 25000,
@@ -19,16 +19,13 @@ export default function SupportCTA() {
 
   return (
     <section ref={sectionRef} className="relative min-h-screen py-32 px-6">
-      {/* Background with mountain silhouette */}
       <div className="absolute inset-0 bg-gradient-to-b from-zinc-900 via-black to-black">
-        {/* Mountain SVG overlay */}
         <svg className="absolute bottom-0 w-full h-64 text-white/5" viewBox="0 0 1440 320" fill="currentColor">
           <path d="M0,160L48,144C96,128,192,96,288,101.3C384,107,480,149,576,149.3C672,149,768,107,864,90.7C960,75,1056,85,1152,106.7C1248,128,1344,160,1392,176L1440,192L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"/>
         </svg>
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto">
-        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -44,14 +41,12 @@ export default function SupportCTA() {
           </p>
         </motion.div>
 
-        {/* Elevation Map Visualization */}
-        <FundingMountain 
+        <FundingMountain
           current={fundingData.current} 
           goal={fundingData.goal} 
           supporters={fundingData.supporters} 
         />
 
-        {/* Sponsorship tiers */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -86,7 +81,6 @@ export default function SupportCTA() {
           </div>
         </motion.div>
 
-        {/* Tax deductible note */}
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
@@ -103,25 +97,21 @@ export default function SupportCTA() {
   );
 }
 
-// Sub-components
-// Sub-components
-
 function FundingMountain({ current, goal, supporters }: { current: number, goal: number, supporters: number }) {
   const percentage = Math.min(100, Math.max(0, (current / goal) * 100));
   const { theme, energyState } = useVitality();
   
-  // Weather effects based on vitality
   const getWeatherClass = () => {
     switch(energyState) {
       case 'HIGH': return 'bg-orange-500/10'; // Clear day
       case 'MEDIUM': return 'bg-yellow-500/10'; // Hazy
       case 'LOW': return 'bg-red-900/20 backdrop-blur-sm'; // Stormy
+      default: return 'bg-white/5';
     }
   };
 
   return (
     <div className={`relative mb-32 p-8 rounded-3xl border border-white/10 ${getWeatherClass()} transition-all duration-1000 overflow-hidden`}>
-      {/* Fog/Weather Layers */}
       {energyState === 'LOW' && (
         <motion.div 
           animate={{ x: [-100, 100] }} 
@@ -130,7 +120,6 @@ function FundingMountain({ current, goal, supporters }: { current: number, goal:
         />
       )}
 
-      {/* Stats Overlay */}
       <div className="flex justify-between items-end mb-8 relative z-10">
         <div>
           <div className="text-sm text-white/50 uppercase tracking-widest mb-1">Elevation Reached</div>
@@ -146,16 +135,13 @@ function FundingMountain({ current, goal, supporters }: { current: number, goal:
         </div>
       </div>
 
-      {/* Mountain Graph */}
       <div className="relative h-64 md:h-96 w-full mt-12">
-        {/* Grid lines */}
         {[0, 25, 50, 75, 100].map(p => (
           <div key={p} className="absolute w-full border-t border-white/5" style={{ bottom: `${p}%` }}>
             <span className="absolute -top-3 right-0 text-xs text-white/20">{p}%</span>
           </div>
         ))}
 
-        {/* The Mountain Path SVG */}
         <svg className="absolute inset-0 w-full h-full overflow-visible" preserveAspectRatio="none">
           <defs>
             <linearGradient id="mountainGradient" x1="0" y1="0" x2="0" y2="1">
@@ -163,9 +149,7 @@ function FundingMountain({ current, goal, supporters }: { current: number, goal:
               <stop offset="100%" stopColor={theme.primaryColor} stopOpacity="0" />
             </linearGradient>
           </defs>
-          
-          {/* Path Definition */}
-          {/* M start, L points... simple mountain profile */}
+
           <motion.path
             d="M0,384 L100,350 L250,300 L400,320 L550,200 L700,250 L850,100 L1000,150 L1200,0 L1200,384 Z"
             fill="url(#mountainGradient)"
@@ -175,7 +159,6 @@ function FundingMountain({ current, goal, supporters }: { current: number, goal:
             transition={{ duration: 1.5, ease: "easeOut" }}
           />
           
-          {/* Progress Line */}
           <motion.path
             d="M0,384 L100,350 L250,300 L400,320 L550,200 L700,250 L850,100 L1000,150 L1200,0"
             fill="none"
@@ -187,35 +170,28 @@ function FundingMountain({ current, goal, supporters }: { current: number, goal:
             transition={{ duration: 1.5, ease: "easeOut", delay: 0.2 }}
           />
 
-          {/* Climber Marker - Position needs to be calculated or estimated based on path */}
-          {/* Simplified for demo: Just a marker that moves horizontally and vertically based on funding % */}
         </svg>
 
-        {/* Animated Climber Marker (Absolute positioned for simplicity over complex SVG path math for now) */}
         <motion.div
           className="absolute w-4 h-4 rounded-full bg-white shadow-[0_0_20px_rgba(255,255,255,0.8)] z-20"
           initial={{ left: '0%', bottom: '0%' }}
-          whileInView={{ 
-            left: `${percentage}%`, 
-            // Rough approximation of height based on % for visual effect
-            bottom: `${percentage * 0.8 + (Math.sin(percentage * 0.1) * 10)}%` 
+          whileInView={{
+            left: `${percentage}%`,
+            bottom: `${percentage * 0.8 + (Math.sin(percentage * 0.1) * 10)}%`
           }}
           transition={{ duration: 2, ease: "easeOut", delay: 0.5 }}
         >
-          {/* Pulse ring */}
           <motion.div
             className="absolute inset-0 rounded-full bg-white"
             animate={{ scale: [1, 2], opacity: [0.5, 0] }}
             transition={{ duration: 1, repeat: Infinity }}
           />
           
-          {/* Label tooltip */}
           <div className="absolute -top-10 left-1/2 -translate-x-1/2 px-3 py-1 bg-white/10 backdrop-blur-md rounded-lg border border-white/20 text-xs font-bold whitespace-nowrap">
             CURRENT ELEVATION
           </div>
         </motion.div>
 
-        {/* Milestones */}
         {[25, 50, 75].map((ms) => (
           <div 
             key={ms} 
@@ -229,7 +205,6 @@ function FundingMountain({ current, goal, supporters }: { current: number, goal:
         ))}
       </div>
       
-      {/* Footer & CTAs */}
       <div className="mt-8 flex flex-col md:flex-row gap-8 items-center justify-between border-t border-white/10 pt-6">
         <div className="flex gap-12">
           <div>
@@ -243,21 +218,25 @@ function FundingMountain({ current, goal, supporters }: { current: number, goal:
         </div>
 
         <div className="flex gap-4 w-full md:w-auto">
-          <motion.button
+          <motion.a
+            href="/sponsors"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="flex-1 md:flex-none px-8 py-3 bg-white/10 hover:bg-white/20 text-white font-bold rounded-full border border-white/20 transition-all"
+            className="flex-1 md:flex-none px-8 py-3 bg-white/10 hover:bg-white/20 text-white font-bold rounded-full border border-white/20 transition-all text-center"
           >
            BECOME A SPONSOR
-          </motion.button>
-          <motion.button
+          </motion.a>
+          <motion.a
+            href="https://give.dare2tri.org/fundraiser/6928347"
+            target="_blank"
+            rel="noopener noreferrer"
             whileHover={{ scale: 1.05, boxShadow: `0 0 20px ${theme.primaryColor}` }}
             whileTap={{ scale: 0.95 }}
-            className="flex-1 md:flex-none px-8 py-3 text-white font-black rounded-full transition-all"
+            className="flex-1 md:flex-none px-8 py-3 text-white font-black rounded-full transition-all text-center"
             style={{ backgroundColor: theme.primaryColor }}
           >
             SUPPORT NOW
-          </motion.button>
+          </motion.a>
         </div>
       </div>
     </div>
@@ -288,7 +267,6 @@ function TierCard({ tier, amount, benefits, color, featured }: TierCardProps) {
         </div>
       )}
 
-      {/* Gradient accent */}
       <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${color}`} />
 
       <div className="mb-6">

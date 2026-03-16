@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import Image from 'next/image';
 
 export default function InstagramFeed() {
-  // Mock Instagram posts - will be replaced with real API data
+  // TODO: Replace with real Instagram API data
   const posts = [
     { id: 1, image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=600&q=80", caption: "Morning run complete 💪" },
     { id: 2, image: "https://images.unsplash.com/photo-1551632811-561732d1e306?w=600&q=80", caption: "Training day" },
@@ -16,11 +16,9 @@ export default function InstagramFeed() {
 
   return (
     <section className="relative py-32 px-6 overflow-hidden">
-      {/* Background */}
       <div className="absolute inset-0 bg-black" />
       
       <div className="relative z-10 max-w-7xl mx-auto">
-        {/* Section header */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -35,7 +33,6 @@ export default function InstagramFeed() {
             Follow along in real-time
           </p>
           
-          {/* Instagram handle */}
           <motion.a
             href="https://instagram.com/patrick.wingert"
             target="_blank"
@@ -51,7 +48,6 @@ export default function InstagramFeed() {
           </motion.a>
         </motion.div>
 
-        {/* Posts grid with staggered animation */}
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           {posts.map((post, index) => (
             <motion.div
@@ -61,9 +57,8 @@ export default function InstagramFeed() {
               transition={{ delay: index * 0.1, duration: 0.6 }}
               viewport={{ once: true }}
               whileHover={{ scale: 1.05, zIndex: 10 }}
-              className="relative aspect-square rounded-2xl overflow-hidden group cursor-pointer"
+              className="relative aspect-square rounded-2xl overflow-hidden group"
             >
-              {/* Image */}
               <Image
                 src={post.image}
                 alt={post.caption}
@@ -71,12 +66,10 @@ export default function InstagramFeed() {
                 className="object-cover transition-transform duration-500 group-hover:scale-110"
               />
               
-              {/* Overlay on hover */}
               <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
                 <p className="text-white text-sm font-medium">{post.caption}</p>
               </div>
 
-              {/* Orange border on hover */}
               <div className="absolute inset-0 border-2 border-orange-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl" 
                    style={{
                      boxShadow: '0 0 30px rgba(249, 115, 22, 0.5)'
@@ -86,7 +79,6 @@ export default function InstagramFeed() {
           ))}
         </div>
 
-        {/* Bottom CTA */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}

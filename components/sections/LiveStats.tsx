@@ -7,7 +7,6 @@ import { useVitality } from '@/contexts/VitalityContext';
 interface WhoopData {
   strain: number;
   recovery: number;
-  // sleep: number;
   hrv: number;
 }
 
@@ -20,16 +19,12 @@ export default function LiveStats() {
     offset: ["start end", "end start"]
   });
 
-  // Mock WHOOP data - In real app, this would fetch from API
-  // We're using local state here to simulate "Live" updates that drive the context
   const whoopData: WhoopData = {
     strain: 16.8,
-    recovery: 87, // Change this to test different states (e.g. 25 for Low)
-    // sleep: 8.2,
+    recovery: 87,
     hrv: 72
   };
 
-  // Sync data with global context on mount
   useEffect(() => {
     setStats(whoopData.recovery, whoopData.strain);
   }, []);
@@ -37,12 +32,12 @@ export default function LiveStats() {
   const opacity = useTransform(scrollYProgress, [0, 0.3, 0.7, 1], [0, 1, 1, 0]);
   const y = useTransform(scrollYProgress, [0, 0.3, 0.7, 1], [100, 0, 0, -100]);
 
-  // Color logic is now driven by context energyState
   const getIntensityColor = () => {
     switch (energyState) {
       case 'HIGH': return { from: 'from-orange-500', to: 'to-red-500', glow: 'rgba(255, 87, 34, 0.9)' };
       case 'MEDIUM': return { from: 'from-amber-400', to: 'to-yellow-500', glow: 'rgba(251, 191, 36, 0.7)' };
       case 'LOW': return { from: 'from-red-900', to: 'to-red-950', glow: 'rgba(153, 27, 27, 0.6)' };
+      default: return { from: 'from-orange-500', to: 'to-red-500', glow: 'rgba(255, 87, 34, 0.9)' };
     }
   };
 
@@ -55,7 +50,6 @@ export default function LiveStats() {
       className="relative min-h-screen flex items-center justify-center py-32 px-6"
     >
       <div className="max-w-7xl w-full">
-        {/* Section header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -76,9 +70,7 @@ export default function LiveStats() {
           </p>
         </motion.div>
 
-        {/* Stats grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {/* Strain */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           <StatCard
             label="Strain"
             value={whoopData.strain}
@@ -90,7 +82,6 @@ export default function LiveStats() {
             speed={theme.animationSpeed}
           />
 
-          {/* Recovery */}
           <StatCard
             label="Recovery"
             value={whoopData.recovery}
@@ -103,19 +94,6 @@ export default function LiveStats() {
             speed={theme.animationSpeed}
           />
 
-          {/* Sleep */}
-          {/* <StatCard
-            label="Sleep"
-            value={whoopData.sleep}
-            unit="hrs"
-            max={12}
-            color={intensityColors}
-            description="Last night"
-            delay={0.3}
-            speed={theme.animationSpeed}
-          /> */}
-
-          {/* HRV */}
           <StatCard
             label="HRV"
             value={whoopData.hrv}
@@ -128,40 +106,41 @@ export default function LiveStats() {
           />
         </div>
 
-        {/* Controls for User Demo - allowing them to feel the difference */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          transition={{ delay: 1, duration: 1 }}
-          className="mt-20 p-8 rounded-2xl bg-white/5 border border-white/10 max-w-2xl mx-auto text-center"
-        >
-          <p className="text-white/60 text-sm mb-6 uppercase tracking-widest">
-            Simulation Control (Dev Only)
-          </p>
-          <div className="flex flex-wrap justify-center gap-4">
-            <button 
-              onClick={() => setStats(25, 12.0)}
-              className="px-6 py-3 rounded-full border border-red-500/50 hover:bg-red-500/20 text-white transition-all text-sm font-bold"
-            >
-              Simulate: HARD DAY (25%)
-            </button>
-            <button 
-              onClick={() => setStats(50, 15.0)}
-              className="px-6 py-3 rounded-full border border-yellow-500/50 hover:bg-yellow-500/20 text-white transition-all text-sm font-bold"
-            >
-              Simulate: ADAPTING (50%)
-            </button>
-            <button 
-              onClick={() => setStats(95, 18.0)}
-              className="px-6 py-3 rounded-full border border-green-500/50 hover:bg-green-500/20 text-white transition-all text-sm font-bold"
-            >
-              Simulate: PEAK (95%)
-            </button>
-          </div>
-          <p className="mt-4 text-xs text-white/40">
-            Click to see how the entire site's atmosphere shifts based on data.
-          </p>
-        </motion.div>
+        {process.env.NODE_ENV === 'development' && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            transition={{ delay: 1, duration: 1 }}
+            className="mt-20 p-8 rounded-2xl bg-white/5 border border-white/10 max-w-2xl mx-auto text-center"
+          >
+            <p className="text-white/60 text-sm mb-6 uppercase tracking-widest">
+              Simulation Control (Dev Only)
+            </p>
+            <div className="flex flex-wrap justify-center gap-4">
+              <button
+                onClick={() => setStats(25, 12.0)}
+                className="px-6 py-3 rounded-full border border-red-500/50 hover:bg-red-500/20 text-white transition-all text-sm font-bold"
+              >
+                Simulate: HARD DAY (25%)
+              </button>
+              <button
+                onClick={() => setStats(50, 15.0)}
+                className="px-6 py-3 rounded-full border border-yellow-500/50 hover:bg-yellow-500/20 text-white transition-all text-sm font-bold"
+              >
+                Simulate: ADAPTING (50%)
+              </button>
+              <button
+                onClick={() => setStats(95, 18.0)}
+                className="px-6 py-3 rounded-full border border-green-500/50 hover:bg-green-500/20 text-white transition-all text-sm font-bold"
+              >
+                Simulate: PEAK (95%)
+              </button>
+            </div>
+            <p className="mt-4 text-xs text-white/40">
+              Click to see how the entire site's atmosphere shifts based on data.
+            </p>
+          </motion.div>
+        )}
       </div>
     </motion.section>
   );
@@ -192,7 +171,6 @@ function StatCard({ label, value, unit, max, color, description, delay, isPrimar
         isPrimary ? 'border-orange-500/50' : 'border-white/10'
       } bg-white/5 backdrop-blur-sm overflow-hidden group hover:border-orange-500/50 transition-all duration-500`}
     >
-      {/* Animated background gradient */}
       <motion.div
         className={`absolute inset-0 bg-gradient-to-br ${color.from} ${color.to} opacity-0 group-hover:opacity-10 transition-opacity duration-500`}
         animate={{

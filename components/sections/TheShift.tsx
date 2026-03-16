@@ -11,7 +11,6 @@ export default function TheShift() {
     offset: ["start end", "end start"]
   });
 
-  // Transform values for split screen effect
   const leftX = useTransform(scrollYProgress, [0, 0.5, 1], [-100, 0, 0]);
   const rightX = useTransform(scrollYProgress, [0, 0.5, 1], [100, 0, 0]);
   const opacity = useTransform(scrollYProgress, [0, 0.3, 0.7, 1], [0, 1, 1, 0]);
@@ -19,11 +18,9 @@ export default function TheShift() {
 
   return (
     <section ref={sectionRef} className="relative min-h-screen py-32 overflow-hidden">
-      {/* Background overlay */}
       <div className="absolute inset-0 bg-gradient-to-b from-black via-zinc-900 to-black" />
 
       <motion.div style={{ opacity }} className="relative z-10">
-        {/* Section title */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -39,10 +36,8 @@ export default function TheShift() {
           </p>
         </motion.div>
 
-        {/* Split screen container */}
         <div className="relative h-[600px] max-w-7xl mx-auto px-6">
           <div className="relative h-full flex gap-4">
-            {/* Left side - The Setback */}
             <motion.div
               style={{ x: leftX, scale }}
               className="flex-1 relative rounded-2xl overflow-hidden group"
@@ -51,11 +46,11 @@ export default function TheShift() {
                 src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=800&q=80"
                 alt="Hospital/Recovery"
                 fill
+                sizes="(max-width: 768px) 100vw, 50vw"
                 className="object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
               
-              {/* Content overlay */}
               <div className="absolute inset-0 flex flex-col justify-end p-8 md:p-12">
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
@@ -72,11 +67,9 @@ export default function TheShift() {
                 </motion.div>
               </div>
 
-              {/* Fade to orange on right edge */}
               <div className="absolute right-0 inset-y-0 w-32 bg-gradient-to-l from-orange-500/20 to-transparent pointer-events-none" />
             </motion.div>
 
-            {/* Center divider with arrow */}
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
               whileInView={{ opacity: 1, scale: 1 }}
@@ -85,7 +78,6 @@ export default function TheShift() {
               className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20"
             >
               <div className="relative">
-                {/* Glowing circle */}
                 <motion.div
                   animate={{
                     scale: [1, 1.2, 1],
@@ -102,7 +94,6 @@ export default function TheShift() {
                   }}
                 />
                 
-                {/* Arrow */}
                 <motion.div
                   animate={{ x: [0, 5, 0] }}
                   transition={{
@@ -112,14 +103,13 @@ export default function TheShift() {
                   }}
                   className="absolute inset-0 flex items-center justify-center"
                 >
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" className="text-orange-500">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" className="text-orange-500" aria-hidden="true">
                     <path d="M5 12h14m-6-6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
                 </motion.div>
               </div>
             </motion.div>
 
-            {/* Right side - The Comeback */}
             <motion.div
               style={{ x: rightX, scale }}
               className="flex-1 relative rounded-2xl overflow-hidden group"
@@ -128,11 +118,11 @@ export default function TheShift() {
                 src="https://images.unsplash.com/photo-1452626038306-9aae5e071dd3?w=800&q=80"
                 alt="Athletic transformation"
                 fill
+                sizes="(max-width: 768px) 100vw, 50vw"
                 className="object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
               
-              {/* Content overlay */}
               <div className="absolute inset-0 flex flex-col justify-end p-8 md:p-12">
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
@@ -149,13 +139,11 @@ export default function TheShift() {
                 </motion.div>
               </div>
 
-              {/* Fade from orange on left edge */}
               <div className="absolute left-0 inset-y-0 w-32 bg-gradient-to-r from-orange-500/20 to-transparent pointer-events-none" />
             </motion.div>
           </div>
         </div>
 
-        {/* Bottom text */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}

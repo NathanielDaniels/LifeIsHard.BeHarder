@@ -11,31 +11,24 @@ export default function ProstheticReveal() {
     offset: ["start end", "end start"]
   });
 
-  // 3D reveal transforms
   const rotateY = useTransform(scrollYProgress, [0.1, 0.4, 0.6], [25, 0, -15]);
-  const perspective = useTransform(scrollYProgress, [0.1, 0.4], [1000, 2000]);
   const opacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0, 1, 1, 0]);
   const scale = useTransform(scrollYProgress, [0.1, 0.4, 0.7], [0.85, 1, 1.05]);
   
-  // Transition from prosthetic detail to triumph
   const prostheticOpacity = useTransform(scrollYProgress, [0.1, 0.4, 0.6, 0.75], [0, 1, 1, 0]);
   const triumphOpacity = useTransform(scrollYProgress, [0.5, 0.7, 0.9], [0, 1, 1]);
 
-  // Glowing border effect
   const glowIntensity = useTransform(scrollYProgress, [0.2, 0.5, 0.7], [0.3, 0.8, 0.4]);
 
   return (
     <section ref={sectionRef} className="relative min-h-[200vh] py-32">
-      {/* Background */}
       <div className="absolute inset-0 bg-gradient-to-b from-black via-zinc-950 to-black" />
 
-      {/* Sticky container */}
       <div className="sticky top-0 h-screen flex items-center justify-center overflow-hidden">
         <motion.div 
           style={{ opacity }} 
           className="relative w-full max-w-7xl mx-auto px-6"
         >
-          {/* Section header */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -51,9 +44,7 @@ export default function ProstheticReveal() {
             </p>
           </motion.div>
 
-          {/* Main 3D reveal container */}
           <div className="relative h-[70vh] flex items-center justify-center">
-            {/* Prosthetic Image with 3D Transform */}
             <motion.div
               style={{
                 opacity: prostheticOpacity,
@@ -69,7 +60,6 @@ export default function ProstheticReveal() {
                   perspective: '1000px'
                 }}
               >
-                {/* Glowing border */}
                 <motion.div
                   style={{ opacity: glowIntensity }}
                   className="absolute -inset-1 rounded-3xl z-0"
@@ -83,7 +73,6 @@ export default function ProstheticReveal() {
                   transition={{ duration: 3, repeat: Infinity }}
                 />
                 
-                {/* Prosthetic leg image */}
                 <div className="relative z-10 w-full h-full rounded-3xl overflow-hidden border border-orange-500/30">
                   <Image
                     src="https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?w=800&q=80"
@@ -93,7 +82,6 @@ export default function ProstheticReveal() {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black/30" />
                   
-                  {/* Technical overlay details */}
                   <div className="absolute bottom-8 left-8 right-8">
                     <motion.div
                       initial={{ opacity: 0, y: 20 }}
@@ -115,13 +103,11 @@ export default function ProstheticReveal() {
               </div>
             </motion.div>
 
-            {/* Triumph Image - Marathon Finish */}
             <motion.div
               style={{ opacity: triumphOpacity }}
               className="absolute inset-0 flex items-center justify-center"
             >
               <div className="relative w-full max-w-4xl aspect-video rounded-3xl overflow-hidden">
-                {/* Victory glow */}
                 <motion.div
                   animate={{
                     boxShadow: [
@@ -143,7 +129,6 @@ export default function ProstheticReveal() {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
                   
-                  {/* Victory text */}
                   <div className="absolute bottom-0 left-0 right-0 p-12 text-center">
                     <motion.h3
                       initial={{ opacity: 0, y: 30 }}
@@ -163,7 +148,6 @@ export default function ProstheticReveal() {
             </motion.div>
           </div>
 
-          {/* Bottom message */}
           <motion.div
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
@@ -178,19 +162,19 @@ export default function ProstheticReveal() {
         </motion.div>
       </div>
 
-      {/* Scroll progress indicator */}
-      <motion.div
-        style={{ scaleY: scrollYProgress }}
-        className="fixed right-8 top-1/2 -translate-y-1/2 w-1 h-32 bg-orange-500/30 rounded-full origin-top hidden lg:block z-50"
+      <div
+        className="fixed right-8 top-1/2 -translate-y-1/2 w-1 h-32 bg-orange-500/30 rounded-full overflow-hidden hidden lg:block z-50"
       >
         <motion.div
           className="absolute top-0 left-0 right-0 bg-orange-500 rounded-full"
-          style={{ 
+          style={{
             height: '100%',
+            scaleY: scrollYProgress,
+            transformOrigin: 'top',
             boxShadow: '0 0 20px rgba(249, 115, 22, 0.6)'
           }}
         />
-      </motion.div>
+      </div>
     </section>
   );
 }

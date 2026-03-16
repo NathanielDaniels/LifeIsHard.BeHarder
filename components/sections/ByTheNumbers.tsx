@@ -16,7 +16,6 @@ export default function ByTheNumbers() {
 
   return (
     <section ref={sectionRef} className="relative min-h-screen py-32 px-6">
-      {/* Background pattern */}
       <div className="absolute inset-0 bg-black">
         <div className="absolute inset-0" style={{
           backgroundImage: `radial-gradient(circle at 2px 2px, rgba(249, 115, 22, 0.05) 1px, transparent 0)`,
@@ -25,7 +24,6 @@ export default function ByTheNumbers() {
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto">
-        {/* Section header */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -41,7 +39,6 @@ export default function ByTheNumbers() {
           </p>
         </motion.div>
 
-        {/* Stats grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
           {stats.map((stat, index) => (
             <StatCounter
@@ -53,7 +50,6 @@ export default function ByTheNumbers() {
           ))}
         </div>
 
-        {/* Bottom emphasis */}
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           whileInView={{ opacity: 1, scale: 1 }}
@@ -91,25 +87,31 @@ function StatCounter({ label, value, unit, color, delay, isInView }: StatCounter
   useEffect(() => {
     if (!isInView) return;
 
-    const duration = 2000; // 2 seconds
+    const delayMs = delay * 1000;
+    const duration = 2000;
     const steps = 60;
     const increment = value / steps;
     let current = 0;
+    let intervalId: ReturnType<typeof setInterval>;
 
-    const timer = setInterval(() => {
-      current += increment;
-      if (current >= value) {
-        setCount(value);
-        clearInterval(timer);
-      } else {
-        setCount(Math.floor(current));
-      }
-    }, duration / steps);
+    const timeoutId = setTimeout(() => {
+      intervalId = setInterval(() => {
+        current += increment;
+        if (current >= value) {
+          setCount(value);
+          clearInterval(intervalId);
+        } else {
+          setCount(Math.floor(current));
+        }
+      }, duration / steps);
+    }, delayMs);
 
-    return () => clearInterval(timer);
-  }, [isInView, value]);
+    return () => {
+      clearTimeout(timeoutId);
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, [isInView, value, delay]);
 
-  // Format large numbers with commas
   const formatNumber = (num: number) => {
     return num.toLocaleString('en-US');
   };
@@ -122,7 +124,6 @@ function StatCounter({ label, value, unit, color, delay, isInView }: StatCounter
       viewport={{ once: true }}
       className="relative p-10 md:p-12 rounded-3xl border border-white/10 bg-white/5 backdrop-blur-sm overflow-hidden group hover:border-orange-500/50 transition-all duration-500"
     >
-      {/* Animated gradient background */}
       <motion.div
         className={`absolute inset-0 bg-gradient-to-br ${color} opacity-0 group-hover:opacity-10 transition-opacity duration-500`}
         animate={{
@@ -137,7 +138,6 @@ function StatCounter({ label, value, unit, color, delay, isInView }: StatCounter
       />
 
       <div className="relative z-10">
-        {/* Label */}
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           whileInView={{ opacity: 1, x: 0 }}
@@ -148,7 +148,6 @@ function StatCounter({ label, value, unit, color, delay, isInView }: StatCounter
           {label}
         </motion.div>
 
-        {/* Counter */}
         <div ref={countRef} className="flex items-baseline gap-2 mb-6">
           <motion.span
             className={`text-6xl md:text-8xl font-black bg-gradient-to-br ${color} bg-clip-text text-transparent`}
@@ -171,7 +170,6 @@ function StatCounter({ label, value, unit, color, delay, isInView }: StatCounter
           )}
         </div>
 
-        {/* Progress bar */}
         <div className="relative h-2 bg-white/10 rounded-full overflow-hidden">
           <motion.div
             initial={{ width: 0 }}
@@ -186,7 +184,6 @@ function StatCounter({ label, value, unit, color, delay, isInView }: StatCounter
         </div>
       </div>
 
-      {/* Decorative corner elements */}
       <div className="absolute top-4 right-4 w-16 h-16 border-t-2 border-r-2 border-orange-500/20 rounded-tr-2xl" />
       <div className="absolute bottom-4 left-4 w-16 h-16 border-b-2 border-l-2 border-orange-500/20 rounded-bl-2xl" />
     </motion.div>

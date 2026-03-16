@@ -54,7 +54,7 @@ const BACKOFF_SCHEDULE_MS = [
   15_000,  // 15s
   30_000,  // 30s
   60_000,  // 1min
-  120_000, // 2min — cap
+  120_000, // 2min - cap
 ];
 
 function getBackoffDelay(attempt: number): number {
@@ -163,7 +163,7 @@ export function WhoopProvider({
             break;
           case 'unauthorized':
             setConnectionStatus('unauthorized');
-            failureCountRef.current = 0; // Not a transient error — stop retrying
+            failureCountRef.current = 0; // Not a transient error - stop retrying
             break;
           case 'error':
           case 'demo':
@@ -201,7 +201,7 @@ export function WhoopProvider({
 
     retryTimerRef.current = setTimeout(() => {
       if (isMountedRef.current) {
-        fetchStats(false); // Silent retry — no loading spinner
+        fetchStats(false); // Silent retry - no loading spinner
       }
     }, delay);
   }, [fetchStats]);
@@ -241,7 +241,7 @@ export function WhoopProvider({
     if (pollInterval <= 0) return;
 
     const interval = setInterval(() => {
-      // Don't poll if we're in unauthorized state — no point
+      // Don't poll if we're in unauthorized state - no point
       if (isMountedRef.current && connectionStatus !== 'unauthorized') {
         fetchStats(false);
       }

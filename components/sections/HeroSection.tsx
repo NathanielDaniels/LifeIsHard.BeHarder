@@ -5,34 +5,34 @@ import { motion, useAnimation, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 
 export default function HeroSection() {
-  const [heartbeat, setHeartbeat] = useState(72); // Mock BPM - will connect to WHOOP
+  const [heartbeat, setHeartbeat] = useState(72); // TODO: connect to WHOOP
   const [showContent, setShowContent] = useState(false);
   const [showMotto, setShowMotto] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
   const controls = useAnimation();
 
-  // Dramatic opening sequence
   useEffect(() => {
+    let isMounted = true;
+
     const sequence = async () => {
-      // Wait for black screen breathing...
       await new Promise(r => setTimeout(r, 1500));
-      
-      // Show content with impact
+      if (!isMounted) return;
       setShowContent(true);
-      
-      // Burn in motto
       await new Promise(r => setTimeout(r, 800));
+      if (!isMounted) return;
       setShowMotto(true);
-      
-      // Show details
       await new Promise(r => setTimeout(r, 1200));
+      if (!isMounted) return;
       setShowDetails(true);
     };
-    
+
     sequence();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
-  // Heartbeat pulse effect
   useEffect(() => {
     const pulse = setInterval(() => {
       controls.start({
@@ -46,7 +46,6 @@ export default function HeroSection() {
 
   return (
     <section className="relative h-screen w-full overflow-hidden bg-black">
-      {/* Initial black void with breathing orange glow */}
       <AnimatePresence>
         {!showContent && (
           <motion.div
@@ -54,7 +53,6 @@ export default function HeroSection() {
             transition={{ duration: 0.8 }}
             className="absolute inset-0 z-50 bg-black flex items-center justify-center"
           >
-            {/* Breathing orange glow in darkness */}
             <motion.div
               animate={{
                 scale: [1, 1.3, 1],
@@ -72,7 +70,6 @@ export default function HeroSection() {
               }}
             />
             
-            {/* Subtle heartbeat pulse text */}
             <motion.span
               animate={{ opacity: [0.3, 0.6, 0.3] }}
               transition={{
@@ -88,7 +85,6 @@ export default function HeroSection() {
         )}
       </AnimatePresence>
 
-      {/* Breathing overlay with orange glow - stays visible */}
       <motion.div
         animate={controls}
         className="absolute inset-0 z-10 pointer-events-none"
@@ -97,8 +93,7 @@ export default function HeroSection() {
         }}
       />
 
-      {/* Hero image with dramatic reveal */}
-      <motion.div 
+      <motion.div
         className="absolute inset-0"
         initial={{ scale: 1.3, opacity: 0 }}
         animate={showContent ? { scale: 1, opacity: 1 } : {}}
@@ -113,9 +108,7 @@ export default function HeroSection() {
         />
       </motion.div>
 
-      {/* Content */}
       <div className="relative z-20 h-full flex flex-col items-center justify-center text-center px-6">
-        {/* Patrick Wingert name */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={showContent ? { opacity: 1, y: 0 } : {}}
@@ -133,11 +126,9 @@ export default function HeroSection() {
           />
         </motion.div>
 
-        {/* Main motto - EMBER BURN-IN EFFECT */}
         <AnimatePresence>
           {showMotto && (
             <motion.div className="relative">
-              {/* Glow layer behind text */}
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -182,7 +173,6 @@ export default function HeroSection() {
           )}
         </AnimatePresence>
 
-        {/* Subtitle with stagger effect */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={showDetails ? { opacity: 1 } : {}}
@@ -217,7 +207,6 @@ export default function HeroSection() {
           </motion.span>
         </motion.div>
 
-        {/* Live heartbeat indicator */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={showDetails ? { opacity: 1 } : {}}
@@ -245,7 +234,6 @@ export default function HeroSection() {
         </motion.div>
       </div>
 
-      {/* Scroll indicator */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={showDetails ? { opacity: 1 } : {}}

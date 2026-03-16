@@ -60,7 +60,7 @@ export default function WelcomeEmail({ email }: WelcomeEmailProps) {
       </Head>
 
       <Preview>
-        You're on the list. Something unstoppable is coming — patrickwingert.com
+        You're on the list. Something unstoppable is coming. patrickwingert.com
       </Preview>
 
       <Body style={body}>
@@ -75,7 +75,7 @@ export default function WelcomeEmail({ email }: WelcomeEmailProps) {
             {/* Monospace system tag */}
             <Text style={systemTag}>{">"} TRANSMISSION RECEIVED</Text>
             <Text style={systemTag}>
-              {">"} SIGNAL LOCKED — SUBSCRIBER VERIFIED
+              {">"} SIGNAL LOCKED // SUBSCRIBER VERIFIED
             </Text>
 
             {/* Decorative ECG line (ASCII art) */}

@@ -1,16 +1,35 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { usePathname } from "next/navigation";
+import Link from "next/link";
 import { useVitality } from "@/contexts/VitalityContext";
-import { HeartPulse, HeartOff } from "lucide-react";
+import { HeartPulse, HeartOff, Users, Handshake, CalendarDays } from "lucide-react";
 
-export default function SoundController() {
+export default function SiteControls() {
   const [isPlaying, setIsPlaying] = useState(false);
   const audioContextRef = useRef<AudioContext | null>(null);
   const masterGainRef = useRef<GainNode | null>(null);
   const droneOscRef = useRef<OscillatorNode | null>(null);
   const nextNoteTimeRef = useRef<number>(0);
   const timerIDRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (timerIDRef.current) {
+        clearTimeout(timerIDRef.current);
+        timerIDRef.current = null;
+      }
+      if (droneOscRef.current) {
+        try { droneOscRef.current.stop(); } catch {}
+        droneOscRef.current = null;
+      }
+      if (audioContextRef.current) {
+        audioContextRef.current.close();
+        audioContextRef.current = null;
+      }
+    };
+  }, []);
 
   // Get vitality stats to drive the heartbeat speed
   const { energyState } = useVitality();
@@ -30,14 +49,19 @@ export default function SoundController() {
   };
 
   const bpm = getHeartRate();
+  const bpmRef = useRef(bpm);
   const lookahead = 25.0; // How frequently to call scheduling function (in milliseconds)
   const scheduleAheadTime = 0.1; // How far ahead to schedule audio (sec)
+
+  useEffect(() => {
+    bpmRef.current = bpm;
+  }, [bpm]);
 
   // Initialize Audio Context (must be user triggered partially, but we setup ref first)
   const initAudio = () => {
     if (!audioContextRef.current) {
       const AudioContextClass =
-        window.AudioContext || window.webkitAudioContext;
+        window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
       audioContextRef.current = new AudioContextClass();
 
       masterGainRef.current = audioContextRef.current.createGain();
@@ -136,7 +160,7 @@ export default function SoundController() {
       // Schedule next beat
       playHeartbeat(nextNoteTimeRef.current);
       // Advance time by 60 / bpm
-      const secondsPerBeat = 60.0 / bpm;
+      const secondsPerBeat = 60.0 / bpmRef.current;
       nextNoteTimeRef.current += secondsPerBeat;
     }
     timerIDRef.current = window.setTimeout(scheduler, lookahead);
@@ -179,21 +203,61 @@ export default function SoundController() {
     }
   };
 
+  const pathname = usePathname();
+  const isOnTeamPage = pathname === "/team";
+  const isOnSponsorsPage = pathname === "/sponsors";
+  const isOnSchedulePage = pathname === "/schedule";
+
   return (
-    <button
-      onClick={toggleSound}
-      title={isPlaying ? "Mute sound" : "Unmute sound"}
-      className={`fixed top-3 right-3 md:top-4 md:right-4 z-50 p-3 md:p-3.5 backdrop-blur-md rounded-full border transition-all flex items-center justify-center group ${
-        isPlaying
-          ? "bg-orange-500/10 text-orange-500 border-orange-500/30 hover:bg-orange-500/20"
-          : "bg-white/5 text-white/50 border-white/5 hover:bg-white/10 hover:text-white/80"
-      }`}
-    >
-      {isPlaying ? (
-        <HeartPulse className="w-5 h-5 md:w-5 md:h-5 text-orange-500 fill-orange-500/20" />
-      ) : (
-        <HeartOff className="w-5 h-5 md:w-5 md:h-5" />
+    <div className="fixed top-3 right-3 md:top-4 md:right-4 z-50 flex items-center gap-2">
+      {!isOnSchedulePage && (
+        <Link
+          href="/schedule"
+          className="group relative p-3 md:p-3.5 backdrop-blur-md rounded-full border transition-colors duration-200 flex items-center justify-center bg-white/5 text-white/50 border-white/5 hover:bg-white/10 hover:text-white/80"
+        >
+          <CalendarDays className="w-5 h-5" />
+          <span className="absolute right-full mr-2 px-3 py-1.5 rounded-full bg-black/80 backdrop-blur-md border border-white/10 whitespace-nowrap font-mono text-xs tracking-wider text-white/80 opacity-0 -translate-x-2 pointer-events-none group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200">
+            Schedule
+          </span>
+        </Link>
       )}
-    </button>
+      {!isOnSponsorsPage && (
+        <Link
+          href="/sponsors"
+          className="group relative p-3 md:p-3.5 backdrop-blur-md rounded-full border transition-colors duration-200 flex items-center justify-center bg-white/5 text-white/50 border-white/5 hover:bg-white/10 hover:text-white/80"
+        >
+          <Handshake className="w-5 h-5" />
+          <span className="absolute right-full mr-2 px-3 py-1.5 rounded-full bg-black/80 backdrop-blur-md border border-white/10 whitespace-nowrap font-mono text-xs tracking-wider text-white/80 opacity-0 -translate-x-2 pointer-events-none group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200">
+            Supporters
+          </span>
+        </Link>
+      )}
+      {!isOnTeamPage && (
+        <Link
+          href="/team"
+          className="group relative p-3 md:p-3.5 backdrop-blur-md rounded-full border transition-colors duration-200 flex items-center justify-center bg-white/5 text-white/50 border-white/5 hover:bg-white/10 hover:text-white/80"
+        >
+          <Users className="w-5 h-5" />
+          <span className="absolute right-full mr-2 px-3 py-1.5 rounded-full bg-black/80 backdrop-blur-md border border-white/10 whitespace-nowrap font-mono text-xs tracking-wider text-white/80 opacity-0 -translate-x-2 pointer-events-none group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200">
+            Meet the Team
+          </span>
+        </Link>
+      )}
+      <button
+        onClick={toggleSound}
+        title={isPlaying ? "Mute sound" : "Unmute sound"}
+        className={`p-3 md:p-3.5 backdrop-blur-md rounded-full border transition-all flex items-center justify-center group ${
+          isPlaying
+            ? "bg-orange-500/10 text-orange-500 border-orange-500/30 hover:bg-orange-500/20"
+            : "bg-white/5 text-white/50 border-white/5 hover:bg-white/10 hover:text-white/80"
+        }`}
+      >
+        {isPlaying ? (
+          <HeartPulse className="w-5 h-5 text-orange-500 fill-orange-500/20" />
+        ) : (
+          <HeartOff className="w-5 h-5" />
+        )}
+      </button>
+    </div>
   );
 }

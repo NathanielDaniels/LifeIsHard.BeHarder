@@ -226,7 +226,7 @@ export async function getLatestWorkout(accessToken: string): Promise<WhoopWorkou
     }
   }
 
-  // All recent workouts are short — return the most recent anyway
+  // All recent workouts are short - return the most recent anyway
   // so the card still shows something rather than nothing
   return response.records[0] || null;
 }
@@ -298,7 +298,7 @@ export async function fetchWhoopStats(accessToken: string): Promise<WhoopStats> 
       // sleepDuration: sleepDurationMinutes || null,
       // sleepConsistency: sleep?.score?.sleep_consistency_percentage ?? null,
       
-      // Last workout — show even if score is null (low-intensity activities don't score)
+      // Last workout - show even if score is null (low-intensity activities don't score)
       lastWorkout: workout ? {
         sport: workout.sport_name || 'Activity',
         strain: workout.score?.strain ?? 0,
@@ -338,12 +338,12 @@ function calculateCurrentHeartRate(
   const defaultResting = 65;
   const resting = restingHR ?? defaultResting;
   
-  // No workout end time — just use resting
+  // No workout end time - just use resting
   if (!workout?.end) {
     return { currentHeartRate: resting, heartRateSource: 'resting' };
   }
 
-  // Workout has no HR score (e.g. stretching) — can't decay from unknown HR
+  // Workout has no HR score (e.g. stretching) - can't decay from unknown HR
   if (!workout.score?.average_heart_rate) {
     return { currentHeartRate: resting, heartRateSource: 'resting' };
   }
