@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef, useMemo } from 'react';
+import { useEffect, useLayoutEffect, useState, useRef, useMemo } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence, useSpring, useTransform, useScroll } from 'framer-motion';
 import { useVitality } from '@/contexts/VitalityContext';
@@ -73,6 +73,17 @@ export default function ComingSoonClient() {
   
   const heartbeat = currentHeartRate;
   const heartbeatDuration = 60 / heartbeat;
+
+  // Skip boot sequence when returning from another page (WHOOP data already in context)
+  const initialStatusRef = useRef(connectionStatus);
+  useLayoutEffect(() => {
+    const status = initialStatusRef.current;
+    if (status === 'connected' || status === 'error' || status === 'unauthorized') {
+      setPhase(6);
+      setLoadingProgress(100);
+      setMinTimeElapsed(true);
+    }
+  }, []);
 
   const statusMessages = useMemo(() => {
     const messages = [
@@ -1005,6 +1016,7 @@ export default function ComingSoonClient() {
               // Invert turns the white background black and logo white. Mix-blend-screen then makes the black background invisible
               { src: '/sponsors/CAF_logo.png', link: 'https://www.challengedathletes.org/', alt: 'Sponsor 3', className: 'h-24 md:h-32 mix-blend-screen invert grayscale group-hover:grayscale-0 group-hover:invert-0 opacity-100 rounded-[50%] object-cover' },
               { src: '/sponsors/david-rotter-logo_orig.png', link: 'https://www.rotterprosthetics.com/', alt: 'David Rotter Prosthetics', className: 'h-16 md:h-20 grayscale group-hover:grayscale-0 brightness-200 group-hover:brightness-100' },
+              { src: '/sponsors/SEBCM_color.png', link: 'https://soeverybodycanmove.org', alt: 'So Every Body Can Move', className: 'h-10 md:h-12 grayscale group-hover:grayscale-0 brightness-200 group-hover:brightness-100' },
             ].map((sponsor, i) => (
               <motion.div
                 key={sponsor.alt}
