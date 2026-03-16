@@ -35,29 +35,35 @@ export default function PersistentECG({ state }: PersistentECGProps) {
 
   return (
     <motion.div
-      className={`fixed left-0 w-full pointer-events-none z-20 ${isExpanding ? 'h-[200px]' : 'h-[100px]'}`}
-      style={{
-        opacity,
-        top: '50%',
-        transform: 'translateY(-50%)',
-      }}
+      className="fixed inset-0 pointer-events-none z-20 flex items-center"
+      style={{ opacity }}
     >
-      <svg
-        className="absolute top-1/2 left-0 w-[200%] h-full -translate-y-1/2"
-        viewBox="0 0 1200 150"
-        preserveAspectRatio="none"
-        style={{
-          animation: isFlat ? 'none' : `heartbeat-ecg ${heartbeatDuration * 2}s linear infinite`,
-        }}
-      >
-        <path
-          d={ecgPath}
-          fill="none"
-          stroke={strokeColor}
-          strokeWidth={isExpanding ? 3 : 2}
-          style={{ filter: `drop-shadow(0 0 ${isExpanding ? 15 : 10}px ${strokeColor})` }}
-        />
-      </svg>
+      <div className={`relative w-full ${isExpanding ? 'h-[200px]' : 'h-[100px]'}`}>
+        <svg
+          className="absolute inset-y-0 left-0 w-[200%] h-full"
+          viewBox="0 0 1200 150"
+          preserveAspectRatio="none"
+          style={{
+            animation: isFlat ? 'none' : `heartbeat-ecg ${heartbeatDuration * 2}s linear infinite`,
+          }}
+        >
+          {/* Glow layer - blurred duplicate is cheaper than drop-shadow filter */}
+          <path
+            d={ecgPath}
+            fill="none"
+            stroke={strokeColor}
+            strokeWidth={isExpanding ? 8 : 6}
+            opacity={0.4}
+          />
+          {/* Sharp layer */}
+          <path
+            d={ecgPath}
+            fill="none"
+            stroke={strokeColor}
+            strokeWidth={isExpanding ? 3 : 2}
+          />
+        </svg>
+      </div>
     </motion.div>
   );
 }
