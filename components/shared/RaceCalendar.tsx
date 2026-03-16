@@ -1,6 +1,7 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { RACES_2026, Race, getNextRace, getDaysUntil } from '@/lib/race-data';
 
 interface RaceCalendarProps {
@@ -105,14 +106,87 @@ interface RaceCardProps {
 }
 
 function RaceCard({ race, isNext, themeColor }: RaceCardProps) {
+  const [expanded, setExpanded] = useState(false);
   const raceDate = new Date(race.date);
   const isPast = raceDate < new Date();
   const daysUntil = getDaysUntil(raceDate);
+  const hasDetails = race.distance || race.course || race.description || race.championship || race.website;
 
   const formattedDate = new Intl.DateTimeFormat('en-US', {
     month: 'short',
-    day: 'numeric'
+    day: 'numeric',
+    timeZone: 'UTC',
   }).format(raceDate);
+
+  const expandedContent = hasDetails ? (
+    <AnimatePresence>
+      {expanded && (
+        <motion.div
+          initial={{ height: 0, opacity: 0 }}
+          animate={{ height: 'auto', opacity: 1 }}
+          exit={{ height: 0, opacity: 0 }}
+          transition={{ duration: 0.3, ease: 'easeInOut' }}
+          className="overflow-hidden"
+        >
+          <div className="pt-6 mt-6 border-t border-white/10 space-y-3">
+            {race.distance && (
+              <div className="flex items-center gap-3">
+                <span className="font-mono text-[10px] tracking-[0.2em] text-white/30 uppercase w-20 shrink-0">Distance</span>
+                <span className="font-mono text-sm text-white/70">{race.distance}</span>
+              </div>
+            )}
+            {race.course && (
+              <div className="flex items-center gap-3">
+                <span className="font-mono text-[10px] tracking-[0.2em] text-white/30 uppercase w-20 shrink-0">Course</span>
+                <span className="font-mono text-sm text-white/70">{race.course}</span>
+              </div>
+            )}
+            {race.championship && (
+              <div className="flex items-center gap-3">
+                <span className="font-mono text-[10px] tracking-[0.2em] text-white/30 uppercase w-20 shrink-0">Stakes</span>
+                <span className="font-mono text-sm tracking-[0.1em]" style={{ color: themeColor }}>{race.championship}</span>
+              </div>
+            )}
+            {race.description && (
+              <p className="font-mono text-sm text-white/50 italic pt-2">
+                &ldquo;{race.description}&rdquo;
+              </p>
+            )}
+            {race.website && (
+              <a
+                href={race.website}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                className="inline-flex items-center gap-2 font-mono text-xs tracking-[0.15em] pt-2 transition-colors duration-200 hover:opacity-80"
+                style={{ color: themeColor }}
+              >
+                RACE WEBSITE
+                <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M7 17L17 7M17 7H7M17 7V17" />
+                </svg>
+              </a>
+            )}
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  ) : null;
+
+  // Chevron indicator for expandable cards
+  const chevron = hasDetails ? (
+    <motion.svg
+      animate={{ rotate: expanded ? 180 : 0 }}
+      transition={{ duration: 0.2 }}
+      className="w-4 h-4 text-white/30 shrink-0"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+    >
+      <path d="M6 9l6 6 6-6" />
+    </motion.svg>
+  ) : null;
 
   if (race.isTarget) {
     return (
@@ -121,7 +195,17 @@ function RaceCard({ race, isNext, themeColor }: RaceCardProps) {
         whileInView={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.6 }}
         viewport={{ once: true }}
-        className="p-8 md:p-10 rounded-2xl border-2 backdrop-blur-sm"
+        role={hasDetails ? 'button' : undefined}
+        tabIndex={hasDetails ? 0 : undefined}
+        aria-expanded={hasDetails ? expanded : undefined}
+        onClick={() => hasDetails && setExpanded(!expanded)}
+        onKeyDown={(e) => {
+          if (hasDetails && (e.key === 'Enter' || e.key === ' ')) {
+            e.preventDefault();
+            setExpanded(!expanded);
+          }
+        }}
+        className={`p-8 md:p-10 rounded-2xl border-2 backdrop-blur-sm ${hasDetails ? 'cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500/50 focus-visible:ring-offset-2 focus-visible:ring-offset-black' : ''}`}
         style={{
           backgroundColor: `${themeColor}18`,
           borderColor: themeColor,
@@ -130,14 +214,17 @@ function RaceCard({ race, isNext, themeColor }: RaceCardProps) {
       >
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
           <div className="space-y-4 flex-1">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border text-xs font-mono tracking-[0.2em]"
-              style={{
-                backgroundColor: `${themeColor}22`,
-                borderColor: `${themeColor}88`,
-                color: themeColor
-              }}>
-              <span className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: themeColor }} />
-              THE TARGET
+            <div className="flex items-center gap-3">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border text-xs font-mono tracking-[0.2em]"
+                style={{
+                  backgroundColor: `${themeColor}22`,
+                  borderColor: `${themeColor}88`,
+                  color: themeColor
+                }}>
+                <span className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: themeColor }} />
+                THE TARGET
+              </div>
+              {chevron}
             </div>
 
             <div>
@@ -167,6 +254,7 @@ function RaceCard({ race, isNext, themeColor }: RaceCardProps) {
             </div>
           )}
         </div>
+        {expandedContent}
       </motion.div>
     );
   }
@@ -177,7 +265,17 @@ function RaceCard({ race, isNext, themeColor }: RaceCardProps) {
       whileInView={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.5 }}
       viewport={{ once: true }}
-      className="p-6 md:p-8 rounded-xl border backdrop-blur-sm transition-all duration-300 hover:scale-[1.02]"
+      role={hasDetails ? 'button' : undefined}
+      tabIndex={hasDetails ? 0 : undefined}
+      aria-expanded={hasDetails ? expanded : undefined}
+      onClick={() => hasDetails && setExpanded(!expanded)}
+      onKeyDown={(e) => {
+        if (hasDetails && (e.key === 'Enter' || e.key === ' ')) {
+          e.preventDefault();
+          setExpanded(!expanded);
+        }
+      }}
+      className={`p-6 md:p-8 rounded-xl border backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] ${hasDetails ? 'cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500/50 focus-visible:ring-offset-2 focus-visible:ring-offset-black' : ''}`}
       style={{
         backgroundColor: isNext ? `${themeColor}11` : 'rgba(255,255,255,0.03)',
         borderColor: isNext ? `${themeColor}66` : 'rgba(255,255,255,0.1)',
@@ -218,19 +316,24 @@ function RaceCard({ race, isNext, themeColor }: RaceCardProps) {
           </div>
         </div>
 
-        {isPast && race.result && (
-          <div className="font-display text-2xl md:text-3xl tracking-wide" style={{ color: themeColor }}>
-            {race.result}
-          </div>
-        )}
+        <div className="flex items-center gap-4">
+          {isPast && race.result && (
+            <div className="font-display text-2xl md:text-3xl tracking-wide" style={{ color: themeColor }}>
+              {race.result}
+            </div>
+          )}
 
-        {!isPast && !isNext && (
-          <div className="text-right">
-            <div className="font-display text-3xl md:text-4xl tracking-wide text-white/40">{daysUntil}</div>
-            <div className="font-mono text-xs tracking-[0.2em] text-white/30">DAYS</div>
-          </div>
-        )}
+          {!isPast && !isNext && (
+            <div className="text-right">
+              <div className="font-display text-3xl md:text-4xl tracking-wide text-white/40">{daysUntil}</div>
+              <div className="font-mono text-xs tracking-[0.2em] text-white/30">DAYS</div>
+            </div>
+          )}
+
+          {chevron}
+        </div>
       </div>
+      {expandedContent}
     </motion.div>
   );
 }
