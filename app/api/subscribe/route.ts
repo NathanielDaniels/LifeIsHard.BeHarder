@@ -108,7 +108,7 @@ export async function POST(request: NextRequest) {
 
     if (emailError) {
       console.error('Welcome email failed:', emailError);
-      // Contact was still added — don't fail the whole request
+      // Contact was still added - don't fail the whole request
     }
 
     return NextResponse.json(
