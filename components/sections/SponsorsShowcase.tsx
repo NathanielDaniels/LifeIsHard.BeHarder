@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
@@ -60,7 +60,9 @@ export default function SponsorsShowcase() {
   // Mobile scroll-center detection: highlight the card nearest viewport center
   const [isMobile, setIsMobile] = useState(false);
   const [activeSponsor, setActiveSponsor] = useState(-1);
-  const cardRefs = useRef<(HTMLAnchorElement | null)[]>([]);
+  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const rafRef = useRef<number>(0);
+  const lastActiveRef = useRef(-1);
 
   useEffect(() => {
     const mq = window.matchMedia('(hover: none)');
@@ -70,35 +72,40 @@ export default function SponsorsShowcase() {
     return () => mq.removeEventListener('change', handler);
   }, []);
 
-  const updateActiveCard = useCallback(() => {
-    if (!isMobile) return;
-    const viewportCenter = window.innerHeight / 2;
-    let closest = -1;
-    let minDist = Infinity;
-
-    cardRefs.current.forEach((el, i) => {
-      if (!el) return;
-      const rect = el.getBoundingClientRect();
-      const cardCenter = rect.top + rect.height / 2;
-      const dist = Math.abs(cardCenter - viewportCenter);
-      if (dist < minDist) {
-        minDist = dist;
-        closest = i;
-      }
-    });
-
-    setActiveSponsor(closest);
-  }, [isMobile]);
-
   useEffect(() => {
     if (!isMobile) {
       setActiveSponsor(-1);
+      lastActiveRef.current = -1;
       return;
     }
-    updateActiveCard();
-    window.addEventListener('scroll', updateActiveCard, { passive: true });
-    return () => window.removeEventListener('scroll', updateActiveCard);
-  }, [isMobile, updateActiveCard]);
+
+    function tick() {
+      const viewportCenter = window.innerHeight / 2;
+      let closest = -1;
+      let minDist = Infinity;
+
+      cardRefs.current.forEach((el, i) => {
+        if (!el) return;
+        const rect = el.getBoundingClientRect();
+        const cardCenter = rect.top + rect.height / 2;
+        const dist = Math.abs(cardCenter - viewportCenter);
+        if (dist < minDist) {
+          minDist = dist;
+          closest = i;
+        }
+      });
+
+      if (closest !== lastActiveRef.current) {
+        lastActiveRef.current = closest;
+        setActiveSponsor(closest);
+      }
+
+      rafRef.current = requestAnimationFrame(tick);
+    }
+
+    rafRef.current = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(rafRef.current);
+  }, [isMobile]);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -169,9 +176,8 @@ export default function SponsorsShowcase() {
           {SPONSORS.map((sponsor, i) => {
             const isActive = isMobile && activeSponsor === i;
             return (
+              <div key={sponsor.name} ref={(el) => { cardRefs.current[i] = el; }}>
               <motion.a
-                key={sponsor.name}
-                ref={(el) => { cardRefs.current[i] = el; }}
                 href={sponsor.url}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -220,6 +226,7 @@ export default function SponsorsShowcase() {
                   <path d="M7 17L17 7M17 7H7M17 7V17" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </motion.a>
+              </div>
             );
           })}
         </div>

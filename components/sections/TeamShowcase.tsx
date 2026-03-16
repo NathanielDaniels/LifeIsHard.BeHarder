@@ -65,7 +65,7 @@ const TEAM: TeamMember[] = [
   {
     id: 'keri',
     name: 'Keri Serota',
-    role: 'Dare2Tri · The One Who Started It All',
+    role: 'Dare2Tri',
     bio: 'The friend who changed the trajectory. Keri introduced Patrick to Dare2Tri and adaptive sports, opening the door to a world he didn\'t know existed. Without that push, none of this happens.',
     image: '/team/Keri.jpg',
   },
