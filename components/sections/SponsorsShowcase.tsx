@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
@@ -56,6 +56,49 @@ export default function SponsorsShowcase() {
   const [formState, setFormState] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
   const [errorMsg, setErrorMsg] = useState('');
   const themeColor = '#f97316';
+
+  // Mobile scroll-center detection: highlight the card nearest viewport center
+  const [isMobile, setIsMobile] = useState(false);
+  const [activeSponsor, setActiveSponsor] = useState(-1);
+  const cardRefs = useRef<(HTMLAnchorElement | null)[]>([]);
+
+  useEffect(() => {
+    const mq = window.matchMedia('(hover: none)');
+    setIsMobile(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
+
+  const updateActiveCard = useCallback(() => {
+    if (!isMobile) return;
+    const viewportCenter = window.innerHeight / 2;
+    let closest = -1;
+    let minDist = Infinity;
+
+    cardRefs.current.forEach((el, i) => {
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      const cardCenter = rect.top + rect.height / 2;
+      const dist = Math.abs(cardCenter - viewportCenter);
+      if (dist < minDist) {
+        minDist = dist;
+        closest = i;
+      }
+    });
+
+    setActiveSponsor(closest);
+  }, [isMobile]);
+
+  useEffect(() => {
+    if (!isMobile) {
+      setActiveSponsor(-1);
+      return;
+    }
+    updateActiveCard();
+    window.addEventListener('scroll', updateActiveCard, { passive: true });
+    return () => window.removeEventListener('scroll', updateActiveCard);
+  }, [isMobile, updateActiveCard]);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -123,45 +166,62 @@ export default function SponsorsShowcase() {
 
         {/* Sponsor Grid */}
         <div className="grid gap-6 md:gap-8 mb-32 lg:mb-40">
-          {SPONSORS.map((sponsor, i) => (
-            <motion.a
-              key={sponsor.name}
-              href={sponsor.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.1 + i * 0.08, ease: [0.22, 1, 0.36, 1] }}
-              className="group flex flex-col md:flex-row items-center gap-6 md:gap-10 p-8 md:p-10 rounded-2xl border border-white/8 bg-white/[0.02] hover:bg-white/[0.05] hover:border-white/15 transition-all duration-500"
-            >
-              <div className="flex-shrink-0 w-full md:w-[200px] flex items-center justify-center md:justify-start">
-                <Image
-                  src={sponsor.logo}
-                  alt={sponsor.name}
-                  width={200}
-                  height={80}
-                  className={`object-contain grayscale group-hover:grayscale-0 opacity-60 group-hover:opacity-100 transition-all duration-500 ${sponsor.logoClass || ''}`}
-                />
-              </div>
-              <div className="flex-1 text-center md:text-left">
-                <h3 className="font-display text-xl md:text-2xl tracking-wide text-white mb-2 group-hover:text-orange-500 transition-colors duration-300">
-                  {sponsor.name}
-                </h3>
-                <p className="text-sm md:text-base text-white/40 leading-relaxed group-hover:text-white/60 transition-colors duration-300">
-                  {sponsor.description}
-                </p>
-              </div>
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                className="flex-shrink-0 text-white/20 group-hover:text-orange-500 transition-all duration-300 group-hover:translate-x-1 hidden md:block"
+          {SPONSORS.map((sponsor, i) => {
+            const isActive = isMobile && activeSponsor === i;
+            return (
+              <motion.a
+                key={sponsor.name}
+                ref={(el) => { cardRefs.current[i] = el; }}
+                href={sponsor.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.1 + i * 0.08, ease: [0.22, 1, 0.36, 1] }}
+                className={`group flex flex-col md:flex-row items-center gap-6 md:gap-10 p-8 md:p-10 rounded-2xl border transition-all duration-500 ${
+                  isActive
+                    ? 'bg-white/[0.05] border-white/15 scale-[1.02]'
+                    : 'bg-white/[0.02] border-white/8 hover:bg-white/[0.05] hover:border-white/15'
+                }`}
               >
-                <path d="M7 17L17 7M17 7H7M17 7V17" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </motion.a>
-          ))}
+                <div className="flex-shrink-0 w-full md:w-[200px] flex items-center justify-center md:justify-start">
+                  <Image
+                    src={sponsor.logo}
+                    alt={sponsor.name}
+                    width={200}
+                    height={80}
+                    className={`object-contain transition-all duration-500 ${
+                      isActive
+                        ? 'grayscale-0 opacity-100'
+                        : 'grayscale group-hover:grayscale-0 opacity-60 group-hover:opacity-100'
+                    } ${sponsor.logoClass || ''}`}
+                  />
+                </div>
+                <div className="flex-1 text-center md:text-left">
+                  <h3 className={`font-display text-xl md:text-2xl tracking-wide mb-2 transition-colors duration-300 ${
+                    isActive ? 'text-orange-500' : 'text-white group-hover:text-orange-500'
+                  }`}>
+                    {sponsor.name}
+                  </h3>
+                  <p className={`text-sm md:text-base leading-relaxed transition-colors duration-300 ${
+                    isActive ? 'text-white/60' : 'text-white/40 group-hover:text-white/60'
+                  }`}>
+                    {sponsor.description}
+                  </p>
+                </div>
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  className="flex-shrink-0 text-white/20 group-hover:text-orange-500 transition-all duration-300 group-hover:translate-x-1 hidden md:block"
+                  aria-hidden="true"
+                >
+                  <path d="M7 17L17 7M17 7H7M17 7V17" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </motion.a>
+            );
+          })}
         </div>
 
         {/* Become a Sponsor */}
