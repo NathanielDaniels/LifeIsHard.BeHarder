@@ -5,9 +5,6 @@ import { useEffect, useState, useRef } from 'react';
 interface CustomCursorProps {
   themeColor: string;
   isDimmed?: boolean;
-  // Legacy props - kept for coming-soon page compat, cursor now self-tracks
-  isHovering?: boolean;
-  mousePosition?: { x: number; y: number };
 }
 
 export default function CustomCursor({ themeColor, isDimmed = false }: CustomCursorProps) {

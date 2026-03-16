@@ -20,6 +20,15 @@ const NEXT_RACE_DATE = new Date('2026-4-11');
 
 export default function ComingSoonClient() {
   const [phase, setPhase] = useState(0);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setPrefersReducedMotion(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
 
   const [mounted, setMounted] = useState(false);
   const [daysSinceAccident, setDaysSinceAccident] = useState(0);
@@ -49,9 +58,7 @@ export default function ComingSoonClient() {
     };
   }, []);
 
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const mousePositionRef = useRef({ x: 0, y: 0 });
-  const [isHovering, setIsHovering] = useState(false);
 
   const { energyState, theme } = useVitality();
 
@@ -103,7 +110,6 @@ export default function ComingSoonClient() {
     mouseX.set(xPct);
     mouseY.set(yPct);
     mousePositionRef.current = { x: clientX, y: clientY };
-    setMousePosition({ x: clientX, y: clientY });
   }
 
   const xLayer1 = useTransform(mouseX, [-0.5, 0.5], [-20, 20]);
@@ -241,7 +247,7 @@ export default function ComingSoonClient() {
         ::selection { background-color: ${themeColor}4D; }
       `}</style>
 
-      <CustomCursor themeColor={themeColor} isHovering={isHovering} mousePosition={mousePosition} />
+      <CustomCursor themeColor={themeColor} />
 
       <div
         className="fixed inset-0 pointer-events-none z-[1000] opacity-[0.035]"
@@ -257,50 +263,58 @@ export default function ComingSoonClient() {
         }}
       />
 
-      <motion.div
-        className="fixed top-[15%] left-[1%] font-display text-[12vw] text-white/[0.02] pointer-events-none z-[1] whitespace-nowrap font-bold tracking-tight"
-        style={{ x: floatX }}
-      >
-        • UNSTOPPABLE • RELENTLESS • UNBROKEN • UNDEFEATED •
-      </motion.div>
-      <motion.div
-        className="fixed bottom-[15%] right-[-10%] font-display text-[12vw] text-white/[0.02] pointer-events-none z-[1] whitespace-nowrap font-bold tracking-tight"
-        style={{ x: floatXReverse }}
-      >
-        • RECORD BREAKER • DARE2TRI • ADAPTIVE ATHLETE • ELITE •
-      </motion.div>
+      {!prefersReducedMotion && (
+        <>
+          <motion.div
+            className="fixed top-[15%] left-[1%] font-display text-[12vw] text-white/[0.02] pointer-events-none z-[1] whitespace-nowrap font-bold tracking-tight will-change-transform"
+            style={{ x: floatX }}
+          >
+            • UNSTOPPABLE • RELENTLESS • UNBROKEN • UNDEFEATED •
+          </motion.div>
+          <motion.div
+            className="fixed bottom-[15%] right-[-10%] font-display text-[12vw] text-white/[0.02] pointer-events-none z-[1] whitespace-nowrap font-bold tracking-tight will-change-transform"
+            style={{ x: floatXReverse }}
+          >
+            • RECORD BREAKER • DARE2TRI • ADAPTIVE ATHLETE • ELITE •
+          </motion.div>
+        </>
+      )}
 
       <motion.div
-        style={{ x: xLayer1, y: yLayer1 }}
+        style={prefersReducedMotion ? {} : { x: xLayer1, y: yLayer1 }}
         className="fixed inset-0 pointer-events-none"
       >
         <div className="absolute inset-0 bg-grid opacity-[0.1]" />
         <div className="absolute inset-0 bg-noise opacity-[0.05] mix-blend-overlay" />
         <div className="absolute inset-0 vignette z-10" />
 
-        <motion.div
-          animate={{ opacity: [0.1, 0.2, 0.1] }}
-          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute top-[-20%] left-[-10%] w-[100vw] h-[100vw] max-w-[800px] max-h-[800px] rounded-full blur-[120px]"
-          style={{ backgroundColor: themeColor, opacity: 0.15 }}
-        />
-        
-        <motion.div
-          animate={{ opacity: [0.05, 0.15, 0.05] }}
-          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-          className="absolute bottom-[-20%] right-[-10%] w-[80vw] h-[80vw] max-w-[600px] max-h-[600px] rounded-full blur-[100px]"
-          style={{ backgroundColor: themeColor, opacity: 0.1 }}
-        />
-
-        <FloatingParticles themeColor={themeColor} />
+        {!prefersReducedMotion && (
+          <>
+            <motion.div
+              animate={{ opacity: [0.1, 0.2, 0.1] }}
+              transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+              className="absolute top-[-20%] left-[-10%] w-[100vw] h-[100vw] max-w-[800px] max-h-[800px] rounded-full blur-[120px]"
+              style={{ backgroundColor: themeColor, opacity: 0.15 }}
+            />
+            <motion.div
+              animate={{ opacity: [0.05, 0.15, 0.05] }}
+              transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+              className="absolute bottom-[-20%] right-[-10%] w-[80vw] h-[80vw] max-w-[600px] max-h-[600px] rounded-full blur-[100px]"
+              style={{ backgroundColor: themeColor, opacity: 0.1 }}
+            />
+            <FloatingParticles themeColor={themeColor} />
+          </>
+        )}
       </motion.div>
 
-      <div className="fixed inset-0 pointer-events-none overflow-hidden z-20">
-        <div 
-          className="w-full h-[2px] bg-gradient-to-r from-transparent via-white/10 to-transparent"
-          style={{ animation: 'scan-line 8s cubic-bezier(0.4, 0, 0.2, 1) infinite' }}
-        />
-      </div>
+      {!prefersReducedMotion && (
+        <div className="fixed inset-0 pointer-events-none overflow-hidden z-20">
+          <div
+            className="w-full h-[2px] bg-gradient-to-r from-transparent via-white/10 to-transparent"
+            style={{ animation: 'scan-line 8s cubic-bezier(0.4, 0, 0.2, 1) infinite' }}
+          />
+        </div>
+      )}
 
       {/* === INTRO SEQUENCE === */}
       <AnimatePresence>
@@ -641,8 +655,6 @@ export default function ComingSoonClient() {
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: 0.2 + i * 0.15 }}
                 className="text-center"
-                onMouseEnter={() => setIsHovering(true)}
-                onMouseLeave={() => setIsHovering(false)}
               >
                 <div 
                   className="font-display text-[clamp(3.5rem,10vw,7rem)] font-bold leading-none"
@@ -705,7 +717,7 @@ export default function ComingSoonClient() {
             transition={{ delay: 0.3 }}
             className="mb-12"
           >
-            <EmailCapture themeColor={themeColor} onHoverChange={setIsHovering} />
+            <EmailCapture themeColor={themeColor} />
           </motion.div>
 
           <motion.div
@@ -714,7 +726,7 @@ export default function ComingSoonClient() {
             viewport={{ once: true }}
             transition={{ delay: 0.5 }}
           >
-            <SocialLinks onHoverChange={setIsHovering} />
+            <SocialLinks />
           </motion.div>
         </motion.div>
       </section>
