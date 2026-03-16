@@ -11,28 +11,21 @@ import FloatingParticles from '@/components/shared/FloatingParticles';
 import BiometricCard from '@/components/shared/BiometricCard';
 import EmailCapture from '@/components/shared/EmailCapture';
 import SocialLinks from '@/components/shared/SocialLinks';
+import RaceCalendar from '@/components/shared/RaceCalendar';
 import CustomCursor from '@/components/shared/CustomCursor';
 
-// ============================================
-// UPDATE THESE DATES WITH ACTUAL VALUES
-// ============================================
 const ACCIDENT_DATE = new Date('2020-11-01');
 const SOBRIETY_DATE = new Date('2020-1-20');
 const NEXT_RACE_DATE = new Date('2026-4-11');
-// ============================================
-
-// --- Main Component ---
 
 export default function ComingSoonClient() {
   const [phase, setPhase] = useState(0);
 
-  // Date counters
   const [mounted, setMounted] = useState(false);
   const [daysSinceAccident, setDaysSinceAccident] = useState(0);
   const [daysSober, setDaysSober] = useState(0);
   const [daysUntilRace, setDaysUntilRace] = useState(0);
   
-  // Scroll indicator (delayed appearance, hides on scroll)
   const [showScrollHint, setShowScrollHint] = useState(false);
   const hasScrolledRef = useRef(false);
 
@@ -56,18 +49,13 @@ export default function ComingSoonClient() {
     };
   }, []);
 
-  // Mouse tracking for cursor and parallax
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const mousePositionRef = useRef({ x: 0, y: 0 });
   const [isHovering, setIsHovering] = useState(false);
 
-  // Vitality Integration
   const { energyState, theme } = useVitality();
 
-    // ============================================
-  // WHOOP Integration
-  // ============================================
-  const { 
+  const {
     stats: whoopStats, 
     connectionStatus, 
     isConnected,
@@ -76,20 +64,9 @@ export default function ComingSoonClient() {
     mode: whoopMode,
   } = useWhoop();
   
-  // const getHeartRate = () => {
-  //   switch (energyState) {
-  //     case 'HIGH': return 160;
-  //     case 'MEDIUM': return 120;
-  //     case 'LOW': return 65;
-  //     default: return 72;
-  //   }
-  // };
-  // const heartbeat = getHeartRate();
-  // const heartbeatDuration = 60 / heartbeat;
   const heartbeat = currentHeartRate;
   const heartbeatDuration = 60 / heartbeat;
 
-    // Dynamic status messages based on real connection
   const statusMessages = useMemo(() => {
     const messages = [
       { text: '> INIT Vitality Engine v2.1', delay: 0 },
@@ -115,7 +92,6 @@ export default function ComingSoonClient() {
     return messages;
   }, [connectionStatus, heartbeat, whoopStats.recovery, whoopStats.strain, whoopMode, isConnected]);
 
-  // 3D Parallax Logic
   const mouseX = useSpring(0, { stiffness: 50, damping: 20 });
   const mouseY = useSpring(0, { stiffness: 50, damping: 20 });
 
@@ -130,20 +106,17 @@ export default function ComingSoonClient() {
     setMousePosition({ x: clientX, y: clientY });
   }
 
-  // Layer transforms
   const xLayer1 = useTransform(mouseX, [-0.5, 0.5], [-20, 20]);
   const yLayer1 = useTransform(mouseY, [-0.5, 0.5], [-20, 20]);
   const xLayer2 = useTransform(mouseX, [-0.5, 0.5], [-40, 40]);
   const yLayer2 = useTransform(mouseY, [-0.5, 0.5], [-40, 40]);
 
-  // Scroll for parallax text
   const { scrollYProgress } = useScroll();
   const floatX = useTransform(scrollYProgress, [0, 1], [0, -300]);
   const floatXReverse = useTransform(scrollYProgress, [0, 1], [0, 300]);
 
   const themeColor = theme.primaryColor;
 
-  // Calculate date counters
   useEffect(() => {
     const today = new Date();
     setDaysSinceAccident(Math.floor((today.getTime() - ACCIDENT_DATE.getTime()) / (1000 * 60 * 60 * 24)));
@@ -152,14 +125,11 @@ export default function ComingSoonClient() {
   }, []);
 
 
-    // ============================================
-  // CONNECTION-SYNCED PROGRESS BAR
-  // ============================================
+  // === CONNECTION-SYNCED PROGRESS BAR ===
   const [loadingProgress, setLoadingProgress] = useState(0);
   const targetProgressRef = useRef(0);
   const animFrameRef = useRef<number | null>(null);
 
-  // Map connectionStatus → target progress milestone
   useEffect(() => {
     switch (connectionStatus) {
       case 'idle':
@@ -179,17 +149,14 @@ export default function ComingSoonClient() {
     }
   }, [connectionStatus]);
 
-  // Smoothly animate loadingProgress toward target
   useEffect(() => {
     const animate = () => {
       setLoadingProgress(prev => {
         const target = targetProgressRef.current;
         if (prev >= target) return prev;
         const diff = target - prev;
-        // Snap when very close so we actually reach 100
-        if (diff < 2) return target;
-        // Fast when far away, slow when close (ease-out feel)
-        const step = Math.max(0.5, diff * 0.08);
+        if (diff < 2) return target; // Snap when very close so we actually reach 100
+        const step = Math.max(0.5, diff * 0.08); // Ease-out feel
         return Math.min(target, prev + step);
       });
       animFrameRef.current = requestAnimationFrame(animate);
@@ -200,24 +167,22 @@ export default function ComingSoonClient() {
     };
   }, []);
 
-  // Minimum cinematic time (don't rush the boot even if API is instant)
+  // Don't rush the boot even if API is instant
   const [minTimeElapsed, setMinTimeElapsed] = useState(false);
   useEffect(() => {
     const timer = setTimeout(() => setMinTimeElapsed(true), 2500);
     return () => clearTimeout(timer);
   }, []);
 
-  // Transition to phase 1 when bar is at 100% AND min time passed
   const dataReady = connectionStatus === 'connected' || connectionStatus === 'error' || connectionStatus === 'unauthorized';
   useEffect(() => {
     if (loadingProgress >= 99 && minTimeElapsed && phase === 0) {
-      // Brief pause at 100% so user sees it complete
-      const timer = setTimeout(() => setPhase(1), 600);
+      const timer = setTimeout(() => setPhase(1), 600); // Brief pause at 100% so user sees it complete
       return () => clearTimeout(timer);
     }
   }, [loadingProgress, minTimeElapsed, phase]);
 
-  // Fallback: if API hangs, force transition after 8s
+  // Fallback if API hangs
   useEffect(() => {
     const fallback = setTimeout(() => {
       if (phase === 0) {
@@ -228,7 +193,6 @@ export default function ComingSoonClient() {
     return () => clearTimeout(fallback);
   }, [phase]);
 
-  // Subsequent phases (cascade after boot completes)
   const cascadeStarted = useRef(false);
   useEffect(() => {
     if (phase === 1 && !cascadeStarted.current) {
@@ -241,15 +205,6 @@ export default function ComingSoonClient() {
     }
   }, [phase]);
 
-  // Lock scroll during boot sequence
-  // useEffect(() => {
-  //   if (phase < 1) {
-  //     document.body.style.overflow = 'hidden';
-  //   } else {
-  //     document.body.style.overflow = '';
-  //   }
-  // }, [phase]);
-    // Lock scroll during intro
   useEffect(() => {
     document.body.style.overflow = phase < 1 ? 'hidden' : '';
   }, [phase]);
@@ -260,7 +215,6 @@ export default function ComingSoonClient() {
       onMouseMove={handleMouseMove}
       style={{ '--theme-color': themeColor } as React.CSSProperties}
     >
-      {/* Glitch keyframes */}
       <style>{`
         @keyframes glitch-1 {
           0%, 90%, 100% { clip-path: inset(0 0 0 0); transform: translate(0); }
@@ -287,10 +241,8 @@ export default function ComingSoonClient() {
         ::selection { background-color: ${themeColor}4D; }
       `}</style>
 
-      {/* Custom Cursor */}
       <CustomCursor themeColor={themeColor} isHovering={isHovering} mousePosition={mousePosition} />
 
-      {/* Noise Overlay */}
       <div
         className="fixed inset-0 pointer-events-none z-[1000] opacity-[0.035]"
         style={{
@@ -298,7 +250,6 @@ export default function ComingSoonClient() {
         }}
       />
 
-      {/* Scanlines */}
       <div
         className="fixed inset-0 pointer-events-none z-[999] opacity-20"
         style={{
@@ -306,7 +257,6 @@ export default function ComingSoonClient() {
         }}
       />
 
-      {/* Floating Background Text */}
       <motion.div
         className="fixed top-[15%] left-[1%] font-display text-[12vw] text-white/[0.02] pointer-events-none z-[1] whitespace-nowrap font-bold tracking-tight"
         style={{ x: floatX }}
@@ -320,21 +270,14 @@ export default function ComingSoonClient() {
         • RECORD BREAKER • DARE2TRI • ADAPTIVE ATHLETE • ELITE •
       </motion.div>
 
-      {/* --- LAYER 1: ATMOSPHERE (Parallax Depth 1) --- */}
-      <motion.div 
+      <motion.div
         style={{ x: xLayer1, y: yLayer1 }}
         className="fixed inset-0 pointer-events-none"
       >
-        {/* Grid Texture */}
         <div className="absolute inset-0 bg-grid opacity-[0.1]" />
-        
-        {/* Film Grain Noise */}
         <div className="absolute inset-0 bg-noise opacity-[0.05] mix-blend-overlay" />
-        
-        {/* Vignette */}
         <div className="absolute inset-0 vignette z-10" />
 
-        {/* Primary Ambient Glow */}
         <motion.div
           animate={{ opacity: [0.1, 0.2, 0.1] }}
           transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
@@ -342,7 +285,6 @@ export default function ComingSoonClient() {
           style={{ backgroundColor: themeColor, opacity: 0.15 }}
         />
         
-        {/* Secondary glow bottom right */}
         <motion.div
           animate={{ opacity: [0.05, 0.15, 0.05] }}
           transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 2 }}
@@ -353,7 +295,6 @@ export default function ComingSoonClient() {
         <FloatingParticles themeColor={themeColor} />
       </motion.div>
 
-      {/* Running Scan Line */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-20">
         <div 
           className="w-full h-[2px] bg-gradient-to-r from-transparent via-white/10 to-transparent"
@@ -370,26 +311,6 @@ export default function ComingSoonClient() {
             transition={{ duration: 0.5 }}
             className="fixed inset-0 z-50 bg-black flex flex-col items-center justify-center p-6"
           >
-            {/* Top-left: scrolling status log */}
-            {/* <div className="absolute top-10 left-10 font-mono text-xs md:text-sm text-white/60 tracking-widest flex flex-col gap-2 overflow-hidden">
-              {[
-                { text: '> INIT Vitality Engine v2.1', delay: 0 },
-                { text: '> Locating WINGERT_VITALITY_FEED...', delay: 0.5 },
-                { text: '> Handshake OK - Biometric stream detected', delay: 1.2 },
-                { text: `> Syncing heart rate... ${heartbeat} BPM`, delay: 1.8 },
-                { text: `> Energy state: ${energyState}`, delay: 2.3 },
-              ].map((line, i) => (
-                <motion.span
-                  key={i}
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: line.delay, duration: 0.3 }}
-                >
-                  {line.text}
-                </motion.span>
-              ))}
-            </div> */}
-            {/* Status Log - DYNAMIC */}
             <div className="absolute top-10 left-10 font-mono text-xs md:text-sm text-white/60 tracking-widest flex flex-col gap-2 overflow-hidden">
               {statusMessages.map((line, i) => (
                 <motion.span
@@ -403,9 +324,7 @@ export default function ComingSoonClient() {
               ))}
             </div>
 
-            {/* Center Loader */}
             <div className="w-full max-w-xs relative mt-8">
-               {/* Label above bar */}
                <motion.p
                  initial={{ opacity: 0 }}
                  animate={{ opacity: 1 }}
@@ -415,35 +334,28 @@ export default function ComingSoonClient() {
                  CONNECTING TO PATRICK&apos;S BIOMETRICS
                </motion.p>
                
-               {/* ------------------------------- */}
-               {/* Biometric Body Loading Outline  */}
-               {/* ------------------------------- */}
                <div className="relative w-24 h-32 mx-auto mb-6 flex flex-col items-center justify-end">
-                 {/* Ghost/Empty state */}
-                 <svg 
+                 <svg
                    className="absolute bottom-0 w-full h-full text-white/10" 
                    viewBox="0 0 100 250" 
                    fill="currentColor"
                    style={{ transform: 'scaleX(-1)' }}
                  >
-                   {/* Custom Amputee Silhouette SVG */}
                    <circle cx="50" cy="24" r="14" />
-                   {/* Body */}
-                   <path d="M 30,52 Q 50,48 70,52 Q 86,52 86,68 L 86,138 
-                            A 5,5 0 0,1 76,138 L 76,80 Q 76,72 70,72 L 70,160 
-                            A 8,8 0 0,1 54,160 L 54,140 A 4,4 0 0,0 46,140 L 46,238 
-                            A 8,8 0 0,1 30,238 L 30,72 Q 24,72 24,80 L 24,138 
+                   <path d="M 30,52 Q 50,48 70,52 Q 86,52 86,68 L 86,138
+                            A 5,5 0 0,1 76,138 L 76,80 Q 76,72 70,72 L 70,160
+                            A 8,8 0 0,1 54,160 L 54,140 A 4,4 0 0,0 46,140 L 46,238
+                            A 8,8 0 0,1 30,238 L 30,72 Q 24,72 24,80 L 24,138
                             A 5,5 0 0,1 14,138 L 14,68 Q 14,52 30,52 Z" />
-                   {/* Prosthetic Rod */}
-                   <path d="M 60,166 L 60,185 L 58,188 L 58,196 L 60,199 
-                            L 60,220 L 58,222 L 58,228 L 60,230 L 60,240 
-                            L 55,242 L 55,246 L 69,246 L 69,242 L 64,240 
-                            L 64,230 L 66,228 L 66,222 L 64,220 L 64,199 
+                   <path d="M 60,166 L 60,185 L 58,188 L 58,196 L 60,199
+                            L 60,220 L 58,222 L 58,228 L 60,230 L 60,240
+                            L 55,242 L 55,246 L 69,246 L 69,242 L 64,240
+                            L 64,230 L 66,228 L 66,222 L 64,220 L 64,199
                             L 66,196 L 66,188 L 64,185 L 64,166 Z" />
                  </svg>
-                 
-                 {/* Filled state, clipped by height */}
-                 <div 
+
+                 {/* Filled state, clipped by loading progress */}
+                 <div
                    className="absolute bottom-0 w-full overflow-hidden transition-all duration-300 ease-out flex justify-center"
                    style={{ height: `${loadingProgress}%` }}
                  >
@@ -456,25 +368,21 @@ export default function ComingSoonClient() {
                        transform: 'scaleX(-1)' 
                      }}
                    >
-                     {/* Custom Amputee Silhouette SVG */}
                      <circle cx="50" cy="24" r="14" />
-                     {/* Body */}
-                     <path d="M 30,52 Q 50,48 70,52 Q 86,52 86,68 L 86,138 
-                              A 5,5 0 0,1 76,138 L 76,80 Q 76,72 70,72 L 70,160 
-                              A 8,8 0 0,1 54,160 L 54,140 A 4,4 0 0,0 46,140 L 46,238 
-                              A 8,8 0 0,1 30,238 L 30,72 Q 24,72 24,80 L 24,138 
+                     <path d="M 30,52 Q 50,48 70,52 Q 86,52 86,68 L 86,138
+                              A 5,5 0 0,1 76,138 L 76,80 Q 76,72 70,72 L 70,160
+                              A 8,8 0 0,1 54,160 L 54,140 A 4,4 0 0,0 46,140 L 46,238
+                              A 8,8 0 0,1 30,238 L 30,72 Q 24,72 24,80 L 24,138
                               A 5,5 0 0,1 14,138 L 14,68 Q 14,52 30,52 Z" />
-                     {/* Prosthetic Rod */}
-                     <path d="M 60,166 L 60,185 L 58,188 L 58,196 L 60,199 
-                              L 60,220 L 58,222 L 58,228 L 60,230 L 60,240 
-                              L 55,242 L 55,246 L 69,246 L 69,242 L 64,240 
-                              L 64,230 L 66,228 L 66,222 L 64,220 L 64,199 
+                     <path d="M 60,166 L 60,185 L 58,188 L 58,196 L 60,199
+                              L 60,220 L 58,222 L 58,228 L 60,230 L 60,240
+                              L 55,242 L 55,246 L 69,246 L 69,242 L 64,240
+                              L 64,230 L 66,228 L 66,222 L 64,220 L 64,199
                               L 66,196 L 66,188 L 64,185 L 64,166 Z" />
                    </svg>
                  </div>
                </div>
                
-               {/* Status Text under the outline */}
                <div className="flex justify-between items-end mt-3 font-mono text-sm tracking-widest text-white/80 border-t border-white/10 pt-4">
                   {loadingProgress >= 99 ? (
                     <motion.span 
@@ -499,36 +407,29 @@ export default function ComingSoonClient() {
                   </span>
                </div>
 
-               {/* Decorative brackets */}
                <div className="absolute -left-4 -top-4 w-2 h-2 border-t border-l border-white/30" />
                <div className="absolute -right-4 -bottom-4 w-2 h-2 border-b border-r border-white/30" />
             </div>
             
-            {/* Bottom Status */}
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 0.3 }}
               transition={{ delay: 2.7 }}
               className="absolute bottom-10 font-mono text-xs text-white/50 tracking-[0.2em]"
             >
-              {/* VITALITY_STREAM // LIVE */}
               {isConnected ? 'VITALITY_STREAM // LIVE' : 'VITALITY_STREAM // DEMO'}
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* ==========================================
-          SECTION 1: HERO
-          ========================================== */}
+      {/* === HERO === */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        {/* Heartbeat ECG Line */}
         <div className="absolute top-1/2 left-0 w-full h-[200px] -translate-y-1/2 overflow-hidden opacity-10 pointer-events-none">
           <svg
             className="absolute top-1/2 left-0 w-[200%] h-[150px]"
             viewBox="0 0 1200 150"
             preserveAspectRatio="none"
-            // style={{ animation: 'heartbeat-ecg 2s linear infinite' }}
             style={{ animation: `heartbeat-ecg ${heartbeatDuration * 2}s linear infinite` }}
           >
             <path
@@ -541,12 +442,10 @@ export default function ComingSoonClient() {
           </svg>
         </div>
 
-        {/* Hero Content */}
-        <motion.div 
+        <motion.div
           style={{ x: xLayer2, y: yLayer2 }}
           className="relative z-30 text-center px-6"
         >
-          {/* Name */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={phase >= 2 ? { opacity: 1, y: 0 } : {}}
@@ -565,7 +464,6 @@ export default function ComingSoonClient() {
             />
           </motion.div>
 
-          {/* Main Title */}
           <AnimatePresence>
             {phase >= 1 && (
               <motion.div
@@ -585,7 +483,6 @@ export default function ComingSoonClient() {
             )}
           </AnimatePresence>
 
-          {/* Subtitle */}
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={phase >= 2 ? { opacity: 1, y: 0 } : {}}
@@ -596,7 +493,6 @@ export default function ComingSoonClient() {
           </motion.p>
         </motion.div>
 
-        {/* Scroll Indicator appears after 3s idle, vanishes on scroll */}
         <AnimatePresence>
           {showScrollHint && phase >= 3 && (
             <motion.div
@@ -619,8 +515,7 @@ export default function ComingSoonClient() {
           )}
         </AnimatePresence>
 
-        {/* Live Stats Bar */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={phase >= 3 ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.8 }}
@@ -645,7 +540,6 @@ export default function ComingSoonClient() {
               </span>
             </div>
           </div>
-           {/* WHOOP stats */}
           <div className="flex items-center gap-6">
             {whoopStats.recovery !== null && (
               <div className="flex flex-col items-center">
@@ -669,12 +563,9 @@ export default function ComingSoonClient() {
         </motion.div>
       </section>
 
-      {/* Cinematic Beat / Negative Space */}
       <div className="w-full h-[20vh] pointer-events-none" />
 
-      {/* ==========================================
-          SECTION 2: THE STORY / STATS
-          ========================================== */}
+      {/* === THE STORY / STATS === */}
       <section className="relative min-h-screen flex items-center justify-center py-16 md:py-20 px-6">
         <motion.div 
           initial={{ opacity: 0 }}
@@ -683,7 +574,6 @@ export default function ComingSoonClient() {
           transition={{ duration: 1 }}
           className="max-w-4xl text-center"
         >
-          {/* Quote */}
           <motion.div
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -715,7 +605,6 @@ export default function ComingSoonClient() {
             </h2>
           </motion.div>
 
-          {/* Pat Image */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -724,8 +613,7 @@ export default function ComingSoonClient() {
             className="w-full flex justify-center mb-8 md:mb-10 pointer-events-none"
           >
             <div className="relative pointer-events-auto">
-              {/* Optional glow effect behind the image */}
-              <div 
+              <div
                 className="absolute inset-0 blur-[100px] opacity-20 rounded-full"
                 style={{ backgroundColor: themeColor }}
               />
@@ -740,7 +628,6 @@ export default function ComingSoonClient() {
             </div>
           </motion.div>
 
-          {/* Stats Grid */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
             {[
               { value: daysSinceAccident, label: 'DAYS SINCE ACCIDENT' },
@@ -772,9 +659,7 @@ export default function ComingSoonClient() {
         </motion.div>
       </section>
 
-            {/* ==========================================
-          SECTION 3: EMAIL CAPTURE
-          ========================================== */}
+      {/* === EMAIL CAPTURE === */}
       <section className="relative flex items-center justify-center py-32 md:py-48 px-6 min-h-[70vh]">
         <motion.div 
           initial={{ opacity: 0 }}
@@ -813,7 +698,6 @@ export default function ComingSoonClient() {
             Be the first to witness it.
           </motion.p>
 
-          {/* Email Form */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -824,7 +708,6 @@ export default function ComingSoonClient() {
             <EmailCapture themeColor={themeColor} onHoverChange={setIsHovering} />
           </motion.div>
 
-          {/* Social Links */}
           <motion.div
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
@@ -836,11 +719,8 @@ export default function ComingSoonClient() {
         </motion.div>
       </section>
 
-      {/* ==========================================
-          SECTION 2.5: LIVE BIOMETRICS
-          ========================================== */}
+      {/* === LIVE BIOMETRICS === */}
       <section className="relative py-32 md:py-48 px-6">
-        {/* Section Header */}
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
@@ -859,7 +739,6 @@ export default function ComingSoonClient() {
             <div className="flex-1 h-px bg-white/10" />
           </div>
 
-          {/* Vitals Grid */}
           <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
             {[
               {
@@ -895,7 +774,7 @@ export default function ComingSoonClient() {
                 delay: 0.2,
                 condition: true,
                 animateValue: { animate: { opacity: [1, 0.7, 1] }, transition: { duration: heartbeatDuration, repeat: Infinity } },
-                subtext: whoopStats.restingHeartRate !== null ? `RESTING: ${whoopStats.restingHeartRate} • MAX: ${whoopStats.maxHeartRate || '—'}` : undefined,
+                subtext: whoopStats.restingHeartRate !== null ? `RESTING: ${whoopStats.restingHeartRate} • MAX: ${whoopStats.maxHeartRate || '--'}` : undefined,
                 tooltip: 'Current heart rate in beats per minute, synced live from Patrick\'s WHOOP device.',
               },
               {
@@ -960,7 +839,6 @@ export default function ComingSoonClient() {
             ))}
           </div>
 
-          {/* Last Workout Card */}
           {whoopStats.lastWorkout && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -1002,7 +880,6 @@ export default function ComingSoonClient() {
             </motion.div>
           )}
 
-          {/* Data source footer */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3 mt-8 font-mono text-[0.65rem] md:text-[0.75rem] tracking-[0.2em] text-white/50">
             <span className="whitespace-nowrap">POWERED BY WHOOP</span>
             <span className="hidden sm:inline opacity-50">•</span>
@@ -1017,22 +894,7 @@ export default function ComingSoonClient() {
         </motion.div>
       </section>
 
-      {/* Pat Image 2 (Cinematic Reveal) */}
       <section className="relative w-full flex justify-center py-32 md:py-48 overflow-hidden">
-        {/* Background Massive Text */}
-        {/* <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0 select-none">
-          <motion.h2 
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 2, ease: "easeOut" }}
-            className="font-display text-[clamp(5rem,15vw,20rem)] font-bold whitespace-nowrap text-white/[0.03]"
-          >
-            RELENTLESS
-          </motion.h2>
-        </div> */}
-
-        {/* Ambient Backlight Glow */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
           <motion.div 
             initial={{ opacity: 0 }}
@@ -1051,7 +913,6 @@ export default function ComingSoonClient() {
           transition={{ duration: 1, ease: "easeOut" }}
           className="relative pointer-events-auto z-10 w-full max-w-5xl px-6"
         >
-          {/* Background: Black and white original image */}
           <motion.div
             initial={{ scale: 1 }}
             whileInView={{ scale: 1.05 }}
@@ -1068,7 +929,7 @@ export default function ComingSoonClient() {
             />
           </motion.div>
           
-          {/* Foreground: Color cropped image that reveals dynamically on scroll */}
+          {/* Color overlay reveals on scroll */}
           {mounted && (
             <motion.div
               initial={{ opacity: 0, scale: 1 }}
@@ -1090,9 +951,20 @@ export default function ComingSoonClient() {
         </motion.div>
       </section>
 
-      {/* ==========================================
-          SECTION 4: SPONSORS & PARTNERS
-          ========================================== */}
+      {/* === RACE SCHEDULE === */}
+      <section className="relative py-32 md:py-48 px-6">
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 1 }}
+          className="max-w-5xl mx-auto"
+        >
+          <RaceCalendar themeColor={themeColor} />
+        </motion.div>
+      </section>
+
+      {/* === SPONSORS === */}
       <section className="relative z-20 py-32 md:py-40 px-6 backdrop-blur-2xl border-t border-white/5">
         <motion.div 
           initial={{ opacity: 0 }}
@@ -1118,8 +990,7 @@ export default function ComingSoonClient() {
           <div className="flex flex-wrap justify-center items-center gap-10 md:gap-16 lg:gap-20 pr-8 md:pr-16">
             {[
               { src: '/sponsors/ATF_logo.png', link: 'https://www.adaptivetrainingfoundation.org/', alt: 'Adaptive Training Foundation', className: 'h-28 md:h-36 lg:h-44 invert brightness-200' },
-              // { src: '/sponsors/Logo_Dare2Tri.png', alt: 'Dare2tri', className: 'h-20 md:h-28 invert brightness-200' },
-              // Invert turns the white background black and logo white. Mix-blend-screen then makes the black background invisible!
+              // Invert turns the white background black and logo white. Mix-blend-screen then makes the black background invisible
               { src: '/sponsors/CAF_logo.png', link: 'https://www.challengedathletes.org/', alt: 'Sponsor 3', className: 'h-24 md:h-32 mix-blend-screen invert grayscale group-hover:grayscale-0 group-hover:invert-0 opacity-100 rounded-[50%] object-cover' },
               { src: '/sponsors/david-rotter-logo_orig.png', link: 'https://www.rotterprosthetics.com/', alt: 'David Rotter Prosthetics', className: 'h-16 md:h-20 grayscale group-hover:grayscale-0 brightness-200 group-hover:brightness-100' },
             ].map((sponsor, i) => (
@@ -1153,9 +1024,7 @@ export default function ComingSoonClient() {
         </motion.div>
       </section>
 
-      {/* ==========================================
-          FOOTER
-          ========================================== */}
+      {/* === FOOTER === */}
       <footer className="relative z-20 py-8 px-6 border-t border-white/5 bg-black">
         <div className="max-w-6xl mx-auto flex flex-row justify-between items-center gap-4">
           <span className="font-display text-base tracking-[0.2em] text-white/60">

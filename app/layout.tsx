@@ -4,7 +4,7 @@ import "./globals.css";
 import SmoothScroll from "@/components/SmoothScroll";
 import { Providers } from "@/components/Providers";
 import Script from "next/script";
-import SoundController from "@/components/SoundController";
+import SiteControls from "@/components/SiteControls";
 import { Analytics } from "@vercel/analytics/next";
 import { GoogleAnalytics } from "@next/third-parties/google";
 
@@ -71,7 +71,7 @@ export default function RootLayout({
         <Providers>
           <SmoothScroll>
             {children}
-            <SoundController />
+            <SiteControls />
           </SmoothScroll>
         </Providers>
         <Analytics />

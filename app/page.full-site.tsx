@@ -1,10 +1,9 @@
 'use client';
 
-import { useRef, useState, useEffect, useCallback } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { useScroll } from 'framer-motion';
 import { useVitality } from '@/contexts/VitalityContext';
 
-// Sections
 import ColdOpen from '@/components/sections/ColdOpen';
 import TheFall from '@/components/sections/TheFall';
 import TheRebuild from '@/components/sections/TheRebuild';
@@ -13,8 +12,6 @@ import TheMachine from '@/components/sections/TheMachine';
 import TheMission from '@/components/sections/TheMission';
 import TheAsk from '@/components/sections/TheAsk';
 import SiteFooter from '@/components/sections/SiteFooter';
-
-// Persistent layers
 import AtmosphericOverlays from '@/components/persistent/AtmosphericOverlays';
 import PersistentECG from '@/components/persistent/PersistentECG';
 import JourneyLine from '@/components/persistent/JourneyLine';
@@ -26,25 +23,21 @@ export default function FullSite() {
   const { theme } = useVitality();
   const themeColor = theme.primaryColor;
 
-  // Container for scroll tracking
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ['start start', 'end end'],
   });
 
-  // Section refs for tracking active section
   const s1Ref = useRef<HTMLDivElement>(null);
   const s2Ref = useRef<HTMLDivElement>(null);
   const s3Ref = useRef<HTMLDivElement>(null);
   const s4Ref = useRef<HTMLDivElement>(null);
   const s5Ref = useRef<HTMLDivElement>(null);
 
-  // ECG state — driven by scroll position
   const [ecgState, setEcgState] = useState<ECGState>('normal');
   const [journeyDimmed, setJourneyDimmed] = useState(false);
 
-  // Track active section via scroll observation
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -55,10 +48,10 @@ export default function FullSite() {
           if (entry.target === s1Ref.current && ratio > 0.3) {
             setEcgState('normal');
             setJourneyDimmed(false);
-          } else if (entry.target === s2Ref.current) {
+          } else if (entry.target === s2Ref.current && ratio > 0.3) {
             if (ratio > 0.6) {
               setEcgState('flatline');
-            } else if (ratio > 0.2) {
+            } else {
               setEcgState('dimming');
             }
             setJourneyDimmed(true);
@@ -87,22 +80,81 @@ export default function FullSite() {
     return () => observer.disconnect();
   }, []);
 
-  // Mouse tracking for cursor
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [isHovering, setIsHovering] = useState(false);
+  // ::-webkit-scrollbar pseudo-elements don't support CSS transitions,
+  // so we interpolate via RAF and inject a <style> each frame.
+  const scrollbarProgress = useRef(0);
+  const scrollbarRaf = useRef<number>(0);
 
-  const handleMouseMove = useCallback((e: React.MouseEvent) => {
-    setMousePosition({ x: e.clientX, y: e.clientY });
-  }, []);
+  useEffect(() => {
+    const id = 'dynamic-scrollbar';
+    let styleEl = document.getElementById(id) as HTMLStyleElement | null;
+    if (!styleEl) {
+      styleEl = document.createElement('style');
+      styleEl.id = id;
+      document.head.appendChild(styleEl);
+    }
+
+    const target = journeyDimmed ? 1 : 0;
+    const duration = 700; // ms, matches cursor transition
+    const startTime = performance.now();
+    const startVal = scrollbarProgress.current;
+
+    const lerpChannel = (a: number, b: number, t: number) =>
+      Math.round(a + (b - a) * t);
+
+    const lerpColor = (hexA: string, hexB: string, t: number) => {
+      const a = parseInt(hexA.slice(1), 16);
+      const b = parseInt(hexB.slice(1), 16);
+      const r = lerpChannel((a >> 16) & 0xff, (b >> 16) & 0xff, t);
+      const g = lerpChannel((a >> 8) & 0xff, (b >> 8) & 0xff, t);
+      const bl = lerpChannel(a & 0xff, b & 0xff, t);
+      return `#${((r << 16) | (g << 8) | bl).toString(16).padStart(6, '0')}`;
+    };
+
+    const animate = (now: number) => {
+      const elapsed = now - startTime;
+      const rawT = Math.min(elapsed / duration, 1);
+      const t = rawT < 0.5 ? 2 * rawT * rawT : 1 - Math.pow(-2 * rawT + 2, 2) / 2;
+      const p = startVal + (target - startVal) * t;
+      scrollbarProgress.current = p;
+
+      const thumbTop = lerpColor('#f97316', '#333333', p);
+      const thumbBot = lerpColor('#ea580c', '#222222', p);
+      const hoverTop = lerpColor('#fb923c', '#444444', p);
+      const hoverBot = lerpColor('#f97316', '#333333', p);
+
+      if (styleEl) {
+        styleEl.textContent = `
+          ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, ${thumbTop} 0%, ${thumbBot} 100%) !important;
+          }
+          ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, ${hoverTop} 0%, ${hoverBot} 100%) !important;
+          }
+        `;
+      }
+
+      if (rawT < 1) {
+        scrollbarRaf.current = requestAnimationFrame(animate);
+      }
+    };
+
+    cancelAnimationFrame(scrollbarRaf.current);
+    scrollbarRaf.current = requestAnimationFrame(animate);
+
+    return () => {
+      cancelAnimationFrame(scrollbarRaf.current);
+      const el = document.getElementById(id);
+      if (el) el.remove();
+    };
+  }, [journeyDimmed]);
 
   return (
     <div
       ref={containerRef}
-      className="relative bg-[#050505] text-white overflow-x-hidden cursor-crosshair"
-      onMouseMove={handleMouseMove}
-      style={{ '--theme-color': themeColor } as React.CSSProperties}
+      className="relative bg-[#050505] text-white cursor-crosshair"
+      style={{ overflowX: 'clip', '--theme-color': themeColor } as React.CSSProperties}
     >
-      {/* Glitch keyframes + selection color */}
       <style>{`
         @keyframes glitch-1 {
           0%, 90%, 100% { clip-path: inset(0 0 0 0); transform: translate(0); }
@@ -119,24 +171,21 @@ export default function FullSite() {
           98% { clip-path: inset(30% 0 50% 0); transform: translate(-3px, 0); }
         }
         @keyframes heartbeat-ecg {
-          0% { transform: translateX(0) translateY(-50%); }
-          100% { transform: translateX(-50%) translateY(-50%); }
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
         }
         ::selection { background-color: ${themeColor}4D; }
       `}</style>
 
-      {/* === PERSISTENT LAYERS === */}
-      <CustomCursor themeColor={themeColor} isHovering={isHovering} mousePosition={mousePosition} />
-      <AtmosphericOverlays themeColor={themeColor} />
+      <CustomCursor themeColor={themeColor} isDimmed={journeyDimmed} />
+      <AtmosphericOverlays themeColor={themeColor} scrollProgress={scrollYProgress} />
       <PersistentECG state={ecgState} />
       <JourneyLine scrollProgress={scrollYProgress} isDimmed={journeyDimmed} />
 
-      {/* === SECTIONS === */}
       <div ref={s1Ref}>
         <ColdOpen />
       </div>
 
-      {/* Cinematic negative space before The Fall */}
       <div className="h-[20vh]" />
 
       <div ref={s2Ref}>
@@ -147,26 +196,22 @@ export default function FullSite() {
         <TheRebuild />
       </div>
 
-      {/* Breathing room before Bhutan */}
       <div className="h-[15vh]" />
 
       <div ref={s4Ref}>
         <TheProof />
       </div>
 
-      {/* Transition space before biometrics */}
       <div className="h-[10vh]" />
 
       <div ref={s5Ref}>
         <TheMachine />
       </div>
 
-      {/* Standard spacing */}
       <div className="h-[15vh]" />
 
       <TheMission />
 
-      {/* Minimal spacing before the ask */}
       <div className="h-[10vh]" />
 
       <TheAsk />
