@@ -21,7 +21,6 @@ export default function BiometricCard({ label, value, unit, color, delay, subtex
   const valueProps = animateValue ? animateValue : {};
   const [tooltipOpen, setTooltipOpen] = useState(false);
 
-  // Close tooltip if tapping anywhere outside
   useEffect(() => {
     if (!tooltipOpen) return;
     const handleOutsideClick = () => setTooltipOpen(false);
@@ -29,7 +28,7 @@ export default function BiometricCard({ label, value, unit, color, delay, subtex
     return () => window.removeEventListener('click', handleOutsideClick);
   }, [tooltipOpen]);
 
-  // Only one tooltip open at a time
+  // Ensure only one tooltip open at a time via custom event
   useEffect(() => {
     const handleClose = (e: CustomEvent) => {
       if (e.detail !== label) setTooltipOpen(false);
@@ -79,7 +78,6 @@ export default function BiometricCard({ label, value, unit, color, delay, subtex
         </div>
       )}
 
-      {/* Full Card Tooltip Overlay */}
       <AnimatePresence>
         {tooltip && tooltipOpen && (
           <motion.div
@@ -94,7 +92,6 @@ export default function BiometricCard({ label, value, unit, color, delay, subtex
               border: `1px solid ${color}40`,
             }}
           >
-            {/* Glowing Effects */}
             <div
               className="absolute top-0 left-0 w-full h-[1px] opacity-70"
               style={{ background: `linear-gradient(90deg, transparent, ${color}, transparent)` }}
@@ -104,7 +101,6 @@ export default function BiometricCard({ label, value, unit, color, delay, subtex
               style={{ background: `radial-gradient(circle at center, ${color} 0%, transparent 70%)` }}
             />
 
-            {/* Overlay Content */}
             <div className="relative z-10 w-full flex flex-col h-full items-start overflow-hidden pt-1">
               <div className="flex w-full justify-between items-start mb-2 shrink-0">
                 <span className="font-mono text-[0.60rem] tracking-[0.2em] uppercase opacity-90" style={{ color }}>
@@ -133,7 +129,7 @@ export default function BiometricCard({ label, value, unit, color, delay, subtex
           style={{ color }}
           {...valueProps}
         >
-          {value !== null ? value : '—'}
+          {value !== null ? value : '--'}
         </ValueTag>
         <span className="font-mono text-sm text-white/50 mb-1">{unit}</span>
       </div>

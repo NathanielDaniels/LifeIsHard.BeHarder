@@ -28,13 +28,13 @@ export default function FloatingParticles({ themeColor, count = 30 }: FloatingPa
       {particles.map((p) => (
         <div
           key={p.id}
-          className="absolute bottom-0 rounded-full blur-[1px] animate-float-particle"
+          className="absolute bottom-0 rounded-full animate-float-particle"
           style={{
             backgroundColor: themeColor,
             left: p.left,
             width: p.size,
             height: p.size,
-            opacity: 0.4,
+            opacity: 0.3,
             // @ts-expect-error custom css vars for animation
             '--delay': p.delay,
             '--duration': p.duration,
