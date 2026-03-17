@@ -12,6 +12,7 @@ import BiometricCard from '@/components/shared/BiometricCard';
 import EmailCapture from '@/components/shared/EmailCapture';
 import SocialLinks from '@/components/shared/SocialLinks';
 import RaceCalendar from '@/components/shared/RaceCalendar';
+// import InstagramFeed from '@/components/sections/InstagramFeed';
 import CustomCursor from '@/components/shared/CustomCursor';
 
 const ACCIDENT_DATE = new Date('2020-11-01');
@@ -980,6 +981,9 @@ export default function ComingSoonClient() {
           <RaceCalendar themeColor={themeColor} />
         </motion.div>
       </section>
+
+      {/* === INSTAGRAM FEED === */}
+      {/* <InstagramFeed themeColor={themeColor} /> */}
 
       {/* === SPONSORS === */}
       <section className="relative z-20 py-32 md:py-40 px-6 backdrop-blur-2xl border-t border-white/5">

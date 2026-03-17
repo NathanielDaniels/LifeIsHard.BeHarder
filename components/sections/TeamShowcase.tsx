@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
-import { useState, useRef, useCallback, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import Image from 'next/image';
-import Link from 'next/link';
-import CustomCursor from '@/components/shared/CustomCursor';
+import { useState, useRef, useCallback, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import Image from "next/image";
+import Link from "next/link";
+import CustomCursor from "@/components/shared/CustomCursor";
 
 interface SocialLink {
-  platform: 'instagram' | 'strava' | 'linkedin';
+  platform: "instagram" | "strava" | "linkedin" | "website";
   url: string;
 }
 
@@ -22,82 +22,97 @@ interface TeamMember {
 
 const TEAM: TeamMember[] = [
   {
-    id: 'patrick',
-    name: 'Patrick Wingert',
-    role: 'Athlete',
-    bio: 'Lost his right leg below the knee on November 1, 2020. Became the first American and first below-knee amputee to complete the Trans Bhutan Trail. Now chasing podium finishes as a Dare2Tri Elite Development Team athlete.',
-    image: '/team/Pat_bike.jpg',
+    id: "patrick",
+    name: "Patrick Wingert",
+    role: "Adaptive Athlete",
+    bio: "Patrick lost his right leg below the knee on November 1, 2020, and rebuilt his life through endurance sport and relentless forward motion. In 2022, he became the first American and first below-knee amputee to complete the Trans Bhutan Trail, 403 kilometers across 12 Himalayan mountain passes. Today, he races triathlon as a member of the Dare2Tri Elite Development Team, chasing podium finishes and the next hard thing. When he's not training, he leads management teams across a portfolio of restaurants, chasing long miles on a motorcycle, or hitting golf balls.",
+    image: "/team/Pat_bike.jpg",
     social: [
-      { platform: 'instagram', url: 'https://www.instagram.com/patwingzzz' },
+      { platform: "instagram", url: "https://www.instagram.com/patwingzzz" },
     ],
   },
   {
-    id: 'halee',
-    name: 'Halee Raff',
-    role: 'Media Manager',
-    bio: 'The eye behind the lens. Halee captures the raw moments - the late-night training sessions, the race-day chaos, and the quiet victories nobody else sees. She turns grit into story.',
-    image: '/team/Halee&Pat.jpg',
+    id: "halee",
+    name: "Halee Raff",
+    role: "Social Media Manager",
+    bio: "The one behind the lens documenting this whole ride. She captures the miles, the chaos, the training, and the races exactly as they are. No filters, no bullshit, just the reality behind the work. She's also Patrick's wife, his biggest supporter, and the only reason half of this story gets told at all.",
+    image: "/team/Halee&Pat.jpg",
   },
   {
-    id: 'kayla',
-    name: 'Kayla Wingert',
-    role: 'Marketing Director',
-    bio: 'The strategist building Patrick\'s brand beyond the finish line. Kayla shapes the narrative, manages partnerships, and makes sure the mission reaches the people who need to hear it.',
-    image: '/team/Kayla.jpeg',
+    id: "kayla",
+    name: "Kayla Wingert",
+    role: "Fundraising & Sponsorship Coordinator",
+    bio: "The strategist building Patrick's brand beyond the finish line. Kayla shapes the narrative, manages partnerships, and makes sure the mission reaches the people who need to hear it.",
+    image: "/team/Kayla.jpeg",
   },
   {
-    id: 'nathaniel',
-    name: 'Nathaniel Daniels',
-    role: 'Lead Developer & Designer',
-    bio: 'The architect behind everything you\'re looking at. Designed and built this site from scratch with every animation, every data integration, and every pixel of the experience.',
-    image: '/team/Nathaniel.jpg',
+    id: "nathaniel",
+    name: "Nathaniel Daniels",
+    role: "Lead Developer & Designer",
+    bio: "The architect behind everything you're looking at. Designed and built this site from scratch with every animation, every data integration, and every pixel of the experience.",
+    image: "/team/Nathaniel.jpg",
     social: [
-      { platform: 'linkedin', url: 'https://www.linkedin.com/in/nathanieldaniels' },
+      {
+        platform: "linkedin",
+        url: "https://www.linkedin.com/in/nathanieldaniels",
+      },
     ],
   },
   {
-    id: 'david',
-    name: 'David Rotter',
-    role: 'Prosthetist',
-    bio: 'The engineer behind the leg. David designs and builds the prosthetics that let Patrick race, trek, and push beyond what anyone thought possible. Every stride starts with his work.',
-    image: '/team/Dave.jpg',
+    id: "david",
+    name: "David Rotter",
+    role: "Prosthetist / Jedi Master",
+    bio: "The engineer behind the leg. David designs and builds the prosthetics that let Patrick live life his way, trek, and push beyond what anyone thought possible. Every stride starts with Dave's work.",
+    image: "/team/Dave.jpg",
+    social: [{ platform: "website", url: "https://www.rotterprosthetics.com/" }, { platform: "instagram", url: "https://www.instagram.com/davidrotterprosthetics/?hl=en" }],
   },
   {
-    id: 'keri',
-    name: 'Keri Serota',
-    role: 'Dare2Tri',
-    bio: 'The friend who changed the trajectory. Keri introduced Patrick to Dare2Tri and adaptive sports, opening the door to a world he didn\'t know existed. Without that push, none of this happens.',
-    image: '/team/Keri.jpg',
+    id: "keri",
+    name: "Keri Serota",
+    role: "Executive Director & Co-Founder of Dare2Tri",
+    bio: "The friend who changed the trajectory. Keri introduced Patrick to Dare2Tri long before he lost his leg and became adaptive himself. After a 4 AM email from a hospital bed at Northwestern, Keri connected Patrick and Dave. Constant, gentle pressure from Keri opened the door to the world of paratriathlon, and one that Patrick didn't know existed for him. Without that push, none of this would have happened.",
+    image: "/team/Keri.jpg",
+    social: [{ platform: "website", url: "https://www.dare2tri.org" }],
   },
-  // {
-  //   id: 'melissa',
-  //   name: 'Melissa Stockwell',
-  //   role: 'Mentor · Dare2Tri Co-Founder',
-  //   bio: 'Three-time Paralympian, Bronze medalist, and co-founder of Dare2Tri. Melissa opened the door to adaptive sport and showed Patrick what was possible on the other side.',
-  //   image: '',
-  // },
 ];
 
-function SocialIcon({ platform }: { platform: SocialLink['platform'] }) {
+function SocialIcon({ platform }: { platform: SocialLink["platform"] }) {
   switch (platform) {
-    case 'instagram':
+    case "instagram":
       return (
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <svg
+          width="12"
+          height="12"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
           <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
           <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
           <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
         </svg>
       );
-    case 'strava':
+    case "strava":
       return (
         <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
           <path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169" />
         </svg>
       );
-    case 'linkedin':
+    case "linkedin":
       return (
         <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
           <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+        </svg>
+      );
+    case "website":
+      return (
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="10" />
+          <line x1="2" y1="12" x2="22" y2="12" />
+          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
         </svg>
       );
   }
@@ -118,18 +133,22 @@ const rowVariants = {
   visible: (i: number) => ({
     opacity: 1,
     x: 0,
-    transition: { delay: 0.3 + i * 0.08, duration: 0.5, ease: [0.22, 1, 0.36, 1] },
+    transition: {
+      delay: 0.3 + i * 0.08,
+      duration: 0.5,
+      ease: [0.22, 1, 0.36, 1],
+    },
   }),
 };
 
 const COLUMN_CONFIG = [
-  { offset: 'mt-0', photoClass: 'w-full aspect-[3/4]' },
-  { offset: 'mt-[68px]', photoClass: 'w-full aspect-[4/5]' },
-  { offset: 'mt-[32px]', photoClass: 'w-full aspect-[3/4]' },
+  { offset: "mt-0", photoClass: "w-full aspect-[3/4]" },
+  { offset: "mt-[68px]", photoClass: "w-full aspect-[4/5]" },
+  { offset: "mt-[32px]", photoClass: "w-full aspect-[3/4]" },
 ];
 
 export default function TeamShowcase() {
-  const [lockedId, setLockedId] = useState<string | null>('patrick');
+  const [lockedId, setLockedId] = useState<string | null>("patrick");
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const activeId = hoveredId ?? lockedId;
   const hoverTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -158,10 +177,10 @@ export default function TeamShowcase() {
   }, []);
 
   const handleTap = (id: string) => {
-    setLockedId(prev => prev === id ? null : id);
+    setLockedId((prev) => (prev === id ? null : id));
     requestAnimationFrame(() => {
       const el = document.querySelector(`[data-member="${id}"]`);
-      el?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      el?.scrollIntoView({ behavior: "smooth", block: "nearest" });
     });
   };
 
@@ -207,14 +226,14 @@ export default function TeamShowcase() {
                 aria-expanded={isActive}
                 onClick={() => handleTap(member.id)}
                 onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
+                  if (e.key === "Enter" || e.key === " ") {
                     e.preventDefault();
                     handleTap(member.id);
                   }
                 }}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-50px' }}
+                viewport={{ once: true, margin: "-50px" }}
                 transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
                 className="relative aspect-[3/4] overflow-hidden cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-orange-500/50 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
               >
@@ -225,7 +244,9 @@ export default function TeamShowcase() {
                     fill
                     className="object-cover transition-all duration-500 ease-out"
                     style={{
-                      filter: isActive ? 'grayscale(0) brightness(1)' : 'grayscale(1) brightness(0.7)',
+                      filter: isActive
+                        ? "grayscale(0) brightness(1)"
+                        : "grayscale(1) brightness(0.7)",
                       opacity: isActive ? 1 : 0.7,
                     }}
                   />
@@ -246,13 +267,17 @@ export default function TeamShowcase() {
                       className="h-1.5 w-1.5 rounded-full flex-shrink-0"
                       animate={{
                         scale: isActive ? 1 : 0.8,
-                        backgroundColor: isActive ? 'rgb(249, 115, 22)' : 'rgba(249, 115, 22, 0.3)',
+                        backgroundColor: isActive
+                          ? "rgb(249, 115, 22)"
+                          : "rgba(249, 115, 22, 0.3)",
                       }}
                       transition={{ duration: 0.3 }}
                     />
                     <span
                       className="font-display text-lg uppercase tracking-wide transition-colors duration-300"
-                      style={{ color: isActive ? '#f97316' : 'rgba(255,255,255,0.8)' }}
+                      style={{
+                        color: isActive ? "#f97316" : "rgba(255,255,255,0.8)",
+                      }}
                     >
                       {member.name}
                     </span>
@@ -283,9 +308,12 @@ export default function TeamShowcase() {
                     {isActive && (
                       <motion.div
                         initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: 'auto', opacity: 1 }}
+                        animate={{ height: "auto", opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                        transition={{
+                          duration: 0.35,
+                          ease: [0.22, 1, 0.36, 1],
+                        }}
                         className="overflow-hidden"
                       >
                         <p className="pt-3 pl-[14px] border-l-2 border-orange-500 ml-[2px] text-sm text-white/40 leading-relaxed">
@@ -320,7 +348,7 @@ export default function TeamShowcase() {
                       variants={photoVariants}
                       initial="hidden"
                       whileInView="visible"
-                      viewport={{ once: true, margin: '-50px' }}
+                      viewport={{ once: true, margin: "-50px" }}
                       tabIndex={0}
                       role="button"
                       aria-label={member.name}
@@ -331,9 +359,11 @@ export default function TeamShowcase() {
                       onFocus={() => handleHoverEnter(member.id)}
                       onBlur={handleHoverLeave}
                       onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
+                        if (e.key === "Enter" || e.key === " ") {
                           e.preventDefault();
-                          setLockedId(prev => prev === member.id ? null : member.id);
+                          setLockedId((prev) =>
+                            prev === member.id ? null : member.id,
+                          );
                         }
                       }}
                     >
@@ -345,8 +375,8 @@ export default function TeamShowcase() {
                           className="object-cover transition-[filter] duration-500"
                           style={{
                             filter: isActive
-                              ? 'grayscale(0) brightness(1)'
-                              : 'grayscale(1) brightness(0.77)',
+                              ? "grayscale(0) brightness(1)"
+                              : "grayscale(1) brightness(0.77)",
                           }}
                         />
                       ) : (
@@ -383,7 +413,7 @@ export default function TeamShowcase() {
                   variants={rowVariants}
                   initial="hidden"
                   whileInView="visible"
-                  viewport={{ once: true, margin: '-50px' }}
+                  viewport={{ once: true, margin: "-50px" }}
                   tabIndex={0}
                   role="button"
                   aria-label={member.name}
@@ -393,11 +423,17 @@ export default function TeamShowcase() {
                   onMouseLeave={handleHoverLeave}
                   onFocus={() => handleHoverEnter(member.id)}
                   onBlur={handleHoverLeave}
-                  onClick={() => setLockedId(prev => prev === member.id ? null : member.id)}
+                  onClick={() =>
+                    setLockedId((prev) =>
+                      prev === member.id ? null : member.id,
+                    )
+                  }
                   onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
+                    if (e.key === "Enter" || e.key === " ") {
                       e.preventDefault();
-                      setLockedId(prev => prev === member.id ? null : member.id);
+                      setLockedId((prev) =>
+                        prev === member.id ? null : member.id,
+                      );
                     }
                   }}
                 >
@@ -407,15 +443,17 @@ export default function TeamShowcase() {
                       animate={{
                         width: isActive ? 24 : 14,
                         backgroundColor: isActive
-                          ? 'rgb(249, 115, 22)'
-                          : 'rgba(249, 115, 22, 0.25)',
+                          ? "rgb(249, 115, 22)"
+                          : "rgba(249, 115, 22, 0.25)",
                       }}
-                      transition={{ duration: 0.3, ease: 'easeOut' }}
+                      transition={{ duration: 0.3, ease: "easeOut" }}
                     />
 
                     <span
                       className="font-display text-2xl lg:text-3xl uppercase tracking-wide transition-colors duration-300"
-                      style={{ color: isActive ? '#f97316' : 'rgba(255,255,255,0.8)' }}
+                      style={{
+                        color: isActive ? "#f97316" : "rgba(255,255,255,0.8)",
+                      }}
                     >
                       {member.name}
                     </span>
@@ -425,8 +463,10 @@ export default function TeamShowcase() {
                         className="flex items-center gap-1.5 ml-1 transition-all duration-300"
                         style={{
                           opacity: isActive ? 1 : 0,
-                          transform: isActive ? 'translateX(0)' : 'translateX(-8px)',
-                          pointerEvents: isActive ? 'auto' : 'none',
+                          transform: isActive
+                            ? "translateX(0)"
+                            : "translateX(-8px)",
+                          pointerEvents: isActive ? "auto" : "none",
                         }}
                       >
                         {member.social.map((link) => (
@@ -453,7 +493,7 @@ export default function TeamShowcase() {
                     {isActive && (
                       <motion.p
                         initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: 'auto', opacity: 1 }}
+                        animate={{ height: "auto", opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
                         transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
                         className="pl-[30px] lg:pl-[38px] text-sm text-white/40 leading-relaxed overflow-hidden"
