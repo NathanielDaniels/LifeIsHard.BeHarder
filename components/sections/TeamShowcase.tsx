@@ -26,7 +26,7 @@ const TEAM: TeamMember[] = [
     name: "Patrick Wingert",
     role: "Adaptive Athlete",
     bio: "Patrick lost his right leg below the knee on November 1, 2020, and rebuilt his life through endurance sport and relentless forward motion. In 2022, he became the first American and first below-knee amputee to complete the Trans Bhutan Trail, 403 kilometers across 12 Himalayan mountain passes. Today, he races triathlon as a member of the Dare2Tri Elite Development Team, chasing podium finishes and the next hard thing. When he's not training, he leads management teams across a portfolio of restaurants, chasing long miles on a motorcycle, or hitting golf balls.",
-    image: "/team/Pat_bike.jpg",
+    image: "/team/pat_team.png",
     social: [
       { platform: "instagram", url: "https://www.instagram.com/patwingzzz" },
     ],
