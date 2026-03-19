@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Darkroom — Spring Displacement</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0a0a0a;
+      overflow: hidden;
+      font-family: 'Courier New', monospace;
+      color: white;
+      cursor: grab;
+    }
+    body.dragging { cursor: grabbing; }
+
+    .label {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 100;
+      font-size: 10px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.3);
+    }
+    .label span { color: #f97316; }
+
+    .subtitle {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      z-index: 100;
+      font-size: 9px;
+      letter-spacing: 0.2em;
+      color: rgba(255,255,255,0.2);
+    }
+
+    .photo {
+      position: absolute;
+      cursor: grab;
+      transition: box-shadow 0.3s ease;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .photo.active { cursor: grabbing; z-index: 999 !important; }
+
+    .photo img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      pointer-events: none;
+    }
+
+    .photo-border {
+      position: absolute;
+      inset: -3px;
+      border: 1px solid rgba(255,255,255,0.08);
+      pointer-events: none;
+    }
+
+    .photo-caption {
+      position: absolute;
+      bottom: -24px;
+      left: 0;
+      font-size: 8px;
+      letter-spacing: 0.15em;
+      color: rgba(255,255,255,0.25);
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .photo:hover .photo-caption,
+    .photo.active .photo-caption {
+      opacity: 1;
+    }
+
+    .photo::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, transparent 50%);
+      pointer-events: none;
+    }
+
+    .photo:hover {
+      box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 40px rgba(249,115,22,0.08);
+    }
+    .photo.active {
+      box-shadow: 0 30px 80px rgba(0,0,0,0.8), 0 0 60px rgba(249,115,22,0.12);
+    }
+
+    .table-surface {
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 50% 50%, rgba(249,115,22,0.02) 0%, transparent 70%),
+        repeating-linear-gradient(0deg, transparent, transparent 100px, rgba(255,255,255,0.005) 100px, rgba(255,255,255,0.005) 101px),
+        repeating-linear-gradient(90deg, transparent, transparent 100px, rgba(255,255,255,0.005) 100px, rgba(255,255,255,0.005) 101px);
+    }
+  </style>
+</head>
+<body>
+  <div class="table-surface"></div>
+  <div class="label">Darkroom — <span>Spring Displacement</span></div>
+  <div class="subtitle">Drag photos to rearrange. Nearby photos push away with spring forces.</div>
+
+  <script>
+    // Layout matches Concept B from instagram-concepts.html
+    // Positions/sizes in % of container, converted to px at runtime
+    const PHOTOS = [
+      { src: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=600&q=80', caption: 'Morning miles',           wp: 30, hp: 55, tp: 5,  lp: 3,  rot: -4,   z: 3 },
+      { src: 'https://images.unsplash.com/photo-1530549387789-4c1017266635?w=600&q=80', caption: 'Race day',                wp: 22, hp: 45, tp: 2,  lp: 28, rot: 2.5,  z: 2 },
+      { src: 'https://images.unsplash.com/photo-1452626038306-9aae5e071dd3?w=600&q=80', caption: 'Transition zone',         wp: 28, hp: 60, tp: 8,  lp: 46, rot: -1.5, z: 4 },
+      { src: 'https://images.unsplash.com/photo-1551632811-561732d1e306?w=600&q=80', caption: 'Trail therapy',              wp: 20, hp: 40, tp: 48, lp: 8,  rot: 3,    z: 5 },
+      { src: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80', caption: '250 miles. 12 passes.',    wp: 25, hp: 48, tp: 42, lp: 30, rot: -2,   z: 1 },
+      { src: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=600&q=80', caption: 'The view from the top',    wp: 32, hp: 55, tp: 30, lp: 66, rot: 1.8,  z: 3 },
+    ];
+
+    const SPRING_RADIUS = 30;
+    const SPRING_STRENGTH = 0.04;
+    const DAMPING = 0.65;
+    const MAX_VELOCITY = 4;
+    const SETTLE_THRESHOLD = 0.1;
+
+    const state = [];
+    let activeIndex = -1;
+    let dragOffsetX = 0;
+    let dragOffsetY = 0;
+    let animFrameId = null;
+
+    function createPhoto(data, index) {
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+
+      const w = Math.round(vw * data.wp / 100);
+      const h = Math.round(vh * data.hp / 100);
+      const baseX = Math.round(vw * data.lp / 100);
+      const baseY = Math.round(vh * data.tp / 100);
+      const rotation = data.rot;
+
+      const el = document.createElement('div');
+      el.className = 'photo';
+      el.style.width = w + 'px';
+      el.style.height = h + 'px';
+      el.style.zIndex = String(data.z);
+
+      const img = document.createElement('img');
+      img.src = data.src;
+      img.alt = data.caption;
+      img.draggable = false;
+      el.appendChild(img);
+
+      const border = document.createElement('div');
+      border.className = 'photo-border';
+      el.appendChild(border);
+
+      const caption = document.createElement('div');
+      caption.className = 'photo-caption';
+      caption.textContent = data.caption;
+      el.appendChild(caption);
+
+      document.body.appendChild(el);
+
+      state.push({
+        el,
+        x: baseX,
+        y: baseY,
+        vx: 0,
+        vy: 0,
+        targetX: baseX,
+        targetY: baseY,
+        w,
+        h,
+        rotation,
+        baseRotation: rotation,
+      });
+
+      updateTransform(state.length - 1);
+    }
+
+    function updateTransform(i) {
+      const s = state[i];
+      s.el.style.transform = 'translate(' + s.x + 'px, ' + s.y + 'px) rotate(' + s.rotation + 'deg)';
+    }
+
+    function getCenterX(i) { return state[i].x + state[i].w / 2; }
+    function getCenterY(i) { return state[i].y + state[i].h / 2; }
+
+    function rectsOverlap(a, b, padding) {
+      return !(a.x + a.w + padding < b.x ||
+               b.x + b.w + padding < a.x ||
+               a.y + a.h + padding < b.y ||
+               b.y + b.h + padding < a.y);
+    }
+
+    function pushAway() {
+      if (activeIndex < 0) return;
+      const active = state[activeIndex];
+      const acx = getCenterX(activeIndex);
+      const acy = getCenterY(activeIndex);
+
+      for (let i = 0; i < state.length; i++) {
+        if (i === activeIndex) continue;
+        const other = state[i];
+
+        if (!rectsOverlap(active, other, SPRING_RADIUS)) continue;
+
+        const ocx = getCenterX(i);
+        const ocy = getCenterY(i);
+        const dx = ocx - acx;
+        const dy = ocy - acy;
+        const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+
+        const overlapX = (active.w / 2 + other.w / 2 + SPRING_RADIUS) - Math.abs(dx);
+        const overlapY = (active.h / 2 + other.h / 2 + SPRING_RADIUS) - Math.abs(dy);
+
+        if (overlapX > 0 && overlapY > 0) {
+          const force = SPRING_STRENGTH * Math.min(overlapX, overlapY);
+          other.vx += (dx / dist) * force;
+          other.vy += (dy / dist) * force;
+          other.rotation = other.baseRotation + (dx / dist) * 2;
+        }
+      }
+    }
+
+    function animate() {
+      let moving = false;
+
+      for (let i = 0; i < state.length; i++) {
+        if (i === activeIndex) continue;
+        const s = state[i];
+
+        const dx = s.targetX - s.x;
+        const dy = s.targetY - s.y;
+        s.vx += dx * 0.03;
+        s.vy += dy * 0.03;
+        const dr = s.baseRotation - s.rotation;
+        s.rotation += dr * 0.05;
+
+        s.vx *= DAMPING;
+        s.vy *= DAMPING;
+        s.vx = Math.max(-MAX_VELOCITY, Math.min(MAX_VELOCITY, s.vx));
+        s.vy = Math.max(-MAX_VELOCITY, Math.min(MAX_VELOCITY, s.vy));
+        s.x += s.vx;
+        s.y += s.vy;
+
+        var distFromHome = Math.abs(s.x - s.targetX) + Math.abs(s.y - s.targetY);
+        if (Math.abs(s.vx) > SETTLE_THRESHOLD || Math.abs(s.vy) > SETTLE_THRESHOLD || distFromHome > 1) {
+          moving = true;
+        }
+
+        updateTransform(i);
+      }
+
+      pushAway();
+
+      if (moving || activeIndex >= 0) {
+        animFrameId = requestAnimationFrame(animate);
+      } else {
+        animFrameId = null;
+      }
+    }
+
+    function startAnim() {
+      if (!animFrameId) {
+        animFrameId = requestAnimationFrame(animate);
+      }
+    }
+
+    function onPointerDown(e) {
+      const target = e.target.closest('.photo');
+      if (!target) return;
+
+      const idx = state.findIndex(function(s) { return s.el === target; });
+      if (idx < 0) return;
+
+      activeIndex = idx;
+      dragOffsetX = e.clientX - state[idx].x;
+      dragOffsetY = e.clientY - state[idx].y;
+
+      target.classList.add('active');
+      document.body.classList.add('dragging');
+
+      // Bring to front
+      let maxZ = 0;
+      state.forEach(function(s) {
+        const z = parseInt(s.el.style.zIndex) || 0;
+        if (z > maxZ) maxZ = z;
+      });
+      target.style.zIndex = String(maxZ + 1);
+
+      startAnim();
+      e.preventDefault();
+    }
+
+    function onPointerMove(e) {
+      if (activeIndex < 0) return;
+      const s = state[activeIndex];
+      s.x = e.clientX - dragOffsetX;
+      s.y = e.clientY - dragOffsetY;
+      s.targetX = s.x;
+      s.targetY = s.y;
+      updateTransform(activeIndex);
+    }
+
+    function onPointerUp() {
+      if (activeIndex < 0) return;
+      state[activeIndex].el.classList.remove('active');
+      document.body.classList.remove('dragging');
+      activeIndex = -1;
+    }
+
+    // Init
+    PHOTOS.forEach(createPhoto);
+
+    document.addEventListener('pointerdown', onPointerDown);
+    document.addEventListener('pointermove', onPointerMove);
+    document.addEventListener('pointerup', onPointerUp);
+
+    // Handle resize
+    window.addEventListener('resize', function() {
+      // Just keep photos where they are on resize
+    });
+  </script>
+</body>
+</html>

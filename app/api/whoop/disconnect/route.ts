@@ -7,7 +7,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getValidAccessToken, clearTokens } from '@/lib/whoop-token-storage';
 import { invalidateCache } from '@/lib/whoop-cache';
-import { verifyAdminAccess, adminUnauthorizedResponse } from '@/lib/admin-auth';
+import { verifyAdminRequest, adminUnauthorizedResponse } from '@/lib/admin-auth';
+import { markDisconnected } from '@/lib/api-connections';
 import { rateLimit, getClientIP, rateLimitResponse } from '@/lib/rate-limit';
 
 export async function POST(request: NextRequest) {
@@ -16,8 +17,8 @@ export async function POST(request: NextRequest) {
   const { success, resetAt } = rateLimit(`disconnect:${ip}`, 5, 60 * 1000);
   if (!success) return rateLimitResponse(resetAt);
 
-  // --- Admin auth check ---
-  if (!verifyAdminAccess(request)) {
+  // --- Admin auth check (supports cookie session + header secret) ---
+  if (!(await verifyAdminRequest(request))) {
     return adminUnauthorizedResponse();
   }
 
@@ -41,10 +42,13 @@ export async function POST(request: NextRequest) {
     
     // Clear local tokens
     await clearTokens();
-    
+
+    // Record disconnection (fire-and-forget)
+    markDisconnected('whoop').catch(() => {});
+
     // Clear cache
     invalidateCache();
-    
+
     return NextResponse.json({ success: true });
     
   } catch (error) {

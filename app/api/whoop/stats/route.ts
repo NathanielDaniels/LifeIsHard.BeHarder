@@ -17,6 +17,7 @@ import {
 import { getStatsWithCache } from "@/lib/whoop-cache";
 import { WhoopStats } from "@/types/whoop";
 import { rateLimit, getClientIP, rateLimitResponse } from "@/lib/rate-limit";
+import { touchLastFetch } from "@/lib/api-connections";
 
 export const dynamic = "force-dynamic";
 
@@ -78,6 +79,10 @@ export async function GET(request: NextRequest) {
     const stats: WhoopStats = await getStatsWithCache(() =>
       fetchWhoopStats(accessToken!),
     );
+
+    // Record successful data fetch (fire-and-forget)
+    touchLastFetch('whoop').catch(() => {});
+
     return NextResponse.json({ ...stats, mode: "live" });
   } catch (err: any) {
     console.error("[stats] fetchWhoopStats error:", err);
@@ -99,6 +104,7 @@ export async function GET(request: NextRequest) {
 
           const stats = await fetchWhoopStats(newAccessToken);
           await setCachedStats(stats);
+          touchLastFetch('whoop').catch(() => {});
           return NextResponse.json({ ...stats, mode: "live" });
         }
       } catch (retryErr: any) {

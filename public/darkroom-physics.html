@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Darkroom — Matter.js Physics</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0a0a0a;
+      overflow: hidden;
+      font-family: 'Courier New', monospace;
+      color: white;
+      cursor: grab;
+    }
+    body.dragging { cursor: grabbing; }
+
+    .label {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 100;
+      font-size: 10px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.3);
+    }
+    .label span { color: #f97316; }
+
+    .subtitle {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      z-index: 100;
+      font-size: 9px;
+      letter-spacing: 0.2em;
+      color: rgba(255,255,255,0.2);
+    }
+
+    .error-msg {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 12px;
+      color: #f97316;
+      letter-spacing: 0.2em;
+      display: none;
+      z-index: 200;
+    }
+
+    .photo {
+      position: absolute;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+      cursor: grab;
+    }
+    .photo.active { cursor: grabbing; }
+
+    .photo img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      pointer-events: none;
+    }
+
+    .photo-border {
+      position: absolute;
+      inset: -3px;
+      border: 1px solid rgba(255,255,255,0.08);
+      pointer-events: none;
+    }
+
+    .photo-caption {
+      position: absolute;
+      bottom: -24px;
+      left: 0;
+      font-size: 8px;
+      letter-spacing: 0.15em;
+      color: rgba(255,255,255,0.25);
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .photo:hover .photo-caption,
+    .photo.active .photo-caption { opacity: 1; }
+
+    .photo::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, transparent 50%);
+      pointer-events: none;
+    }
+
+    .photo:hover {
+      box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 40px rgba(249,115,22,0.08);
+    }
+    .photo.active {
+      box-shadow: 0 30px 80px rgba(0,0,0,0.8), 0 0 60px rgba(249,115,22,0.12);
+    }
+
+    .table-surface {
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 50% 50%, rgba(249,115,22,0.02) 0%, transparent 70%),
+        repeating-linear-gradient(0deg, transparent, transparent 100px, rgba(255,255,255,0.005) 100px, rgba(255,255,255,0.005) 101px),
+        repeating-linear-gradient(90deg, transparent, transparent 100px, rgba(255,255,255,0.005) 100px, rgba(255,255,255,0.005) 101px);
+    }
+  </style>
+</head>
+<body>
+  <div class="table-surface"></div>
+  <div class="label">Darkroom — <span>Matter.js Physics</span></div>
+  <div class="subtitle">Drag photos to rearrange. Full rigid-body physics with collisions and friction.</div>
+  <div class="error-msg" id="error">Failed to load Matter.js. Check your connection.</div>
+
+  <script>
+    // Load Matter.js dynamically with fallback URLs
+    function loadScript(urls, callback) {
+      var i = 0;
+      function tryNext() {
+        if (i >= urls.length) {
+          document.getElementById('error').style.display = 'block';
+          return;
+        }
+        var script = document.createElement('script');
+        script.src = urls[i];
+        script.onload = callback;
+        script.onerror = function() { i++; tryNext(); };
+        document.head.appendChild(script);
+      }
+      tryNext();
+    }
+
+    loadScript([
+      'https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.20.0/matter.min.js',
+      'https://cdn.jsdelivr.net/npm/matter-js@0.20.0/build/matter.min.js',
+    ], function() {
+      initDarkroom();
+    });
+
+    function initDarkroom() {
+      var Engine = Matter.Engine;
+      var Bodies = Matter.Bodies;
+      var Body = Matter.Body;
+      var World = Matter.World;
+      var Events = Matter.Events;
+
+      var PHOTOS = [
+        { src: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=600&q=80', caption: 'Morning miles', w: 240, h: 320 },
+        { src: 'https://images.unsplash.com/photo-1530549387789-4c1017266635?w=600&q=80', caption: 'Race day', w: 300, h: 220 },
+        { src: 'https://images.unsplash.com/photo-1452626038306-9aae5e071dd3?w=600&q=80', caption: 'Transition zone', w: 260, h: 340 },
+        { src: 'https://images.unsplash.com/photo-1551632811-561732d1e306?w=600&q=80', caption: 'Trail therapy', w: 280, h: 200 },
+        { src: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80', caption: '250 miles. 12 passes.', w: 320, h: 240 },
+        { src: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=600&q=80', caption: 'The view from the top', w: 240, h: 300 },
+      ];
+
+      var vw = window.innerWidth;
+      var vh = window.innerHeight;
+
+      // Engine with no gravity (top-down table view)
+      var engine = Engine.create({ gravity: { x: 0, y: 0 } });
+
+      // Walls
+      var wallT = 60;
+      var walls = [
+        Bodies.rectangle(vw / 2, -wallT / 2, vw + 200, wallT, { isStatic: true }),
+        Bodies.rectangle(vw / 2, vh + wallT / 2, vw + 200, wallT, { isStatic: true }),
+        Bodies.rectangle(-wallT / 2, vh / 2, wallT, vh + 200, { isStatic: true }),
+        Bodies.rectangle(vw + wallT / 2, vh / 2, wallT, vh + 200, { isStatic: true }),
+      ];
+      World.add(engine.world, walls);
+
+      var items = [];
+      var maxZ = PHOTOS.length + 1;
+      var dragIndex = -1;
+      var dragOffsetX = 0;
+      var dragOffsetY = 0;
+
+      PHOTOS.forEach(function(data, index) {
+        var scale = Math.min(vw / 1400, 1);
+        var w = Math.round(data.w * scale);
+        var h = Math.round(data.h * scale);
+
+        var col = index % 3;
+        var row = Math.floor(index / 3);
+        var cellW = vw / 3;
+        var cellH = vh / 2;
+        var cx = cellW * col + cellW / 2 + (Math.random() - 0.5) * 60;
+        var cy = cellH * row + cellH / 2 + (Math.random() - 0.5) * 40 + 20;
+        var angle = (Math.random() - 0.5) * 0.2;
+
+        // Physics body
+        var body = Bodies.rectangle(cx, cy, w, h, {
+          angle: angle,
+          friction: 0.3,
+          frictionAir: 0.06,
+          restitution: 0.3,
+          density: 0.003,
+          chamfer: { radius: 2 },
+        });
+        World.add(engine.world, body);
+
+        // DOM element
+        var el = document.createElement('div');
+        el.className = 'photo';
+        el.style.width = w + 'px';
+        el.style.height = h + 'px';
+        el.style.zIndex = String(index + 1);
+        el.dataset.index = String(index);
+
+        var img = document.createElement('img');
+        img.src = data.src;
+        img.alt = data.caption;
+        img.draggable = false;
+        el.appendChild(img);
+
+        var border = document.createElement('div');
+        border.className = 'photo-border';
+        el.appendChild(border);
+
+        var caption = document.createElement('div');
+        caption.className = 'photo-caption';
+        caption.textContent = data.caption;
+        el.appendChild(caption);
+
+        document.body.appendChild(el);
+        items.push({ el: el, body: body, w: w, h: h });
+      });
+
+      function syncDOM() {
+        for (var i = 0; i < items.length; i++) {
+          var it = items[i];
+          var pos = it.body.position;
+          var deg = it.body.angle * (180 / Math.PI);
+          it.el.style.transform = 'translate(' + (pos.x - it.w / 2) + 'px, ' + (pos.y - it.h / 2) + 'px) rotate(' + deg + 'deg)';
+        }
+      }
+
+      // Manual drag via pointer events — more reliable than MouseConstraint with DOM overlays
+      document.addEventListener('pointerdown', function(e) {
+        var photoEl = e.target.closest('.photo');
+        if (!photoEl) return;
+
+        var idx = parseInt(photoEl.dataset.index);
+        if (isNaN(idx)) return;
+
+        dragIndex = idx;
+        var body = items[idx].body;
+
+        // Offset from body center so photo doesn't snap
+        dragOffsetX = e.clientX - body.position.x;
+        dragOffsetY = e.clientY - body.position.y;
+
+        // Make static so physics doesn't fight the drag
+        Body.setStatic(body, true);
+        Body.setVelocity(body, { x: 0, y: 0 });
+        Body.setAngularVelocity(body, 0);
+
+        // Z-order
+        maxZ++;
+        photoEl.style.zIndex = String(maxZ);
+        photoEl.classList.add('active');
+        document.body.classList.add('dragging');
+
+        e.preventDefault();
+      });
+
+      var lastMoveX = 0;
+      var lastMoveY = 0;
+      var lastMoveTime = 0;
+      var velX = 0;
+      var velY = 0;
+
+      document.addEventListener('pointermove', function(e) {
+        if (dragIndex < 0) return;
+
+        var now = performance.now();
+        var targetX = e.clientX - dragOffsetX;
+        var targetY = e.clientY - dragOffsetY;
+
+        // Track velocity for throw
+        var dt = (now - lastMoveTime) / 1000;
+        if (dt > 0 && dt < 0.1) {
+          velX = (targetX - lastMoveX) / dt * 0.02;
+          velY = (targetY - lastMoveY) / dt * 0.02;
+        }
+        lastMoveX = targetX;
+        lastMoveY = targetY;
+        lastMoveTime = now;
+
+        Body.setPosition(items[dragIndex].body, { x: targetX, y: targetY });
+      });
+
+      document.addEventListener('pointerup', function() {
+        if (dragIndex < 0) return;
+
+        var body = items[dragIndex].body;
+        items[dragIndex].el.classList.remove('active');
+        document.body.classList.remove('dragging');
+
+        // Release back to dynamic with throw velocity
+        Body.setStatic(body, false);
+
+        // Clamp velocity so it doesn't fly off
+        var maxVel = 15;
+        velX = Math.max(-maxVel, Math.min(maxVel, velX));
+        velY = Math.max(-maxVel, Math.min(maxVel, velY));
+        Body.setVelocity(body, { x: velX, y: velY });
+
+        dragIndex = -1;
+        velX = 0;
+        velY = 0;
+      });
+
+      // Physics + render loop
+      function tick() {
+        Engine.update(engine, 1000 / 60);
+        syncDOM();
+        requestAnimationFrame(tick);
+      }
+      tick();
+
+      // Resize walls
+      window.addEventListener('resize', function() {
+        var nw = window.innerWidth;
+        var nh = window.innerHeight;
+        Body.setPosition(walls[0], { x: nw / 2, y: -wallT / 2 });
+        Body.setPosition(walls[1], { x: nw / 2, y: nh + wallT / 2 });
+        Body.setPosition(walls[2], { x: -wallT / 2, y: nh / 2 });
+        Body.setPosition(walls[3], { x: nw + wallT / 2, y: nh / 2 });
+      });
+    }
+  </script>
+</body>
+</html>

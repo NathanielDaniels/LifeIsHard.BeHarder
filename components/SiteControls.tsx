@@ -207,7 +207,11 @@ export default function SiteControls() {
   const isOnTeamPage = pathname === "/team";
   const isOnSponsorsPage = pathname === "/sponsors";
   const isOnSchedulePage = pathname === "/schedule";
+  const isOnAdminPage = pathname === "/admin";
   const isOnHomePage = pathname === "/";
+
+  // Hide all controls on admin page
+  if (isOnAdminPage) return null;
 
   return (
     <div className="fixed top-3 right-3 md:top-4 md:right-4 z-50 flex items-center gap-2">
