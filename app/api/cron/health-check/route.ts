@@ -29,7 +29,16 @@ export async function GET(request: NextRequest) {
   await Promise.all(
     services.map(async (service) => {
       try {
-        const result = await service.checkHealth();
+        let result = await service.checkHealth();
+
+        // Transient errors (race conditions, network blips) often self-resolve.
+        // Retry once after a short delay before recording an error status.
+        if (result.status === 'error') {
+          console.log(`[health-check] ${service.id} returned error, retrying in 5s...`);
+          await new Promise((r) => setTimeout(r, 5000));
+          result = await service.checkHealth();
+        }
+
         results[service.id] = result;
 
         // Write result to Supabase

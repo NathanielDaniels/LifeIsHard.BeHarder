@@ -80,8 +80,8 @@ export async function GET(request: NextRequest) {
       fetchWhoopStats(accessToken!),
     );
 
-    // Record successful data fetch (fire-and-forget)
-    touchLastFetch('whoop').catch(() => {});
+    // Record successful data fetch before responding
+    await touchLastFetch('whoop').catch(() => {});
 
     return NextResponse.json({ ...stats, mode: "live" });
   } catch (err: any) {
@@ -104,7 +104,7 @@ export async function GET(request: NextRequest) {
 
           const stats = await fetchWhoopStats(newAccessToken);
           await setCachedStats(stats);
-          touchLastFetch('whoop').catch(() => {});
+          await touchLastFetch('whoop').catch(() => {});
           return NextResponse.json({ ...stats, mode: "live" });
         }
       } catch (retryErr: any) {
