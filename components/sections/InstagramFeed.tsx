@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 
@@ -68,6 +68,15 @@ function getClipPath(index: number, total: number): string {
 export default function InstagramFeed({ themeColor }: InstagramFeedProps) {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const total = PLACEHOLDER_POSTS.length;
+  // Track which card was revealed by touch so first tap reveals, second navigates
+  const touchRevealedRef = useRef<string | null>(null);
+
+  const handleTouchStart = useCallback((e: React.TouchEvent, postId: string) => {
+    if (touchRevealedRef.current === postId) return; // already revealed, let link navigate
+    e.preventDefault();
+    touchRevealedRef.current = postId;
+    setHoveredId(postId);
+  }, []);
 
   return (
     <section className="relative py-32 md:py-40">
@@ -134,6 +143,10 @@ export default function InstagramFeed({ themeColor }: InstagramFeedProps) {
                 }}
                 onMouseEnter={() => setHoveredId(post.id)}
                 onMouseLeave={() => setHoveredId(null)}
+                onFocus={() => setHoveredId(post.id)}
+                onBlur={() => setHoveredId(null)}
+                onTouchStart={(e) => handleTouchStart(e, post.id)}
+                aria-label={`${post.caption} — ${post.timestamp} ago`}
               >
                 <div className="absolute inset-0 overflow-hidden">
                   <Image

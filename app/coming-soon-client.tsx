@@ -638,7 +638,7 @@ export default function ComingSoonClient() {
                 style={{ backgroundColor: themeColor }}
               />
               <Image
-                src="/pat-crop.png"
+                src="/pat-crop.webp"
                 alt="Patrick Wingert"
                 width={800}
                 height={800}
@@ -938,7 +938,7 @@ export default function ComingSoonClient() {
             transition={{ duration: 2, ease: "easeOut" }}
           >
             <Image
-              src="/pat-run.jpg"
+              src="/pat-run.webp"
               alt="Patrick Wingert running background"
               width={1200}
               height={1200}
@@ -957,7 +957,7 @@ export default function ComingSoonClient() {
               className="absolute inset-0 top-0 left-0 px-6 z-10"
             >
               <Image
-                src="/pat-crop-run.png"
+                src="/pat-crop-run.webp"
                 alt="Patrick Wingert running color overlay"
                 width={1200}
                 height={1200}
