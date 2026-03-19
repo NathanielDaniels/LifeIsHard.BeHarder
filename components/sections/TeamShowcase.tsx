@@ -7,7 +7,7 @@ import Link from "next/link";
 import CustomCursor from "@/components/shared/CustomCursor";
 
 interface SocialLink {
-  platform: "instagram" | "strava" | "linkedin" | "website";
+  platform: "instagram" | "strava" | "linkedin" | "website" | "linktree";
   url: string;
 }
 
@@ -26,9 +26,9 @@ const TEAM: TeamMember[] = [
     name: "Patrick Wingert",
     role: "Adaptive Athlete",
     bio: "Patrick lost his right leg below the knee on November 1, 2020, and rebuilt his life through endurance sport and relentless forward motion. In 2022, he became the first American and first below-knee amputee to complete the Trans Bhutan Trail, 403 kilometers across 12 Himalayan mountain passes. Today, he races triathlon as a member of the Dare2Tri Elite Development Team, chasing podium finishes and the next hard thing. When he's not training, he leads management teams across a portfolio of restaurants, chasing long miles on a motorcycle, or hitting golf balls.",
-    image: "/team/pat_team.png",
+    image: "/team/pat_team.webp",
     social: [
-      { platform: "instagram", url: "https://www.instagram.com/patwingzzz" },
+      { platform: "linktree", url: "https://linktr.ee/patrickwingert" },
     ],
   },
   {
@@ -36,19 +36,19 @@ const TEAM: TeamMember[] = [
     name: "Halee Raff",
     role: "Social Media Manager",
     bio: "The one behind the lens documenting this whole ride. She captures the miles, the chaos, the training, and the races exactly as they are. No filters, no bullshit, just the reality behind the work. She's also Patrick's wife, his biggest supporter, and the only reason half of this story gets told at all.",
-    image: "/team/Halee&Pat.jpg",
+    image: "/team/Halee&Pat.webp",
   },
   {
     id: "kayla",
     name: "Kayla Wingert",
     role: "Fundraising & Sponsorship Coordinator",
     bio: "The strategist building Patrick's brand beyond the finish line. Kayla shapes the narrative, manages partnerships, and makes sure the mission reaches the people who need to hear it.",
-    image: "/team/Kayla.jpeg",
+    image: "/team/Kayla.webp",
   },
   {
     id: "nathaniel",
     name: "Nathaniel Daniels",
-    role: "Lead Developer & Designer",
+    role: "Developer & Designer",
     bio: "The architect behind everything you're looking at. Designed and built this site from scratch with every animation, every data integration, and every pixel of the experience.",
     image: "/team/Nathaniel.jpg",
     social: [
@@ -71,7 +71,7 @@ const TEAM: TeamMember[] = [
     name: "Keri Serota",
     role: "Executive Director & Co-Founder of Dare2Tri",
     bio: "The friend who changed the trajectory. Keri introduced Patrick to Dare2Tri long before he lost his leg and became adaptive himself. After a 4 AM email from a hospital bed at Northwestern, Keri connected Patrick and Dave. Constant, gentle pressure from Keri opened the door to the world of paratriathlon, and one that Patrick didn't know existed for him. Without that push, none of this would have happened.",
-    image: "/team/Keri.jpg",
+    image: "/team/Keri.webp",
     social: [{ platform: "website", url: "https://www.dare2tri.org" }],
   },
 ];
@@ -81,8 +81,8 @@ function SocialIcon({ platform }: { platform: SocialLink["platform"] }) {
     case "instagram":
       return (
         <svg
-          width="12"
-          height="12"
+          width="16"
+          height="16"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -97,22 +97,29 @@ function SocialIcon({ platform }: { platform: SocialLink["platform"] }) {
       );
     case "strava":
       return (
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
           <path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169" />
         </svg>
       );
     case "linkedin":
       return (
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
           <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
         </svg>
       );
     case "website":
       return (
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <circle cx="12" cy="12" r="10" />
           <line x1="2" y1="12" x2="22" y2="12" />
           <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+        </svg>
+      );
+    case "linktree":
+      return (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M13.435 5.589c-.198-.444-.619-.444-.817 0l-3.376 7.552h-2.93l4.632-6.525c.29-.408.29-1.07 0-1.478l-3.793-5.342h9.529l-3.794 5.342c-.29.408-.29 1.07 0 1.478l4.632 6.525h-2.93l-3.376-7.552z" />
+          <path d="M12.026 15.65c-.482 0-.872.417-.872.932v7.418h1.745v-7.418c0-.515-.39-.932-.873-.932z" />
         </svg>
       );
   }

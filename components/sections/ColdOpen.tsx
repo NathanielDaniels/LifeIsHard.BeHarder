@@ -82,7 +82,7 @@ export default function ColdOpen() {
           className="relative w-full h-full"
         >
           <Image
-            src="/pat-run.jpg"
+            src="/pat-run.webp"
             alt="Patrick Wingert - Mid-Race"
             fill
             className="object-cover"

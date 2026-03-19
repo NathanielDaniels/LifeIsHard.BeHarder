@@ -63,7 +63,7 @@ export default function TheRebuild() {
             className="relative aspect-[2/3] overflow-hidden"
           >
             <Image
-              src="/pat-crop.png"
+              src="/pat-crop.webp"
               alt="Patrick Wingert with prosthetic"
               fill
               className="object-cover object-top"
@@ -185,7 +185,7 @@ export default function TheRebuild() {
             className="relative aspect-[4/5] overflow-hidden order-1 md:order-2"
           >
             <Image
-              src="/Pat_D2T.png"
+              src="/Pat_D2T.webp"
               alt="Patrick at Dare2Tri"
               fill
               className="object-cover"
