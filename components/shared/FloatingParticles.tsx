@@ -7,7 +7,7 @@ interface FloatingParticlesProps {
   count?: number;
 }
 
-export default function FloatingParticles({ themeColor, count = 30 }: FloatingParticlesProps) {
+export default function FloatingParticles({ themeColor, count = 15 }: FloatingParticlesProps) {
   const [particles, setParticles] = useState<
     Array<{ id: number; left: string; delay: string; duration: string; size: number }>
   >([]);
