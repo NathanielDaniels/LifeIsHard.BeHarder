@@ -16,8 +16,8 @@ import RaceCalendar from '@/components/shared/RaceCalendar';
 import CustomCursor from '@/components/shared/CustomCursor';
 
 const ACCIDENT_DATE = new Date('2020-11-01');
-const SOBRIETY_DATE = new Date('2020-1-20');
-const NEXT_RACE_DATE = new Date('2026-4-11');
+const SOBRIETY_DATE = new Date('2020-01-20');
+const NEXT_RACE_DATE = new Date('2026-04-11');
 
 export default function ComingSoonClient() {
   const { energyState, theme } = useVitality();
