@@ -336,8 +336,9 @@ export default function TeamShowcase() {
         </div>
 
         {/* ── Desktop: main layout ─────────────────────────────────────────── */}
-        <div className="hidden lg:flex flex-col lg:flex-row items-start gap-12 lg:gap-16">
-          <div className="flex gap-4 lg:gap-5 flex-shrink-0 w-full lg:w-[60%]">
+        <div className="hidden lg:flex flex-row items-start gap-12 lg:gap-16">
+          <div className="flex flex-col flex-shrink-0 w-full lg:w-[60%]">
+          <div className="flex gap-4 lg:gap-5">
             {columns.map((col, colIdx) => (
               <div
                 key={colIdx}
@@ -406,6 +407,24 @@ export default function TeamShowcase() {
                 })}
               </div>
             ))}
+          </div>
+
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1, duration: 0.6 }}
+            className="mt-24"
+          >
+            <Link
+              href="/"
+              className="inline-flex items-center gap-3 font-display text-lg tracking-wide text-white/60 hover:text-white transition-colors duration-300 uppercase group"
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" className="transition-transform duration-300 group-hover:-translate-x-1">
+                <path d="M19 12H5M5 12L12 19M5 12L12 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              Back to Main Site
+            </Link>
+          </motion.div>
           </div>
 
           <div className="flex flex-col flex-1 w-full lg:pt-1">
@@ -520,7 +539,7 @@ export default function TeamShowcase() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1, duration: 0.6 }}
-          className="mt-24 lg:mt-32"
+          className="mt-24 lg:mt-32 lg:hidden"
         >
           <Link
             href="/"
