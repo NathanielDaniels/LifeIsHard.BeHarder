@@ -228,39 +228,45 @@ export default function SiteControls() {
       </Link>
     )}
     <div className="fixed top-3 right-3 md:top-4 md:right-4 z-50 flex items-center gap-2">
-      {!isOnSchedulePage && (
-        <Link
-          href="/schedule"
-          className="group relative p-3 md:p-3.5 backdrop-blur-md rounded-full border transition-colors duration-200 flex items-center justify-center bg-white/5 text-white/50 border-white/5 hover:bg-white/10 hover:text-white/80"
-        >
-          <CalendarDays className="w-5 h-5" />
-          <span className="absolute right-full mr-2 px-3 py-1.5 rounded-full bg-black/80 backdrop-blur-md border border-white/10 whitespace-nowrap font-mono text-xs tracking-wider text-white/80 opacity-0 -translate-x-2 pointer-events-none group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200">
-            Schedule
-          </span>
-        </Link>
-      )}
-      {!isOnSponsorsPage && (
-        <Link
-          href="/sponsors"
-          className="group relative p-3 md:p-3.5 backdrop-blur-md rounded-full border transition-colors duration-200 flex items-center justify-center bg-white/5 text-white/50 border-white/5 hover:bg-white/10 hover:text-white/80"
-        >
-          <Handshake className="w-5 h-5" />
-          <span className="absolute right-full mr-2 px-3 py-1.5 rounded-full bg-black/80 backdrop-blur-md border border-white/10 whitespace-nowrap font-mono text-xs tracking-wider text-white/80 opacity-0 -translate-x-2 pointer-events-none group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200">
-            Supporters
-          </span>
-        </Link>
-      )}
-      {!isOnTeamPage && (
-        <Link
-          href="/team"
-          className="group relative p-3 md:p-3.5 backdrop-blur-md rounded-full border transition-colors duration-200 flex items-center justify-center bg-white/5 text-white/50 border-white/5 hover:bg-white/10 hover:text-white/80"
-        >
-          <Users className="w-5 h-5" />
-          <span className="absolute right-full mr-2 px-3 py-1.5 rounded-full bg-black/80 backdrop-blur-md border border-white/10 whitespace-nowrap font-mono text-xs tracking-wider text-white/80 opacity-0 -translate-x-2 pointer-events-none group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200">
-            Team
-          </span>
-        </Link>
-      )}
+      <Link
+        href="/schedule"
+        className={`group relative p-3 md:p-3.5 backdrop-blur-md rounded-full border transition-colors duration-200 flex items-center justify-center ${
+          isOnSchedulePage
+            ? "bg-orange-500/10 text-orange-500 border-orange-500/30"
+            : "bg-white/5 text-white/50 border-white/5 hover:bg-white/10 hover:text-white/80"
+        }`}
+      >
+        <CalendarDays className="w-5 h-5" />
+        <span className="absolute right-full mr-2 px-3 py-1.5 rounded-full bg-black/80 backdrop-blur-md border border-white/10 whitespace-nowrap font-mono text-xs tracking-wider text-white/80 opacity-0 -translate-x-2 pointer-events-none group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200">
+          Schedule
+        </span>
+      </Link>
+      <Link
+        href="/sponsors"
+        className={`group relative p-3 md:p-3.5 backdrop-blur-md rounded-full border transition-colors duration-200 flex items-center justify-center ${
+          isOnSponsorsPage
+            ? "bg-orange-500/10 text-orange-500 border-orange-500/30"
+            : "bg-white/5 text-white/50 border-white/5 hover:bg-white/10 hover:text-white/80"
+        }`}
+      >
+        <Handshake className="w-5 h-5" />
+        <span className="absolute right-full mr-2 px-3 py-1.5 rounded-full bg-black/80 backdrop-blur-md border border-white/10 whitespace-nowrap font-mono text-xs tracking-wider text-white/80 opacity-0 -translate-x-2 pointer-events-none group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200">
+          Supporters
+        </span>
+      </Link>
+      <Link
+        href="/team"
+        className={`group relative p-3 md:p-3.5 backdrop-blur-md rounded-full border transition-colors duration-200 flex items-center justify-center ${
+          isOnTeamPage
+            ? "bg-orange-500/10 text-orange-500 border-orange-500/30"
+            : "bg-white/5 text-white/50 border-white/5 hover:bg-white/10 hover:text-white/80"
+        }`}
+      >
+        <Users className="w-5 h-5" />
+        <span className="absolute right-full mr-2 px-3 py-1.5 rounded-full bg-black/80 backdrop-blur-md border border-white/10 whitespace-nowrap font-mono text-xs tracking-wider text-white/80 opacity-0 -translate-x-2 pointer-events-none group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200">
+          Team
+        </span>
+      </Link>
       <button
         onClick={toggleSound}
         title={isPlaying ? "Mute sound" : "Unmute sound"}
