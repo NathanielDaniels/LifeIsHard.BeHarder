@@ -23,11 +23,18 @@ const SPONSORS: Sponsor[] = [
     logoClass: 'h-12 md:h-14',
   },
   {
+    name: 'Performance Wealth Partners',
+    description: 'A pure wealth management firm. Three generations of fiduciary advisors committed to transparency, innovation, and putting clients first.',
+    logo: '/sponsors/performance-wealth-partners.svg',
+    url: 'https://performancewealthpartners.com',
+    logoClass: 'h-20 md:h-24 -mt-3 brightness-[4] group-hover:brightness-[2.5]',
+  },
+  {
     name: 'Adaptive Training Foundation',
     description: 'Building adaptive athletes through world-class coaching, programming, and community. Strength has no limitations.',
     logo: '/sponsors/ATF_logo.png',
     url: 'https://www.adaptivetrainingfoundation.org/',
-    logoClass: 'h-20 md:h-24 invert brightness-200',
+    logoClass: 'h-28 md:h-32 -my-4 invert brightness-200',
   },
   {
     name: 'Challenged Athletes Foundation',
@@ -184,7 +191,7 @@ export default function SponsorsShowcase() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.1 + i * 0.08, ease: [0.22, 1, 0.36, 1] }}
-                className={`group flex flex-col md:flex-row items-center gap-6 md:gap-10 p-8 md:p-10 rounded-2xl border transition-all duration-500 ${
+                className={`group flex flex-col md:flex-row items-center gap-6 md:gap-10 p-8 md:p-10 rounded-2xl border transition-all duration-500 cursor-pointer ${
                   isActive
                     ? 'bg-white/[0.05] border-white/15 scale-[1.02]'
                     : 'bg-white/[0.02] border-white/8 hover:bg-white/[0.05] hover:border-white/15'
