@@ -914,7 +914,7 @@ export default function ComingSoonClient() {
 
       <section className="relative w-full flex justify-center py-32 md:py-48 overflow-hidden">
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 0.15 }}
             viewport={{ once: true }}
@@ -946,7 +946,7 @@ export default function ComingSoonClient() {
               priority
             />
           </motion.div>
-          
+
           {/* Color overlay reveals on scroll */}
           {mounted && (
             <motion.div
@@ -1010,6 +1010,7 @@ export default function ComingSoonClient() {
 
           <div className="flex flex-wrap justify-center items-center gap-10 md:gap-16 lg:gap-20 pr-8 md:pr-16">
             {[
+              { src: '/sponsors/performance-wealth-partners.svg', link: 'https://performancewealthpartners.com', alt: 'Performance Wealth Partners', className: 'h-16 md:h-20 grayscale brightness-[4] group-hover:grayscale-0 group-hover:brightness-[2.5]' },
               { src: '/sponsors/ATF_logo.png', link: 'https://www.adaptivetrainingfoundation.org/', alt: 'Adaptive Training Foundation', className: 'h-28 md:h-36 lg:h-44 invert brightness-200' },
               // Invert turns the white background black and logo white. Mix-blend-screen then makes the black background invisible
               { src: '/sponsors/CAF_logo.png', link: 'https://www.challengedathletes.org/', alt: 'Sponsor 3', className: 'h-24 md:h-32 mix-blend-screen invert grayscale group-hover:grayscale-0 group-hover:invert-0 opacity-100 rounded-[50%] object-cover' },
