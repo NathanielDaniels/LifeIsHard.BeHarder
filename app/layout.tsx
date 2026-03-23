@@ -40,7 +40,7 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "/Pat_D2T_Sponsor.webp",
+        url: "/og-image-v2.webp",
         width: 1200,
         height: 630,
         alt: "Patrick Wingert - Dare2tri Elite Team Athlete",
@@ -52,7 +52,7 @@ export const metadata: Metadata = {
     title: "Patrick Wingert | Dare2tri Elite Team Athlete",
     description:
       "Life is Hard. Be Harder. Record-setting adaptive-athlete pushing limits and inspiring possibility.",
-    images: ["/Pat_D2T_Sponsor.webp"],
+    images: ["/og-image-v2.webp"],
   },
 };
 
