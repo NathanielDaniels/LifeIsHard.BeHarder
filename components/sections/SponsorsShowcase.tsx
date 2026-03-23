@@ -25,9 +25,9 @@ const SPONSORS: Sponsor[] = [
   {
     name: 'Performance Wealth Partners',
     description: 'A pure wealth management firm. Three generations of fiduciary advisors committed to transparency, innovation, and putting clients first.',
-    logo: '/sponsors/performance-wealth-partners.svg',
+    logo: '/sponsors/performance-wealth-partners-light.svg',
     url: 'https://performancewealthpartners.com',
-    logoClass: 'h-20 md:h-24 -mt-3 brightness-[4] group-hover:brightness-[2.5]',
+    logoClass: 'h-20 md:h-24 -mt-3',
   },
   {
     name: 'Adaptive Training Foundation',
