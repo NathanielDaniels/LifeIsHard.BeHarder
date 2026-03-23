@@ -11,10 +11,10 @@ export default function TheAsk() {
 
   const sponsors = [
     {
-      src: '/sponsors/performance-wealth-partners.svg',
+      src: '/sponsors/performance-wealth-partners-light.svg',
       link: 'https://performancewealthpartners.com',
       alt: 'Performance Wealth Partners',
-      className: 'h-16 md:h-20 grayscale brightness-[4] hover:grayscale-0 hover:brightness-[2.5]'
+      className: 'h-16 md:h-20 grayscale hover:grayscale-0'
     },
     {
       src: '/sponsors/ATF_logo.png',
