@@ -327,7 +327,7 @@ export default function ComingSoonClient() {
             key="intro-overlay"
             exit={{ opacity: 0 }}
             transition={{ duration: 0.5 }}
-            className="fixed inset-0 z-50 bg-black flex flex-col items-center justify-center p-6"
+            className="fixed inset-0 z-[60] bg-black flex flex-col items-center justify-center p-6"
           >
             <div className="absolute top-10 left-10 font-mono text-xs md:text-sm text-white/60 tracking-widest flex flex-col gap-2 overflow-hidden">
               {statusMessages.map((line, i) => (
