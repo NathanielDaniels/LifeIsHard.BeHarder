@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { RACES_2026, Race, getNextRace, getDaysUntil } from '@/lib/race-data';
+import MiniRouteMap from '@/components/shared/MiniRouteMap';
 
 interface RaceCalendarProps {
   themeColor: string;
@@ -128,45 +129,59 @@ function RaceCard({ race, isNext, themeColor }: RaceCardProps) {
           transition={{ duration: 0.3, ease: 'easeInOut' }}
           className="overflow-hidden"
         >
-          <div className="pt-6 mt-6 border-t border-white/10 space-y-3">
-            {race.distance && (
-              <div className="flex items-center gap-3">
-                <span className="font-mono text-[10px] tracking-[0.2em] text-white/30 uppercase w-20 shrink-0">Distance</span>
-                <span className="font-mono text-sm text-white/70">{race.distance}</span>
+          <div className="pt-6 mt-6 border-t border-white/10">
+            <div className="flex flex-col md:flex-row md:gap-8">
+              {/* Details (left) */}
+              <div className="flex-1 space-y-3">
+                {race.distance && (
+                  <div className="flex items-center gap-3">
+                    <span className="font-mono text-[10px] tracking-[0.2em] text-white/30 uppercase w-20 shrink-0">Distance</span>
+                    <span className="font-mono text-sm text-white/70">{race.distance}</span>
+                  </div>
+                )}
+                {race.course && (
+                  <div className="flex items-center gap-3">
+                    <span className="font-mono text-[10px] tracking-[0.2em] text-white/30 uppercase w-20 shrink-0">Course</span>
+                    <span className="font-mono text-sm text-white/70">{race.course}</span>
+                  </div>
+                )}
+                {race.championship && (
+                  <div className="flex items-center gap-3">
+                    <span className="font-mono text-[10px] tracking-[0.2em] text-white/30 uppercase w-20 shrink-0">Stakes</span>
+                    <span className="font-mono text-sm tracking-[0.1em]" style={{ color: themeColor }}>{race.championship}</span>
+                  </div>
+                )}
+                {race.description && (
+                  <p className="font-mono text-sm text-white/50 italic pt-2">
+                    &ldquo;{race.description}&rdquo;
+                  </p>
+                )}
+                {race.website && (
+                  <a
+                    href={race.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    className="inline-flex items-center gap-2 font-mono text-xs tracking-[0.15em] pt-2 transition-colors duration-200 hover:opacity-80"
+                    style={{ color: themeColor }}
+                  >
+                    RACE WEBSITE
+                    <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M7 17L17 7M17 7H7M17 7V17" />
+                    </svg>
+                  </a>
+            )}
               </div>
-            )}
-            {race.course && (
-              <div className="flex items-center gap-3">
-                <span className="font-mono text-[10px] tracking-[0.2em] text-white/30 uppercase w-20 shrink-0">Course</span>
-                <span className="font-mono text-sm text-white/70">{race.course}</span>
+
+              {/* Mini map (right on desktop, below on mobile) */}
+              <div className="mt-4 md:mt-0 md:shrink-0 md:self-center">
+                <MiniRouteMap
+                  destination={race.coords}
+                  themeColor={themeColor}
+                  isTarget={race.isTarget}
+                />
               </div>
-            )}
-            {race.championship && (
-              <div className="flex items-center gap-3">
-                <span className="font-mono text-[10px] tracking-[0.2em] text-white/30 uppercase w-20 shrink-0">Stakes</span>
-                <span className="font-mono text-sm tracking-[0.1em]" style={{ color: themeColor }}>{race.championship}</span>
-              </div>
-            )}
-            {race.description && (
-              <p className="font-mono text-sm text-white/50 italic pt-2">
-                &ldquo;{race.description}&rdquo;
-              </p>
-            )}
-            {race.website && (
-              <a
-                href={race.website}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={(e) => e.stopPropagation()}
-                className="inline-flex items-center gap-2 font-mono text-xs tracking-[0.15em] pt-2 transition-colors duration-200 hover:opacity-80"
-                style={{ color: themeColor }}
-              >
-                RACE WEBSITE
-                <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M7 17L17 7M17 7H7M17 7V17" />
-                </svg>
-              </a>
-            )}
+            </div>
           </div>
         </motion.div>
       )}
