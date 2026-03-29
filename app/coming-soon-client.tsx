@@ -12,6 +12,7 @@ import BiometricCard from '@/components/shared/BiometricCard';
 import EmailCapture from '@/components/shared/EmailCapture';
 import SocialLinks from '@/components/shared/SocialLinks';
 import RaceCalendar from '@/components/shared/RaceCalendar';
+import RaceGlobe from '@/components/shared/RaceGlobe';
 // import InstagramFeed from '@/components/sections/InstagramFeed';
 import CustomCursor from '@/components/shared/CustomCursor';
 
@@ -967,6 +968,20 @@ export default function ComingSoonClient() {
             </motion.div>
           )}
         </motion.div>
+      </section>
+
+      {/* === RACE MAP GLOBE === */}
+      <section className="relative py-20 md:py-32 px-6">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 1, ease: 'easeOut' }}
+          className="max-w-5xl mx-auto flex justify-center"
+        >
+          <RaceGlobe themeColor={themeColor} />
+        </motion.div>
+
       </section>
 
       {/* === RACE SCHEDULE === */}

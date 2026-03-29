@@ -1,0 +1,64 @@
+'use client';
+
+import CobeGlobe from '@/components/shared/CobeGlobe';
+
+interface RaceGlobeProps {
+  themeColor: string;
+}
+
+const SF: [number, number] = [37.76, -122.44];
+
+const RACE_MARKERS = [
+  { id: 'sf',               location: SF,                                        size: 0.05 },
+  { id: 'napa',             location: [38.30, -122.29] as [number, number] },
+  { id: 'hammond',          location: [41.58, -87.50]  as [number, number] },
+  { id: 'long-beach',       location: [33.77, -118.19] as [number, number] },
+  { id: 'pleasant-prairie', location: [42.55, -87.93]  as [number, number] },
+  { id: 'milwaukee',        location: [43.04, -87.91]  as [number, number], size: 0.07 },
+  { id: 'chicago',          location: [41.88, -87.63]  as [number, number] },
+  { id: 'la-jolla',         location: [32.85, -117.27] as [number, number] },
+  { id: 'berkeley',         location: [37.87, -122.27] as [number, number] },
+  { id: 'sacramento',       location: [38.58, -121.49] as [number, number] },
+];
+
+// Hub-and-spoke from SF — only long-distance arcs visible on globe
+const RACE_ARCS = [
+  { id: 'sf-hammond',          from: SF, to: [41.58, -87.50]  as [number, number] },
+  { id: 'sf-long-beach',       from: SF, to: [33.77, -118.19] as [number, number] },
+  { id: 'sf-pleasant-prairie', from: SF, to: [42.55, -87.93]  as [number, number] },
+  { id: 'sf-milwaukee',        from: SF, to: [43.04, -87.91]  as [number, number] },
+  { id: 'sf-chicago',          from: SF, to: [41.88, -87.63]  as [number, number] },
+  { id: 'sf-la-jolla',         from: SF, to: [32.85, -117.27] as [number, number] },
+];
+
+export default function RaceGlobe({ themeColor }: RaceGlobeProps) {
+  return (
+    <div className="flex flex-col items-center text-center">
+      <p className="font-mono text-xs tracking-[0.3em] text-white/40 mb-2 uppercase">
+        Race Map
+      </p>
+      <h3 className="font-display text-3xl md:text-4xl tracking-[0.15em] text-white mb-8">
+        2026 SEASON
+      </h3>
+
+      <div className="w-[320px] h-[320px] md:w-[520px] md:h-[520px] lg:w-[600px] lg:h-[600px]">
+        <CobeGlobe
+          markers={RACE_MARKERS}
+          arcs={RACE_ARCS}
+          themeColor={themeColor}
+          speed={0.002}
+          initialPhi={4.85}
+          theta={0.25}
+        />
+      </div>
+
+      <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 mt-8 font-mono text-[10px] tracking-[0.2em] text-white/40 uppercase">
+        <span>10 Races</span>
+        <span className="hidden sm:inline">·</span>
+        <span>4 States</span>
+        <span className="hidden sm:inline">·</span>
+        <span style={{ color: themeColor }}>Nationals: Milwaukee</span>
+      </div>
+    </div>
+  );
+}
