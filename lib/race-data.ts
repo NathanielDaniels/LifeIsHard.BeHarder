@@ -11,6 +11,8 @@ export interface Race {
   description?: string;
   championship?: string;
   website?: string;
+  cityCode: string;
+  stateFips: string;
 }
 
 export const SF_HOME: [number, number] = [-122.44, 37.76];
@@ -27,6 +29,8 @@ export const RACES_2026: Race[] = [
     description: 'First race of the season. Setting the tone.',
     championship: 'CA North State Championship',
     website: 'https://alpha.win/event/napa-valley-ca-2/',
+    cityCode: 'NPA',
+    stateFips: '06',
   },
   {
     date: '2026-06-07',
@@ -38,6 +42,8 @@ export const RACES_2026: Race[] = [
     course: '500m swim · 18.7km bike · 5km run',
     description: 'Back in the Midwest. Racing where it started.',
     website: 'https://www.trisignup.com/Race/IN/Hammond/AmericaSRaceLeonSTriathlon',
+    cityCode: 'HMD',
+    stateFips: '18',
   },
   {
     date: '2026-07-19',
@@ -49,6 +55,8 @@ export const RACES_2026: Race[] = [
     course: '750m swim · 20km bike · 5km run',
     description: 'West coast showcase. Big field, bigger stage.',
     website: 'https://by.supertri.com/long-beach/',
+    cityCode: 'LBC',
+    stateFips: '06',
   },
   {
     date: '2026-06-28',
@@ -60,6 +68,8 @@ export const RACES_2026: Race[] = [
     course: '750m swim · 23km bike · 5km run',
     description: 'Midwest turf. No excuses.',
     website: 'https://www.pleasantprairietri.com/',
+    cityCode: 'PPR',
+    stateFips: '55',
   },
   {
     date: '2026-07-26',
@@ -71,6 +81,8 @@ export const RACES_2026: Race[] = [
     course: '42.2km',
     description: '42.2km through the city by the bay. Golden Gate and back.',
     website: 'https://www.thesfmarathon.com/',
+    cityCode: 'SFO',
+    stateFips: '06',
   },
   {
     date: '2026-08-09',
@@ -84,6 +96,8 @@ export const RACES_2026: Race[] = [
     description: 'Everything builds to this.',
     championship: 'National Championship',
     website: 'https://www.usatriathlon.org/2026-usa-triathlon-nationals',
+    cityCode: 'MKE',
+    stateFips: '55',
   },
   {
     date: '2026-08-23',
@@ -96,6 +110,8 @@ export const RACES_2026: Race[] = [
     description: 'Racing in the city that changed everything.',
     championship: 'Illinois State Championship',
     website: 'https://by.supertri.com/chicago-triathlon/',
+    cityCode: 'CHI',
+    stateFips: '17',
   },
   {
     date: '2026-10-25',
@@ -107,6 +123,8 @@ export const RACES_2026: Race[] = [
     course: '1.6km swim · 48km bike · 13km run',
     description: 'CAF flagship event. Nothing left to prove, everything left to give.',
     website: 'https://www.challengedathletes.org/events/2026-san-diego-triathlon-challenge/',
+    cityCode: 'SDG',
+    stateFips: '06',
   },
   {
     date: '2026-11-15',
@@ -118,6 +136,8 @@ export const RACES_2026: Race[] = [
     course: '21.1km',
     description: 'Speed over distance. Testing the engine.',
     website: 'https://berkeleyhalfmarathon.com/',
+    cityCode: 'BRK',
+    stateFips: '06',
   },
   {
     date: '2026-12-06',
@@ -129,6 +149,8 @@ export const RACES_2026: Race[] = [
     course: '42.2km',
     description: 'Closing out the year. Full send.',
     website: 'https://runsra.org/california-international-marathon/',
+    cityCode: 'SAC',
+    stateFips: '06',
   },
 ];
 
