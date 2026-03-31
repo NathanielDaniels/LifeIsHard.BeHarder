@@ -159,7 +159,7 @@ export default function TeamShowcase() {
     hoverTimeout.current = setTimeout(() => {
       setHoveredId(null);
       hoverTimeout.current = null;
-    }, 80);
+    }, 200);
   }, []);
 
   useEffect(() => {
