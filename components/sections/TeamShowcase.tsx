@@ -125,26 +125,13 @@ function SocialIcon({ platform }: { platform: SocialLink["platform"] }) {
   }
 }
 
-const photoVariants = {
-  hidden: { opacity: 0, y: 30, scale: 0.97 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    scale: 1,
-    transition: { delay: i * 0.12, duration: 0.7, ease: [0.22, 1, 0.36, 1] },
-  }),
-};
 
 const rowVariants = {
-  hidden: { opacity: 0, x: 40 },
+  hidden: { opacity: 0, x: -30 },
   visible: (i: number) => ({
     opacity: 1,
     x: 0,
-    transition: {
-      delay: 0.3 + i * 0.08,
-      duration: 0.5,
-      ease: [0.22, 1, 0.36, 1],
-    },
+    transition: { duration: 0.5, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] },
   }),
 };
 
@@ -225,7 +212,7 @@ export default function TeamShowcase() {
             const isActive = activeId === member.id;
 
             return (
-              <motion.div
+              <div
                 key={member.id}
                 data-member={member.id}
                 role="button"
@@ -238,10 +225,6 @@ export default function TeamShowcase() {
                     handleTap(member.id);
                   }
                 }}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-50px" }}
-                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
                 className="relative aspect-[3/4] overflow-hidden cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-orange-500/50 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
               >
                 {member.image ? (
@@ -330,7 +313,7 @@ export default function TeamShowcase() {
                     )}
                   </AnimatePresence>
                 </div>
-              </motion.div>
+              </div>
             );
           })}
         </div>
@@ -350,17 +333,12 @@ export default function TeamShowcase() {
                   const isDimmed = activeId !== null && !isActive;
 
                   return (
-                    <motion.div
+                    <div
                       key={member.id}
-                      custom={globalIdx}
-                      variants={photoVariants}
-                      initial="hidden"
-                      whileInView="visible"
-                      viewport={{ once: true, margin: "-50px" }}
                       tabIndex={0}
                       role="button"
                       aria-label={member.name}
-                      className={`relative ${COLUMN_CONFIG[colIdx].photoClass} overflow-hidden rounded-xl cursor-pointer transition-opacity duration-400 outline-none focus-visible:ring-2 focus-visible:ring-orange-500/50`}
+                      className={`relative ${COLUMN_CONFIG[colIdx].photoClass} overflow-hidden rounded-xl cursor-pointer transition-opacity duration-[400ms] outline-none focus-visible:ring-2 focus-visible:ring-orange-500/50`}
                       style={{ opacity: isDimmed ? 0.6 : 1 }}
                       onMouseEnter={() => handleHoverEnter(member.id)}
                       onMouseLeave={handleHoverLeave}
@@ -402,7 +380,7 @@ export default function TeamShowcase() {
                         className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-orange-500/25 to-transparent transition-opacity duration-500"
                         style={{ opacity: isActive ? 1 : 0 }}
                       />
-                    </motion.div>
+                    </div>
                   );
                 })}
               </div>
