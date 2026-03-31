@@ -179,6 +179,8 @@ function RaceCard({ race, isNext, themeColor }: RaceCardProps) {
                   destination={race.coords}
                   themeColor={themeColor}
                   isTarget={race.isTarget}
+                  cityCode={race.cityCode}
+                  stateFips={race.stateFips}
                 />
               </div>
             </div>
