@@ -38,7 +38,7 @@ Next Race:      April 11, 2026 (AlphaWin Napa Valley Triathlon - California Stat
 **Triathlon:**
 - Apr 11: AlphaWin Napa Valley Triathlon (CA State Championship)
 - Jun 7: Leon's Triathlon, Hammond, IN
-- Jun 19: SuperTri Long Beach Legacy Triathlon
+- Jul 19: SuperTri Long Beach Legacy Triathlon
 - Jun 28: Pleasant Prairie Triathlon, WI
 - Aug 9: USA Para Triathlon National Championships, Milwaukee
 - Aug 23: SuperTri Chicago Triathlon (IL State Championship)
