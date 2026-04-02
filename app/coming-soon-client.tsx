@@ -19,6 +19,7 @@ import CustomCursor from '@/components/shared/CustomCursor';
 const ACCIDENT_DATE = new Date('2020-11-01');
 const SOBRIETY_DATE = new Date('2020-01-20');
 const NEXT_RACE_DATE = new Date('2026-04-11');
+const NATIONALS_DATE = new Date('2026-08-09');
 
 export default function ComingSoonClient() {
   const { energyState, theme } = useVitality();
@@ -53,6 +54,8 @@ export default function ComingSoonClient() {
   const [daysSinceAccident, setDaysSinceAccident] = useState(0);
   const [daysSober, setDaysSober] = useState(0);
   const [daysUntilRace, setDaysUntilRace] = useState(0);
+  const [daysUntilNationals, setDaysUntilNationals] = useState(0);
+  const [showNationals, setShowNationals] = useState(false);
   
   const [showScrollHint, setShowScrollHint] = useState(false);
   const hasScrolledRef = useRef(false);
@@ -135,6 +138,7 @@ export default function ComingSoonClient() {
     setDaysSinceAccident(Math.floor((today.getTime() - ACCIDENT_DATE.getTime()) / (1000 * 60 * 60 * 24)));
     setDaysSober(Math.floor((today.getTime() - SOBRIETY_DATE.getTime()) / (1000 * 60 * 60 * 24)));
     setDaysUntilRace(Math.max(0, Math.floor((NEXT_RACE_DATE.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))));
+    setDaysUntilNationals(Math.max(0, Math.floor((NATIONALS_DATE.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))));
   }, []);
 
 
@@ -655,7 +659,6 @@ export default function ComingSoonClient() {
             {[
               { value: daysSinceAccident, label: 'DAYS SINCE ACCIDENT' },
               { value: daysSober, label: 'DAYS SOBER' },
-              { value: daysUntilRace, label: 'DAYS UNTIL NEXT RACE' },
             ].map((stat, i) => (
               <motion.div
                 key={stat.label}
@@ -665,7 +668,7 @@ export default function ComingSoonClient() {
                 transition={{ duration: 0.6, delay: 0.2 + i * 0.15 }}
                 className="text-center"
               >
-                <div 
+                <div
                   className="font-display text-[clamp(3.5rem,10vw,7rem)] font-bold leading-none"
                   style={{ color: themeColor }}
                 >
@@ -676,6 +679,48 @@ export default function ComingSoonClient() {
                 </div>
               </motion.div>
             ))}
+
+            {/* Toggleable race countdown */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.5 }}
+              className="text-center cursor-pointer select-none group"
+              onClick={() => setShowNationals((prev) => !prev)}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setShowNationals((prev) => !prev); }}
+              aria-label={showNationals ? 'Show days until next race' : 'Show days until nationals'}
+            >
+              <div className="relative overflow-hidden">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={showNationals ? 'nationals' : 'next-race'}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <div
+                      className="font-display text-[clamp(3.5rem,10vw,7rem)] font-bold leading-none"
+                      style={{ color: themeColor }}
+                    >
+                      <AnimatedCounter value={showNationals ? daysUntilNationals : daysUntilRace} duration={2600} />
+                    </div>
+                    <div className="font-mono text-[0.7rem] md:text-[0.8rem] tracking-[0.3em] text-white/70 mt-2 font-medium">
+                      {showNationals ? 'DAYS UNTIL NATIONALS' : 'DAYS UNTIL NEXT RACE'}
+                    </div>
+                  </motion.div>
+                </AnimatePresence>
+              </div>
+              <div
+                className="font-mono text-[0.55rem] tracking-[0.2em] mt-3 transition-opacity duration-300 opacity-0 group-hover:opacity-100"
+                style={{ color: `${themeColor}99` }}
+              >
+                TAP TO {showNationals ? 'SEE NEXT RACE' : 'SEE NATIONALS'}
+              </div>
+            </motion.div>
           </div>
         </motion.div>
       </section>

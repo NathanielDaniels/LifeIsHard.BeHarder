@@ -15,6 +15,8 @@ export default function RaceCalendar({ themeColor }: RaceCalendarProps) {
   const runningRaces = RACES_2026.filter(r => r.type === 'running');
   const nationals = RACES_2026.find(r => r.isTarget);
   const daysUntilNationals = nationals ? getDaysUntil(new Date(nationals.date)) : 0;
+  const daysUntilNext = nextRace ? getDaysUntil(new Date(nextRace.date)) : 0;
+  const [showNationals, setShowNationals] = useState(true);
 
   return (
     <div className="space-y-16">
@@ -40,18 +42,45 @@ export default function RaceCalendar({ themeColor }: RaceCalendarProps) {
             boxShadow: `0 0 60px ${themeColor}33`
           }}
         >
-          <div className="font-mono text-xs tracking-[0.3em] text-white/50 mb-3">
-            DAYS UNTIL NATIONALS
-          </div>
-          <div
-            className="font-display text-7xl md:text-8xl lg:text-9xl tracking-wider mb-2"
-            style={{ color: themeColor }}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={showNationals ? 'nationals' : 'next-race'}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ duration: 0.25 }}
+            >
+              <div className="font-mono text-xs tracking-[0.3em] text-white/50 mb-3">
+                {showNationals ? 'DAYS UNTIL NATIONALS' : 'DAYS UNTIL NEXT RACE'}
+              </div>
+              <div
+                className="font-display text-7xl md:text-8xl lg:text-9xl tracking-wider mb-2"
+                style={{ color: themeColor }}
+              >
+                {showNationals ? daysUntilNationals : daysUntilNext}
+              </div>
+              <div className="font-mono text-sm tracking-[0.2em] text-white/60">
+                {showNationals
+                  ? nationals.name.toUpperCase()
+                  : nextRace
+                    ? nextRace.name.toUpperCase()
+                    : 'NO UPCOMING RACES'}
+              </div>
+            </motion.div>
+          </AnimatePresence>
+
+          {/* Toggle */}
+          <button
+            onClick={() => setShowNationals((prev) => !prev)}
+            className="mt-6 font-mono text-[10px] md:text-xs tracking-[0.2em] px-5 py-2 rounded-full border transition-all duration-300 hover:scale-105"
+            style={{
+              borderColor: `${themeColor}44`,
+              color: `${themeColor}aa`,
+              backgroundColor: 'transparent',
+            }}
           >
-            {daysUntilNationals}
-          </div>
-          <div className="font-mono text-sm tracking-[0.2em] text-white/60">
-            {nationals.name.toUpperCase()}
-          </div>
+            {showNationals ? 'SHOW NEXT RACE →' : '← SHOW NATIONALS'}
+          </button>
         </motion.div>
       )}
 
