@@ -123,8 +123,10 @@ export default function ComingSoonClient() {
   const yLayer2 = useTransform(mouseY, [-0.5, 0.5], [-40, 40]);
 
   const { scrollYProgress } = useScroll();
-  const floatX = useTransform(scrollYProgress, [0, 1], [0, -300]);
-  const floatXReverse = useTransform(scrollYProgress, [0, 1], [0, 300]);
+  const floatXRaw = useTransform(scrollYProgress, [0, 1], [0, -300]);
+  const floatXReverseRaw = useTransform(scrollYProgress, [0, 1], [0, 300]);
+  const floatX = useSpring(floatXRaw, { stiffness: 80, damping: 30, mass: 0.5 });
+  const floatXReverse = useSpring(floatXReverseRaw, { stiffness: 80, damping: 30, mass: 0.5 });
 
   const themeColor = theme.primaryColor;
 
@@ -274,7 +276,7 @@ export default function ComingSoonClient() {
             className="fixed top-[15%] left-[1%] font-display text-[12vw] text-white/[0.02] pointer-events-none z-[1] whitespace-nowrap font-bold tracking-tight will-change-transform"
             style={{ x: floatX }}
           >
-            • UNSTOPPABLE • RELENTLESS • UNBROKEN • UNDEFEATED •
+            • RELENTLESS • UNSTOPPABLE • UNBROKEN • UNDEFEATED •
           </motion.div>
           <motion.div
             className="fixed bottom-[15%] right-[-10%] font-display text-[12vw] text-white/[0.02] pointer-events-none z-[1] whitespace-nowrap font-bold tracking-tight will-change-transform"
