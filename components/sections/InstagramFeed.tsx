@@ -105,13 +105,13 @@ export default function InstagramFeed({ themeColor }: InstagramFeedProps) {
               Training. Racing. Living.
             </p>
             <a
-              href="https://www.instagram.com/patwingzzz"
+              href="https://www.instagram.com/patwingit"
               target="_blank"
               rel="noopener noreferrer"
               className="font-mono text-sm tracking-[0.1em] transition-colors duration-200 hover:opacity-80"
               style={{ color: themeColor }}
             >
-              @patwingzzz
+              @patwingit
             </a>
           </div>
         </motion.div>
@@ -131,7 +131,7 @@ export default function InstagramFeed({ themeColor }: InstagramFeedProps) {
             return (
               <a
                 key={post.id}
-                href="https://www.instagram.com/patwingzzz"
+                href="https://www.instagram.com/patwingit"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="relative h-[45vh] md:h-[55vh] lg:h-[65vh] overflow-visible group transition-[flex] duration-500 ease-out"
@@ -206,7 +206,7 @@ export default function InstagramFeed({ themeColor }: InstagramFeedProps) {
           className="mt-12 md:mt-16 flex justify-center px-6"
         >
           <a
-            href="https://www.instagram.com/patwingzzz"
+            href="https://www.instagram.com/patwingit"
             target="_blank"
             rel="noopener noreferrer"
             className="group flex items-center gap-3 px-8 py-4 border transition-all duration-300 hover:bg-white/5"

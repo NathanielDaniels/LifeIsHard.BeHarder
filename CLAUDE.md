@@ -270,7 +270,7 @@ The full site (`page_full-site.tsx`) uses scroll-driven storytelling with an ora
 - "He didn't go looking for meaning. He went to finish something he started in his head twenty years ago."
 
 ### Social Links
-- Instagram: https://www.instagram.com/patwings666
+- Instagram: https://www.instagram.com/patwingit
 - Strava: https://www.strava.com (needs specific profile link)
 - Dare2Tri: https://www.dare2tri.org
 

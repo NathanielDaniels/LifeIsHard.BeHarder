@@ -12,7 +12,7 @@ export default function SocialLinks({ onHoverChange }: SocialLinksProps) {
   const socialLinks = [
     {
       name: 'Instagram',
-      href: 'https://www.instagram.com/patwingzzz',
+      href: 'https://www.instagram.com/patwingit',
       icon: (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-7 h-7 md:w-8 md:h-8">
           <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
