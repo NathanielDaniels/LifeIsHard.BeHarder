@@ -114,12 +114,17 @@ export async function POST(request: NextRequest) {
     // Notify Patrick of new subscriber
     const notifyEmail = process.env.SUBSCRIBE_NOTIFY_EMAIL;
     if (notifyEmail) {
-      getResend().emails.send({
-        from: `Patrick Wingert <${process.env.RESEND_FROM_EMAIL || 'patrick@patrickwingert.com'}>`,
-        to: notifyEmail.split(',').map((e) => e.trim()),
-        subject: `New subscriber: ${email}`,
-        text: `New email signup on patrickwingert.com\n\n${email}\n\nTotal subscribers can be viewed in your Resend dashboard.`,
-      }).catch((err) => console.error('Notify email failed:', err));
+      getResend().contacts.list({ audienceId: getAudienceId() })
+        .then(({ data }) => {
+          const count = data?.data?.length ?? '?';
+          return getResend().emails.send({
+            from: `Patrick Wingert <${process.env.RESEND_FROM_EMAIL || 'patrick@patrickwingert.com'}>`,
+            to: notifyEmail.split(',').map((e) => e.trim()),
+            subject: `Subscriber #${count}: ${email}`,
+            text: `New email signup on patrickwingert.com\n\n${email}\n\nTotal subscribers: ${count}\n\nView all subscribers: https://resend.com/audiences`,
+          });
+        })
+        .catch((err) => console.error('Notify email failed:', err));
     }
 
     return NextResponse.json(
