@@ -222,7 +222,7 @@ export default function SiteControls() {
         aria-label="Back to main site"
       >
         <ArrowLeft className="w-5 h-5" />
-        <span className="absolute left-full ml-2 px-3 py-1.5 rounded-full bg-black/80 backdrop-blur-md border border-white/10 whitespace-nowrap font-mono text-xs tracking-wider text-white/80 opacity-0 translate-x-2 pointer-events-none group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200">
+        <span className="absolute top-full mt-2 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-full bg-black/80 backdrop-blur-md border border-white/10 whitespace-nowrap font-mono text-xs tracking-wider text-white/80 opacity-0 translate-y-1 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200">
           Home
         </span>
       </Link>
@@ -237,7 +237,7 @@ export default function SiteControls() {
         }`}
       >
         <CalendarDays className="w-5 h-5" />
-        <span className="absolute right-full mr-2 px-3 py-1.5 rounded-full bg-black/80 backdrop-blur-md border border-white/10 whitespace-nowrap font-mono text-xs tracking-wider text-white/80 opacity-0 -translate-x-2 pointer-events-none group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200">
+        <span className="absolute top-full mt-2 right-1/2 translate-x-1/2 px-3 py-1.5 rounded-full bg-black/80 backdrop-blur-md border border-white/10 whitespace-nowrap font-mono text-xs tracking-wider text-white/80 opacity-0 translate-y-1 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200">
           Schedule
         </span>
       </Link>
@@ -250,7 +250,7 @@ export default function SiteControls() {
         }`}
       >
         <Handshake className="w-5 h-5" />
-        <span className="absolute right-full mr-2 px-3 py-1.5 rounded-full bg-black/80 backdrop-blur-md border border-white/10 whitespace-nowrap font-mono text-xs tracking-wider text-white/80 opacity-0 -translate-x-2 pointer-events-none group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200">
+        <span className="absolute top-full mt-2 right-1/2 translate-x-1/2 px-3 py-1.5 rounded-full bg-black/80 backdrop-blur-md border border-white/10 whitespace-nowrap font-mono text-xs tracking-wider text-white/80 opacity-0 translate-y-1 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200">
           Supporters
         </span>
       </Link>
@@ -263,7 +263,7 @@ export default function SiteControls() {
         }`}
       >
         <Users className="w-5 h-5" />
-        <span className="absolute right-full mr-2 px-3 py-1.5 rounded-full bg-black/80 backdrop-blur-md border border-white/10 whitespace-nowrap font-mono text-xs tracking-wider text-white/80 opacity-0 -translate-x-2 pointer-events-none group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200">
+        <span className="absolute top-full mt-2 right-1/2 translate-x-1/2 px-3 py-1.5 rounded-full bg-black/80 backdrop-blur-md border border-white/10 whitespace-nowrap font-mono text-xs tracking-wider text-white/80 opacity-0 translate-y-1 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200">
           Team
         </span>
       </Link>
