@@ -104,7 +104,7 @@ const dark = {
 
 const socialLinks = [
   {
-    href: "https://www.instagram.com/patwingzzz",
+    href: "https://www.instagram.com/patwingit",
     label: "INSTAGRAM",
     iconSrc: `${SITE}/icons/instagram.png`,
     size: 32,

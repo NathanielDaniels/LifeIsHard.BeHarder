@@ -185,7 +185,7 @@ export default function SiteLaunchEmail({ email }: SiteLaunchEmailProps) {
 
             <Text style={socialRow}>
               <Link
-                href="https://www.instagram.com/patwingzzz"
+                href="https://www.instagram.com/patwingit"
                 style={socialLink}
               >
                 INSTAGRAM
