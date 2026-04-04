@@ -57,6 +57,7 @@ export default function ComingSoonClient() {
   const [daysUntilRace, setDaysUntilRace] = useState(0);
   const [daysUntilNationals, setDaysUntilNationals] = useState(0);
   const [showNationals, setShowNationals] = useState(false);
+  const [dismissedBanner, setDismissedBanner] = useState(false);
   
   const [showScrollHint, setShowScrollHint] = useState(false);
   const hasScrolledRef = useRef(false);
@@ -448,6 +449,37 @@ export default function ComingSoonClient() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* === LLLDAM 2026 CORNER BADGE (APRIL ONLY) === */}
+      {new Date().getMonth() === 3 && (
+        <div className="fixed top-3 left-3 md:top-4 md:left-4 z-50 group">
+          <a
+            href="https://40years.amputee-coalition.org"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block"
+          >
+            <Image
+              src="/LLLDAM2026.png"
+              alt="#LLLDAM2026 - Limb Loss and Limb Difference Awareness Month"
+              width={240}
+              height={60}
+              className="h-12 md:h-14 w-auto cursor-pointer opacity-70 hover:opacity-100 transition-opacity duration-200"
+            />
+          </a>
+          <div className="absolute top-full left-0 mt-2 w-72 p-4 rounded-xl bg-black/90 backdrop-blur-xl border border-white/10 opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto transition-all duration-300">
+            <p className="font-mono text-[10px] tracking-[0.2em] text-orange-500 mb-2">
+              APRIL IS LIMB LOSS & LIMB DIFFERENCE AWARENESS MONTH
+            </p>
+            <p className="text-sm text-white/60 leading-relaxed mb-3">
+              Nearly 2.1 million Americans live with limb loss. This month honors their stories, raises awareness, and celebrates the strength of the limb loss and limb difference community.
+            </p>
+            <span className="font-mono text-[10px] tracking-[0.15em] text-orange-500/70">
+              CLICK TO LEARN MORE →
+            </span>
+          </div>
+        </div>
+      )}
 
       {/* === HERO === */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
@@ -1110,41 +1142,53 @@ export default function ComingSoonClient() {
         </motion.div>
       </section>
 
+      {/* === LIMB LOSS & LIMB DIFFERENCE AWARENESS MONTH (APRIL ONLY) === */}
+      {new Date().getMonth() === 3 && (
+        <motion.section
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 1 }}
+          className="relative z-20 py-12 md:py-16 px-6 border-t border-white/5"
+          style={{ backgroundColor: 'rgba(5,5,5,0.95)' }}
+        >
+          <a
+            href="https://40years.amputee-coalition.org"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block max-w-4xl mx-auto hover:opacity-90 transition-opacity duration-200"
+          >
+            <Image
+              src="/LLLDAM-Header.png"
+              alt="April is Limb Loss and Limb Difference Awareness Month - One Community. Countless Stories."
+              width={1200}
+              height={400}
+              className="w-full h-auto object-contain"
+            />
+          </a>
+        </motion.section>
+      )}
+
       {/* === FOOTER === */}
       <footer className="relative z-20 py-8 px-6 border-t border-white/5 bg-black">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-4 items-center">
-          <div className="flex justify-center md:justify-start order-2 md:order-1">
-            <span className="font-display text-base tracking-[0.2em] text-white/60">
-              PATRICK WINGERT
-            </span>
-          </div>
-          
-          <div className="flex justify-center order-1 md:order-2">
-            <Image 
-              src="/orange-runner-blade-black.png" 
-              alt="Para-athlete running blade" 
-              width={80} 
-              height={80} 
-              className="w-20 h-auto mix-blend-lighten"
+        <div className="max-w-6xl mx-auto flex flex-row justify-between items-center gap-4">
+          <span className="font-display text-base tracking-[0.2em] text-white/60">
+            PATRICK WINGERT
+          </span>
+          <a
+            href="https://dare2tri.org/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-end opacity-60 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-300 cursor-pointer outline-none"
+          >
+            <Image
+              src="/sponsors/D2T_logo_short.webp"
+              alt="Dare2Tri Elite Team Athlete."
+              width={120}
+              height={40}
+              className="object-contain"
             />
-          </div>
-
-          <div className="flex justify-center md:justify-end order-3">
-            <a 
-              href="https://dare2tri.org/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="opacity-60 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-300 cursor-pointer outline-none"
-            >
-              <Image 
-                src="/sponsors/D2T_logo_short.webp" 
-                alt="Dare2Tri Elite Team Athlete." 
-                width={120} 
-                height={40} 
-                className="object-contain"
-              />
-            </a>
-          </div>
+          </a>
         </div>
       </footer>
     </div>
