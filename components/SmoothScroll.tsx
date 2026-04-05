@@ -18,6 +18,7 @@ export default function SmoothScroll({ children }: { children: ReactNode }) {
     });
 
     setLenis(lenisInstance);
+    (window as unknown as { lenis?: Lenis }).lenis = lenisInstance;
 
     function raf(time: number) {
       lenisInstance.raf(time);
@@ -27,6 +28,7 @@ export default function SmoothScroll({ children }: { children: ReactNode }) {
     requestAnimationFrame(raf);
 
     return () => {
+      delete (window as unknown as { lenis?: Lenis }).lenis;
       lenisInstance.destroy();
     };
   }, []);

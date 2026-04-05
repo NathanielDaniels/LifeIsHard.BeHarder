@@ -1,6 +1,9 @@
 'use client';
 
+import { useState, useRef } from 'react';
+import { AnimatePresence } from 'framer-motion';
 import CobeGlobe from '@/components/shared/CobeGlobe';
+import FullRaceMap from '@/components/shared/FullRaceMap';
 
 interface RaceGlobeProps {
   themeColor: string;
@@ -32,6 +35,9 @@ const RACE_ARCS = [
 ];
 
 export default function RaceGlobe({ themeColor }: RaceGlobeProps) {
+  const [showMap, setShowMap] = useState(false);
+  const pointerStart = useRef<{ x: number; y: number } | null>(null);
+
   return (
     <div className="flex flex-col items-center text-center">
       <p className="font-mono text-xs tracking-[0.3em] text-white/40 mb-2 uppercase">
@@ -41,7 +47,18 @@ export default function RaceGlobe({ themeColor }: RaceGlobeProps) {
         2026 SEASON
       </h3>
 
-      <div className="w-[320px] h-[320px] md:w-[520px] md:h-[520px] lg:w-[600px] lg:h-[600px]">
+      <div
+        className="w-[320px] h-[320px] md:w-[520px] md:h-[520px] lg:w-[600px] lg:h-[600px] cursor-pointer group"
+        onPointerDown={(e) => { pointerStart.current = { x: e.clientX, y: e.clientY }; }}
+        onPointerUp={(e) => {
+          if (pointerStart.current && window.innerWidth >= 768) {
+            const dx = Math.abs(e.clientX - pointerStart.current.x);
+            const dy = Math.abs(e.clientY - pointerStart.current.y);
+            if (dx < 5 && dy < 5) setShowMap(true);
+          }
+          pointerStart.current = null;
+        }}
+      >
         <CobeGlobe
           markers={RACE_MARKERS}
           arcs={RACE_ARCS}
@@ -59,6 +76,24 @@ export default function RaceGlobe({ themeColor }: RaceGlobeProps) {
         <span className="hidden sm:inline">·</span>
         <span style={{ color: themeColor }}>Nationals: Milwaukee</span>
       </div>
+
+      <button
+        onClick={() => setShowMap(true)}
+        className="hidden md:inline-block mt-4 font-mono text-[10px] md:text-xs tracking-[0.2em] px-5 py-2 rounded-full border transition-all duration-300 hover:scale-105"
+        style={{
+          borderColor: `${themeColor}44`,
+          color: `${themeColor}aa`,
+          backgroundColor: 'transparent',
+        }}
+      >
+        VIEW FULL MAP →
+      </button>
+
+      <AnimatePresence>
+        {showMap && (
+          <FullRaceMap themeColor={themeColor} onClose={() => setShowMap(false)} />
+        )}
+      </AnimatePresence>
     </div>
   );
 }
