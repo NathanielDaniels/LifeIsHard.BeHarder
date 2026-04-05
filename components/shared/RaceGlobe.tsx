@@ -51,7 +51,7 @@ export default function RaceGlobe({ themeColor }: RaceGlobeProps) {
         className="w-[320px] h-[320px] md:w-[520px] md:h-[520px] lg:w-[600px] lg:h-[600px] cursor-pointer group"
         onPointerDown={(e) => { pointerStart.current = { x: e.clientX, y: e.clientY }; }}
         onPointerUp={(e) => {
-          if (pointerStart.current && window.innerWidth >= 768) {
+          if (pointerStart.current) {
             const dx = Math.abs(e.clientX - pointerStart.current.x);
             const dy = Math.abs(e.clientY - pointerStart.current.y);
             if (dx < 5 && dy < 5) setShowMap(true);
@@ -79,7 +79,7 @@ export default function RaceGlobe({ themeColor }: RaceGlobeProps) {
 
       <button
         onClick={() => setShowMap(true)}
-        className="hidden md:inline-block mt-4 font-mono text-[10px] md:text-xs tracking-[0.2em] px-5 py-2 rounded-full border transition-all duration-300 hover:scale-105"
+        className="mt-4 font-mono text-[10px] md:text-xs tracking-[0.2em] px-5 py-2 rounded-full border transition-all duration-300 hover:scale-105"
         style={{
           borderColor: `${themeColor}44`,
           color: `${themeColor}aa`,
