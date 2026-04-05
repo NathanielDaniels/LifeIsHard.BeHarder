@@ -1,6 +1,6 @@
 'use client';
 
-import { memo, useState, useRef, useEffect, useCallback } from 'react';
+import { memo, useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import {
   ComposableMap,
@@ -11,6 +11,7 @@ import {
   ZoomableGroup,
 } from 'react-simple-maps';
 import { RACES_2026, SF_HOME, getNextRace, getDaysUntil } from '@/lib/race-data';
+import { haversineDistance, formatMiles } from '@/lib/geo-utils';
 
 interface FullRaceMapProps {
   themeColor: string;
@@ -24,21 +25,59 @@ const RACE_STATE_FIPS = Array.from(new Set(RACES_2026.map((r) => r.stateFips)));
 function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
   const nextRace = getNextRace();
   const [hoveredRace, setHoveredRace] = useState<string | null>(null);
-  const activeRace = hoveredRace;
+  const [selectedRace, setSelectedRace] = useState<string | null>(null);
+  const activeRace = hoveredRace || selectedRace;
   const cardRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
+  const selectedData = useMemo(() => {
+    if (!selectedRace) return null;
+    const race = RACES_2026.find((r) => r.cityCode === selectedRace);
+    if (!race) return null;
+    const distance = haversineDistance(SF_HOME, race.coords);
+    const midpoint: [number, number] = [
+      (SF_HOME[0] + race.coords[0]) / 2,
+      (SF_HOME[1] + race.coords[1]) / 2,
+    ];
+    // Zoom level based on distance — closer races need more zoom
+    const zoom = distance < 200 ? 6 : distance < 500 ? 3 : distance < 1500 ? 2 : 1.5;
+    return { race, distance, midpoint, zoom };
+  }, [selectedRace]);
+
+  const mapCenter: [number, number] = selectedData ? selectedData.midpoint : [-96, 38];
+  const mapZoom = selectedData ? selectedData.zoom : 1;
+
+  const isTouchRef = useRef(false);
+
+  useEffect(() => {
+    const onTouch = () => { isTouchRef.current = true; };
+    const onMouse = () => { isTouchRef.current = false; };
+    window.addEventListener('touchstart', onTouch, { passive: true });
+    window.addEventListener('mousemove', onMouse, { passive: true });
+    return () => {
+      window.removeEventListener('touchstart', onTouch);
+      window.removeEventListener('mousemove', onMouse);
+    };
+  }, []);
+
   const setHoverSafe = useCallback((cityCode: string | null) => {
+    if (isTouchRef.current) return; // Touch devices use tap/click only
     setHoveredRace(cityCode);
   }, []);
 
-  // Escape key to close
+  // Escape key — deselect first, then close
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
+      if (e.key === 'Escape') {
+        if (selectedRace) {
+          setSelectedRace(null);
+        } else {
+          onClose();
+        }
+      }
     };
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
-  }, [onClose]);
+  }, [selectedRace, onClose]);
 
   // Lock body scroll and stop Lenis while map is open
   useEffect(() => {
@@ -74,19 +113,79 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
           <h3 className="font-display text-2xl md:text-3xl tracking-[0.15em] text-white">
             2026 RACE MAP
           </h3>
-          <p className="font-mono text-[10px] tracking-[0.2em] text-white/40 mt-1">
-            {RACES_2026.length} RACES · PINCH TO ZOOM · ESC TO CLOSE
-          </p>
+          {!selectedData && (
+            <p className="font-mono text-[10px] tracking-[0.2em] text-white/40 mt-1">
+              {RACES_2026.length} RACES · CLICK A RACE FOR DETAILS
+            </p>
+          )}
+          {selectedData && (() => {
+            const { race, distance } = selectedData;
+            const isPast = new Date(race.date) < new Date();
+            const daysUntil = getDaysUntil(new Date(race.date));
+            const raceDate = new Intl.DateTimeFormat('en-US', {
+              month: 'long',
+              day: 'numeric',
+              year: 'numeric',
+              timeZone: 'UTC',
+            }).format(new Date(race.date));
+            return (
+              <div className="mt-2 space-y-1">
+                {/* Line 1: Name + countdown */}
+                <div className="flex items-baseline gap-4">
+                  <span className="font-display text-xl md:text-2xl tracking-wide text-white">
+                    {race.name}
+                  </span>
+                  {!isPast && (
+                    <span className="font-mono text-xs tracking-[0.15em] font-medium shrink-0" style={{ color: themeColor }}>
+                      {daysUntil} DAYS
+                    </span>
+                  )}
+                </div>
+                {/* Line 2: Details */}
+                <div className="font-mono text-[11px] tracking-[0.1em] text-white/60 flex flex-wrap items-center">
+                  <span>{raceDate}</span>
+                  <span className="mx-2 text-white/20">·</span>
+                  <span>{race.location}</span>
+                  {race.distance && (
+                    <>
+                      <span className="mx-2 text-white/20">·</span>
+                      <span>{race.distance}</span>
+                    </>
+                  )}
+                  {race.course && (
+                    <>
+                      <span className="mx-2 text-white/20">·</span>
+                      <span className="text-white/40">{race.course}</span>
+                    </>
+                  )}
+                  {race.championship && (
+                    <>
+                      <span className="mx-2 text-white/20">·</span>
+                      <span style={{ color: themeColor }}>{race.championship.toUpperCase()}</span>
+                    </>
+                  )}
+                  {distance < 20 && (
+                    <>
+                      <span className="mx-2 text-white/20">·</span>
+                      <span style={{ color: themeColor }}>HOME TURF</span>
+                    </>
+                  )}
+                </div>
+              </div>
+            );
+          })()}
         </div>
-        <button
-          onClick={onClose}
-          className="p-3 rounded-full bg-white/10 text-white/70 hover:bg-white/20 hover:text-white transition-all duration-200 border border-white/20"
-          aria-label="Close map"
-        >
-          <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-            <path d="M18 6L6 18M6 6l12 12" />
-          </svg>
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={onClose}
+            className="p-3 rounded-full bg-white/10 text-white/70 hover:bg-white/20 hover:text-white transition-all duration-200 border border-white/20"
+            aria-label="Close map"
+          >
+            <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <path d="M18 6L6 18M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
       </div>
 
       {/* Split layout: map + sidebar */}
@@ -98,7 +197,7 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
             projectionConfig={{ scale: 900 }}
             style={{ width: '100%', height: '100%' }}
           >
-            <ZoomableGroup center={[-96, 38]} zoom={1} maxZoom={8} minZoom={1}>
+            <ZoomableGroup center={mapCenter} zoom={mapZoom} maxZoom={8} minZoom={1}>
               {/* States */}
               <Geographies geography={STATES_URL}>
                 {({ geographies }) =>
@@ -124,6 +223,8 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
 
               {/* Route lines — always rendered, faded via opacity */}
               {RACES_2026.map((race) => {
+                const dist = haversineDistance(SF_HOME, race.coords);
+                if (dist < 20) return null; // Skip route line for home races
                 const isHighlighted = activeRace === race.cityCode;
                 const lineHidden = activeRace !== null && !isHighlighted;
                 return (
@@ -142,6 +243,57 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
                   />
                 );
               })}
+
+              {/* Distance label — on hover or select */}
+              {activeRace && (() => {
+                const activeRaceData = RACES_2026.find((r) => r.cityCode === activeRace);
+                if (!activeRaceData) return null;
+                const dist = haversineDistance(SF_HOME, activeRaceData.coords);
+                if (dist < 20) return null; // HOME TURF — no label needed
+                const midpoint: [number, number] = [
+                  (SF_HOME[0] + activeRaceData.coords[0]) / 2,
+                  (SF_HOME[1] + activeRaceData.coords[1]) / 2,
+                ];
+                const isClose = dist < 300;
+                const label = `${formatMiles(dist)} MI`;
+                const fontSize = isClose ? 4 : 6;
+                const labelWidth = label.length * fontSize * 0.65;
+                const padX = isClose ? 4 : 6;
+                const padY = isClose ? 3 : 5;
+                const offsetLng = isClose ? 3 : 0;
+                const offsetLat = isClose ? 0.5 : 0;
+                const coords: [number, number] = [
+                  midpoint[0] + offsetLng,
+                  midpoint[1] + offsetLat,
+                ];
+                return (
+                  <Marker coordinates={coords}>
+                    <rect
+                      x={-labelWidth / 2 - padX}
+                      y={-fontSize / 2 - padY}
+                      width={labelWidth + padX * 2}
+                      height={fontSize + padY * 2}
+                      rx={3}
+                      fill="rgba(0,0,0,0.8)"
+                      stroke={`${themeColor}44`}
+                      strokeWidth={0.5}
+                    />
+                    <text
+                      textAnchor="middle"
+                      dominantBaseline="central"
+                      style={{
+                        fontFamily: 'monospace',
+                        fontSize,
+                        fill: themeColor,
+                        letterSpacing: '0.1em',
+                        fontWeight: 'bold',
+                      }}
+                    >
+                      {label}
+                    </text>
+                  </Marker>
+                );
+              })()}
 
               {/* SF Home */}
               <Marker coordinates={SF_HOME}>
@@ -190,8 +342,8 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
                       style={{ transition: 'opacity 0.3s ease, r 0.2s ease' }}
                     />
 
-                    {/* City code — always visible for next race, on hover for others */}
-                    {(isActive || (isNext && !isPast)) && (
+                    {/* City code — on hover, or next race when nothing else is active */}
+                    {(isActive || (isNext && !isPast && activeRace === null && selectedRace === null)) && (
                       <text
                         y={-dotSize - 4}
                         textAnchor="middle"
@@ -244,15 +396,18 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
                 <div
                   key={race.cityCode}
                   ref={(el) => { cardRefs.current[race.cityCode] = el; }}
-                  className="block px-5 py-4 border-b transition-all duration-200"
+                  className="block px-5 py-4 border-b transition-all duration-200 cursor-pointer"
                   style={{
-                    borderColor: 'rgba(255,255,255,0.06)',
-                    backgroundColor: isActive
-                      ? `${themeColor}15`
-                      : isNext
-                        ? `${themeColor}0a`
-                        : 'transparent',
+                    borderColor: selectedRace === race.cityCode ? `${themeColor}44` : 'rgba(255,255,255,0.06)',
+                    backgroundColor: selectedRace === race.cityCode
+                      ? `${themeColor}20`
+                      : isActive
+                        ? `${themeColor}15`
+                        : isNext
+                          ? `${themeColor}0a`
+                          : 'transparent',
                   }}
+                  onClick={() => setSelectedRace(selectedRace === race.cityCode ? null : race.cityCode)}
                   onMouseEnter={() => setHoverSafe(race.cityCode)}
                   onMouseLeave={() => setHoverSafe(null)}
                 >
