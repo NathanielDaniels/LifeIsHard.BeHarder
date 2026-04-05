@@ -186,11 +186,10 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
                 }
               </Geographies>
 
-              {/* Route lines */}
+              {/* Route lines — always rendered, faded via opacity */}
               {mapRaces.map((race) => {
                 const isHighlighted = activeRace === race.cityCode;
-                // When a race is hovered, only show that line. Otherwise show all.
-                if (activeRace !== null && !isHighlighted) return null;
+                const lineHidden = activeRace !== null && !isHighlighted;
                 return (
                   <Line
                     key={`line-${race.cityCode}`}
@@ -200,6 +199,10 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
                     strokeWidth={isHighlighted ? 1.5 : 0.5}
                     strokeLinecap="round"
                     strokeDasharray={isHighlighted ? 'none' : '4 3'}
+                    style={{
+                      opacity: lineHidden ? 0 : 1,
+                      transition: 'opacity 0.3s ease, stroke-width 0.3s ease',
+                    }}
                   />
                 );
               })}
@@ -237,12 +240,12 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
                   >
                     {/* Glow for next race */}
                     {isNext && !isPast && (
-                      <circle r={9} fill={themeColor} opacity={isDimmed ? 0.03 : 0.12} />
+                      <circle r={9} fill={themeColor} opacity={isDimmed ? 0.03 : 0.12} style={{ transition: 'opacity 0.3s ease' }} />
                     )}
 
                     {/* Ring for target (Nationals) */}
                     {race.isTarget && !isPast && (
-                      <circle r={7} fill="none" stroke={themeColor} strokeWidth={0.8} opacity={isDimmed ? 0.1 : 0.4} />
+                      <circle r={7} fill="none" stroke={themeColor} strokeWidth={0.8} opacity={isDimmed ? 0.1 : 0.4} style={{ transition: 'opacity 0.3s ease' }} />
                     )}
 
                     {/* Pulse for next race or active selection */}
@@ -258,6 +261,7 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
                       r={dotSize}
                       fill={isPast ? 'rgba(255,255,255,0.3)' : themeColor}
                       opacity={isDimmed ? 0.15 : isPast ? 0.5 : 1}
+                      style={{ transition: 'opacity 0.3s ease, r 0.2s ease' }}
                     />
 
                     {/* City code — always visible for next race, on hover for others */}
@@ -294,8 +298,10 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
 
           {/* Scrollable race list */}
           <div
-            className="flex-1 overflow-y-auto"
+            className="flex-1 overflow-y-auto overscroll-contain"
+            style={{ WebkitOverflowScrolling: 'touch' }}
             onWheel={(e) => e.stopPropagation()}
+            onTouchMove={(e) => e.stopPropagation()}
           >
             {sidebarRaces.map((race, i) => {
               const isPast = new Date(race.date) < new Date();
