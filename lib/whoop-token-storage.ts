@@ -253,13 +253,14 @@ function isAuthError(message: string): boolean {
     lower.includes("invalid_grant") ||
     lower.includes("invalid grant") ||
     lower.includes("invalid_client") ||
+    lower.includes("invalid_request") ||
     lower.includes("token has been revoked")
   ) {
     return true;
   }
 
   // A generic 400 could be rate limiting, malformed request, or temporary API weirdness.
-  // We should NOT clear tokens just for a generic 400 unless it has invalid_grant.
+  // We should NOT clear tokens just for a generic 400 unless it has a known OAuth error.
   return false;
 }
 
