@@ -1,6 +1,6 @@
 'use client';
 
-import { memo, useState, useMemo, useRef, useEffect, useCallback } from 'react';
+import { memo, useState, useRef, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import {
   ComposableMap,
@@ -21,71 +21,29 @@ const STATES_URL = 'https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json';
 
 const RACE_STATE_FIPS = Array.from(new Set(RACES_2026.map((r) => r.stateFips)));
 
-const STATE_CENTERS: Record<string, { center: [number, number]; zoom: number }> = {
-  '06': { center: [-119.5, 37.5], zoom: 4 },
-  '17': { center: [-89.3, 40.0], zoom: 5 },
-  '18': { center: [-86.3, 40.0], zoom: 5 },
-  '55': { center: [-89.5, 44.5], zoom: 5 },
-};
-
-const MIDWEST_CENTER: [number, number] = [-87.8, 42.5];
-const MIDWEST_ZOOM = 6;
-const MIDWEST_FIPS = ['17', '18', '55'];
-
-const NEXT_RACE_COLOR = '#f97316'; // same orange, differentiated by size/glow
-
 function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
   const nextRace = getNextRace();
-  const [zoomedState, setZoomedState] = useState<string | null>(null);
   const [hoveredRace, setHoveredRace] = useState<string | null>(null);
-  const hoverLockRef = useRef(false);
   const activeRace = hoveredRace;
-
-  const setHoverSafe = useCallback((cityCode: string | null) => {
-    if (!hoverLockRef.current) setHoveredRace(cityCode);
-  }, []);
   const cardRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
-  const { center, zoom } = useMemo(() => {
-    if (!zoomedState) return { center: [-96, 38] as [number, number], zoom: 1 };
-    if (MIDWEST_FIPS.includes(zoomedState)) return { center: MIDWEST_CENTER, zoom: MIDWEST_ZOOM };
-    return STATE_CENTERS[zoomedState] || { center: [-96, 38] as [number, number], zoom: 1 };
-  }, [zoomedState]);
+  const setHoverSafe = useCallback((cityCode: string | null) => {
+    setHoveredRace(cityCode);
+  }, []);
 
-  const visibleRaces = useMemo(() => {
-    if (!zoomedState) return RACES_2026;
-    if (MIDWEST_FIPS.includes(zoomedState)) {
-      return RACES_2026.filter((r) => MIDWEST_FIPS.includes(r.stateFips));
-    }
-    return RACES_2026.filter((r) => r.stateFips === zoomedState);
-  }, [zoomedState]);
-
-  const isZoomed = zoomedState !== null;
-  const showHomeMarker = !isZoomed || zoomedState === '06';
-  const mapRaces = RACES_2026; // always show all dots on map
-  const sidebarRaces = isZoomed ? visibleRaces : RACES_2026;
-
-  // Escape key to close, back to US
+  // Escape key to close
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        if (isZoomed) {
-          setZoomedState(null);
-          setHoveredRace(null);
-        } else {
-          onClose();
-        }
-      }
+      if (e.key === 'Escape') onClose();
     };
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
-  }, [isZoomed, onClose]);
+  }, [onClose]);
 
   // Lock body scroll and stop Lenis while map is open
   useEffect(() => {
     document.body.style.overflow = 'hidden';
     document.documentElement.style.overflow = 'hidden';
-    // Stop Lenis smooth scroll if active
     const lenis = (window as unknown as { lenis?: { stop: () => void; start: () => void } }).lenis;
     lenis?.stop();
     return () => {
@@ -95,7 +53,7 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
     };
   }, []);
 
-  // Scroll card into view when a race is active (hovered or selected)
+  // Scroll card into view when a race is active
   useEffect(() => {
     if (activeRace && cardRefs.current[activeRace]) {
       cardRefs.current[activeRace]?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -117,30 +75,18 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
             2026 RACE MAP
           </h3>
           <p className="font-mono text-[10px] tracking-[0.2em] text-white/40 mt-1">
-            {isZoomed
-              ? `${visibleRaces.length} RACE${visibleRaces.length > 1 ? 'S' : ''} IN VIEW`
-              : `${RACES_2026.length} RACES · CLICK A HIGHLIGHTED STATE TO ZOOM`}
+            {RACES_2026.length} RACES · PINCH TO ZOOM · ESC TO CLOSE
           </p>
         </div>
-        <div className="flex items-center gap-3">
-          {isZoomed && (
-            <button
-              onClick={() => { setZoomedState(null); setHoveredRace(null); }}
-              className="px-4 py-2 rounded-full bg-white/10 text-white/70 hover:bg-white/20 hover:text-white transition-all duration-200 border border-white/20 font-mono text-xs tracking-[0.15em]"
-            >
-              ← US
-            </button>
-          )}
-          <button
-            onClick={onClose}
-            className="p-3 rounded-full bg-white/10 text-white/70 hover:bg-white/20 hover:text-white transition-all duration-200 border border-white/20"
-            aria-label="Close map"
-          >
-            <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <path d="M18 6L6 18M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
+        <button
+          onClick={onClose}
+          className="p-3 rounded-full bg-white/10 text-white/70 hover:bg-white/20 hover:text-white transition-all duration-200 border border-white/20"
+          aria-label="Close map"
+        >
+          <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+            <path d="M18 6L6 18M6 6l12 12" />
+          </svg>
+        </button>
       </div>
 
       {/* Split layout: map + sidebar */}
@@ -152,13 +98,12 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
             projectionConfig={{ scale: 900 }}
             style={{ width: '100%', height: '100%' }}
           >
-            <ZoomableGroup center={center} zoom={zoom} maxZoom={8} minZoom={1}>
+            <ZoomableGroup center={[-96, 38]} zoom={1} maxZoom={8} minZoom={1}>
               {/* States */}
               <Geographies geography={STATES_URL}>
                 {({ geographies }) =>
                   geographies.map((geo) => {
-                    const fips = geo.id;
-                    const hasRaces = RACE_STATE_FIPS.includes(fips);
+                    const hasRaces = RACE_STATE_FIPS.includes(geo.id);
                     return (
                       <Geography
                         key={geo.rsmKey}
@@ -166,18 +111,9 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
                         fill={hasRaces ? '#1a1a1a' : '#0e0e0e'}
                         stroke={hasRaces ? `${themeColor}33` : 'rgba(255,255,255,0.06)'}
                         strokeWidth={hasRaces ? 0.8 : 0.4}
-                        onClick={() => {
-                          if (hasRaces) {
-                            setZoomedState(fips);
-                            setHoveredRace(null);
-                          } else if (isZoomed) {
-                            setZoomedState(null);
-                            setHoveredRace(null);
-                          }
-                        }}
                         style={{
-                          default: { outline: 'none', cursor: hasRaces ? 'pointer' : 'default' },
-                          hover: { outline: 'none', fill: hasRaces ? '#222' : '#111', cursor: hasRaces ? 'pointer' : 'default' },
+                          default: { outline: 'none' },
+                          hover: { outline: 'none', fill: hasRaces ? '#222' : '#111' },
                           pressed: { outline: 'none' },
                         }}
                       />
@@ -187,7 +123,7 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
               </Geographies>
 
               {/* Route lines — always rendered, faded via opacity */}
-              {mapRaces.map((race) => {
+              {RACES_2026.map((race) => {
                 const isHighlighted = activeRace === race.cityCode;
                 const lineHidden = activeRace !== null && !isHighlighted;
                 return (
@@ -208,15 +144,13 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
               })}
 
               {/* SF Home */}
-              {showHomeMarker && (
-                <Marker coordinates={SF_HOME}>
-                  <circle r={isZoomed ? 3 : 4} fill={themeColor} opacity={0.9} />
-                  <circle r={isZoomed ? 5 : 7} fill="none" stroke={themeColor} strokeWidth={0.5} opacity={0.4} />
-                </Marker>
-              )}
+              <Marker coordinates={SF_HOME}>
+                <circle r={4} fill={themeColor} opacity={0.9} />
+                <circle r={7} fill="none" stroke={themeColor} strokeWidth={0.5} opacity={0.4} />
+              </Marker>
 
               {/* Race markers */}
-              {mapRaces.map((race) => {
+              {RACES_2026.map((race) => {
                 const isNext = nextRace?.date === race.date;
                 const isPast = new Date(race.date) < new Date();
                 const isActive = activeRace === race.cityCode;
@@ -227,14 +161,6 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
                   <Marker
                     key={race.cityCode}
                     coordinates={race.coords}
-                    onClick={() => {
-                      if (!isZoomed) {
-                        hoverLockRef.current = true;
-                        setZoomedState(race.stateFips);
-                        setHoveredRace(race.cityCode);
-                        setTimeout(() => { hoverLockRef.current = false; }, 500);
-                      }
-                    }}
                     onMouseEnter={() => setHoverSafe(race.cityCode)}
                     onMouseLeave={() => setHoverSafe(null)}
                   >
@@ -250,7 +176,7 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
 
                     {/* Pulse for next race or active selection */}
                     {(isNext || isActive) && !isPast && (
-                      <circle r={dotSize * 2.5} fill="none" stroke={themeColor} strokeWidth={isNext ? 1 : isActive ? 1 : 0.5} opacity={0.3}>
+                      <circle r={dotSize * 2.5} fill="none" stroke={themeColor} strokeWidth={isNext ? 1 : 0.5} opacity={0.3}>
                         <animate attributeName="r" from={dotSize * 1.5} to={dotSize * 3.5} dur={isNext ? '1.5s' : '2s'} repeatCount="indefinite" />
                         <animate attributeName="opacity" from="0.6" to="0" dur={isNext ? '1.5s' : '2s'} repeatCount="indefinite" />
                       </circle>
@@ -271,7 +197,7 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
                         textAnchor="middle"
                         style={{
                           fontFamily: 'monospace',
-                          fontSize: isZoomed ? 3.5 : 7,
+                          fontSize: 7,
                           fill: themeColor,
                           letterSpacing: '0.1em',
                           fontWeight: 'bold',
@@ -292,7 +218,7 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
           {/* Sidebar header */}
           <div className="px-5 py-4 border-b border-white/10">
             <div className="font-mono text-[10px] tracking-[0.3em] text-white/40">
-              {isZoomed ? 'RACES IN REGION' : 'ALL RACES'}
+              ALL RACES
             </div>
           </div>
 
@@ -303,7 +229,7 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
             onWheel={(e) => e.stopPropagation()}
             onTouchMove={(e) => e.stopPropagation()}
           >
-            {sidebarRaces.map((race, i) => {
+            {RACES_2026.map((race) => {
               const isPast = new Date(race.date) < new Date();
               const isNext = nextRace?.date === race.date;
               const daysUntil = getDaysUntil(new Date(race.date));
@@ -318,21 +244,13 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
                 <div
                   key={race.cityCode}
                   ref={(el) => { cardRefs.current[race.cityCode] = el; }}
-                  className="block px-5 py-4 border-b transition-all duration-200 cursor-pointer"
-                  onClick={() => {
-                    if (!isZoomed) {
-                      hoverLockRef.current = true;
-                      setZoomedState(race.stateFips);
-                      setHoveredRace(race.cityCode);
-                      setTimeout(() => { hoverLockRef.current = false; }, 500);
-                    }
-                  }}
+                  className="block px-5 py-4 border-b transition-all duration-200"
                   style={{
                     borderColor: 'rgba(255,255,255,0.06)',
                     backgroundColor: isActive
-                      ? `${isNext ? NEXT_RACE_COLOR : themeColor}15`
+                      ? `${themeColor}15`
                       : isNext
-                        ? `${NEXT_RACE_COLOR}0a`
+                        ? `${themeColor}0a`
                         : 'transparent',
                   }}
                   onMouseEnter={() => setHoverSafe(race.cityCode)}
@@ -343,12 +261,12 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
                       <div className="flex items-center gap-2">
                         {/* Race type icon */}
                         {race.type === 'triathlon' ? (
-                          <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke={isPast ? 'rgba(255,255,255,0.3)' : isNext ? NEXT_RACE_COLOR : themeColor} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke={isPast ? 'rgba(255,255,255,0.3)' : themeColor} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <circle cx="12" cy="5" r="3" />
                             <path d="M6.5 21L9 12l3 3 3-3 2.5 9" />
                           </svg>
                         ) : (
-                          <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke={isPast ? 'rgba(255,255,255,0.3)' : isNext ? NEXT_RACE_COLOR : themeColor} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke={isPast ? 'rgba(255,255,255,0.3)' : themeColor} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <path d="M13 4v4l4 4-4 4v4" />
                             <path d="M7 4v4l-4 4 4 4v4" />
                           </svg>
@@ -359,7 +277,7 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
                         {isNext && !isPast && (
                           <span
                             className="font-mono text-[8px] tracking-[0.15em] px-2 py-0.5 rounded-full animate-pulse"
-                            style={{ backgroundColor: `${NEXT_RACE_COLOR}22`, color: NEXT_RACE_COLOR }}
+                            style={{ backgroundColor: `${themeColor}22`, color: themeColor }}
                           >
                             NEXT
                           </span>
@@ -392,7 +310,7 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
                     <div className="text-right shrink-0 pt-1">
                       {!isPast && (
                         <>
-                          <div className="font-display text-xl" style={{ color: isNext ? NEXT_RACE_COLOR : themeColor }}>
+                          <div className="font-display text-xl" style={{ color: themeColor }}>
                             {daysUntil}
                           </div>
                           <div className="font-mono text-[8px] tracking-[0.2em] text-white/30">
