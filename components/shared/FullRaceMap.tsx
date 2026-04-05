@@ -36,12 +36,14 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
   const nextRace = getNextRace();
   const [hoveredRace, setHoveredRace] = useState<string | null>(null);
   const [selectedRace, setSelectedRace] = useState<string | null>(null);
-  const activeRace = hoveredRace || selectedRace;
+  const [mobileIndex, setMobileIndex] = useState(-1); // -1 = overview, 0+ = race index
+  const activeRace = hoveredRace || selectedRace || (mobileIndex >= 0 ? RACES_2026[mobileIndex]?.cityCode : null);
   const cardRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   const selectedData = useMemo(() => {
-    if (!selectedRace) return null;
-    const race = RACES_2026.find((r) => r.cityCode === selectedRace);
+    const code = selectedRace || (mobileIndex >= 0 ? RACES_2026[mobileIndex]?.cityCode : null);
+    if (!code) return null;
+    const race = RACES_2026.find((r) => r.cityCode === code);
     if (!race) return null;
     const distance = haversineDistance(SF_HOME, race.coords);
     const midpoint: [number, number] = [
@@ -51,7 +53,7 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
     // Zoom level based on distance — closer races need more zoom
     const zoom = distance < 200 ? 6 : distance < 500 ? 3 : distance < 1500 ? 2 : 1.5;
     return { race, distance, midpoint, zoom };
-  }, [selectedRace]);
+  }, [selectedRace, mobileIndex]);
 
   const mapCenter: [number, number] = selectedData ? selectedData.midpoint : [-96, 38];
   const mapZoom = selectedData ? selectedData.zoom : 1;
@@ -139,7 +141,7 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
               timeZone: 'UTC',
             }).format(new Date(race.date));
             return (
-              <div className="mt-2 space-y-1">
+              <div className="hidden md:block mt-2 space-y-1">
                 {/* Line 1: Name + countdown */}
                 <div className="flex items-baseline gap-4">
                   <span className="font-display text-xl md:text-2xl tracking-wide text-white">
@@ -305,19 +307,13 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
                 );
               })()}
 
-              {/* SF Home */}
-              <Marker coordinates={SF_HOME}>
-                <circle r={4} fill={themeColor} opacity={0.9} />
-                <circle r={7} fill="none" stroke={themeColor} strokeWidth={0.5} opacity={0.4} />
-              </Marker>
-
               {/* Race markers */}
               {RACES_2026.map((race) => {
                 const isNext = nextRace?.date === race.date;
                 const isPast = new Date(race.date) < new Date();
                 const isActive = activeRace === race.cityCode;
                 const isDimmed = activeRace !== null && !isActive;
-                const dotSize = isNext ? 5 : isActive ? 4 : 3;
+                const dotSize = isNext ? 4 : isActive ? 4 : 3;
 
                 return (
                   <Marker
@@ -328,7 +324,7 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
                   >
                     {/* Glow for next race */}
                     {isNext && !isPast && (
-                      <circle r={9} fill={themeColor} opacity={isDimmed ? 0.03 : 0.12} style={{ transition: 'opacity 0.3s ease' }} />
+                      <circle r={7} fill={themeColor} opacity={isDimmed ? 0.03 : 0.12} style={{ transition: 'opacity 0.3s ease' }} />
                     )}
 
                     {/* Ring for target (Nationals) */}
@@ -344,7 +340,7 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
                       </circle>
                     )}
 
-                    {/* Dot */}
+                    {/* Dot — white for next race */}
                     <circle
                       r={dotSize}
                       fill={isPast ? 'rgba(255,255,255,0.3)' : themeColor}
@@ -353,10 +349,14 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
                     />
 
                     {/* City code — on hover, or next race when nothing else is active */}
-                    {(isActive || (isNext && !isPast && activeRace === null && selectedRace === null)) && (
+                    {(isActive || (isNext && !isPast && activeRace === null && selectedRace === null)) && (() => {
+                      // Offset label right for SoCal races where the route line covers the left side
+                      const needsOffset = race.cityCode === 'SDG' || race.cityCode === 'LBC';
+                      return (
                       <text
+                        x={needsOffset ? dotSize + 3 : 0}
                         y={-dotSize - 4}
-                        textAnchor="middle"
+                        textAnchor={needsOffset ? 'start' : 'middle'}
                         style={{
                           fontFamily: 'monospace',
                           fontSize: 7,
@@ -367,10 +367,17 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
                       >
                         {race.cityCode}
                       </text>
-                    )}
+                      );
+                    })()}
                   </Marker>
                 );
               })}
+
+              {/* SF Home — house icon, rendered last so it draws on top */}
+              {/* SF Home — hollow ring to distinguish from filled race dots */}
+              <Marker coordinates={SF_HOME}>
+                <circle r={4} fill="#050505" stroke={themeColor} strokeWidth={1.5} />
+              </Marker>
             </ZoomableGroup>
           </ComposableMap>
         </div>
@@ -516,6 +523,124 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
             </span>
           </div>
         </div>
+      </div>
+      {/* Mobile championship tag — above nav */}
+      {mobileIndex >= 0 && RACES_2026[mobileIndex]?.championship && (
+        <div className="md:hidden text-center py-1.5" style={{ backgroundColor: `${themeColor}11` }}>
+          <span className="font-mono text-[10px] tracking-[0.2em]" style={{ color: themeColor }}>
+            {RACES_2026[mobileIndex].championship?.toUpperCase()}
+          </span>
+        </div>
+      )}
+
+      {/* Mobile bottom nav — visible only below md */}
+      <div className="md:hidden border-t border-white/10 bg-black/80 backdrop-blur-md">
+        {mobileIndex < 0 ? (
+          <button
+            onClick={() => {
+              const nextIdx = RACES_2026.findIndex((r) => r.date === nextRace?.date);
+              setMobileIndex(nextIdx >= 0 ? nextIdx : 0);
+            }}
+            className="w-full py-5 font-mono text-sm tracking-[0.2em] transition-all duration-200"
+            style={{ color: themeColor }}
+          >
+            EXPLORE RACES →
+          </button>
+        ) : (
+          <div>
+            {/* Full-width nav buttons with race counter */}
+            <div className="flex items-stretch">
+              <button
+                onClick={() => setMobileIndex((prev) => prev <= 0 ? RACES_2026.length - 1 : prev - 1)}
+                className="w-16 flex items-center justify-center border-r border-white/10 text-white/60 active:bg-white/10 transition-colors"
+              >
+                <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M15 18l-6-6 6-6" />
+                </svg>
+              </button>
+
+              <div
+                className="flex-1 py-3 text-center cursor-pointer active:bg-white/5 flex flex-col justify-center"
+                style={{ minHeight: '105px' }}
+                onClick={() => setMobileIndex(-1)}
+              >
+                {(() => {
+                  const race = RACES_2026[mobileIndex];
+                  if (!race) return null;
+                  const isPast = new Date(race.date) < new Date();
+                  const daysUntil = getDaysUntil(new Date(race.date));
+                  const raceDate = new Intl.DateTimeFormat('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    timeZone: 'UTC',
+                  }).format(new Date(race.date));
+                  return (
+                    <>
+                      {/* Discipline icons */}
+                      <div className="flex items-center justify-center gap-1.5 mb-1" style={{ color: `${themeColor}88` }}>
+                        {race.type === 'triathlon' ? (
+                          <>
+                            <Waves className="w-4 h-4" />
+                            <Bike className="w-4 h-4" />
+                            <RunShoe className="w-4 h-4" />
+                          </>
+                        ) : (
+                          <RunShoe className="w-4 h-4" />
+                        )}
+                      </div>
+                      {/* Race name */}
+                      <div className="font-display text-lg tracking-wide text-white truncate">
+                        {race.name}
+                      </div>
+                      {/* Date, location, distance */}
+                      <div className="font-mono text-[11px] tracking-[0.1em] text-white/50 mt-1">
+                        {raceDate.toUpperCase()} · {race.location}
+                        {race.distance ? ` · ${race.distance}` : ''}
+                      </div>
+                      {/* Course + stats */}
+                      <div className="flex items-center justify-center gap-3 mt-1.5 flex-wrap">
+                        {race.course && (
+                          <span className="font-mono text-[10px] tracking-[0.1em] text-white/40">
+                            {race.course}
+                          </span>
+                        )}
+                        {!isPast && (
+                          <span className="font-mono text-[11px] tracking-[0.1em] font-medium" style={{ color: themeColor }}>
+                            {daysUntil} DAYS
+                          </span>
+                        )}
+                      </div>
+                    </>
+                  );
+                })()}
+              </div>
+
+              <button
+                onClick={() => setMobileIndex((prev) => prev >= RACES_2026.length - 1 ? 0 : prev + 1)}
+                className="w-16 flex items-center justify-center border-l border-white/10 text-white/60 active:bg-white/10 transition-colors"
+              >
+                <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M9 18l6-6-6-6" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Dot indicators */}
+            <div className="flex justify-center gap-2 py-2 border-t border-white/5">
+              {RACES_2026.map((race, i) => (
+                <button
+                  key={race.cityCode}
+                  onClick={() => setMobileIndex(i)}
+                  className="w-2 h-2 rounded-full transition-all duration-200"
+                  style={{
+                    backgroundColor: i === mobileIndex ? themeColor : 'rgba(255,255,255,0.15)',
+                    transform: i === mobileIndex ? 'scale(1.3)' : 'scale(1)',
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </motion.div>
   );
