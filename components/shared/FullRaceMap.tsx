@@ -307,19 +307,13 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
                 );
               })()}
 
-              {/* SF Home */}
-              <Marker coordinates={SF_HOME}>
-                <circle r={4} fill={themeColor} opacity={0.9} />
-                <circle r={7} fill="none" stroke={themeColor} strokeWidth={0.5} opacity={0.4} />
-              </Marker>
-
               {/* Race markers */}
               {RACES_2026.map((race) => {
                 const isNext = nextRace?.date === race.date;
                 const isPast = new Date(race.date) < new Date();
                 const isActive = activeRace === race.cityCode;
                 const isDimmed = activeRace !== null && !isActive;
-                const dotSize = isNext ? 5 : isActive ? 4 : 3;
+                const dotSize = isNext ? 4 : isActive ? 4 : 3;
 
                 return (
                   <Marker
@@ -330,7 +324,7 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
                   >
                     {/* Glow for next race */}
                     {isNext && !isPast && (
-                      <circle r={9} fill={themeColor} opacity={isDimmed ? 0.03 : 0.12} style={{ transition: 'opacity 0.3s ease' }} />
+                      <circle r={7} fill={themeColor} opacity={isDimmed ? 0.03 : 0.12} style={{ transition: 'opacity 0.3s ease' }} />
                     )}
 
                     {/* Ring for target (Nationals) */}
@@ -346,7 +340,7 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
                       </circle>
                     )}
 
-                    {/* Dot */}
+                    {/* Dot — white for next race */}
                     <circle
                       r={dotSize}
                       fill={isPast ? 'rgba(255,255,255,0.3)' : themeColor}
@@ -355,10 +349,14 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
                     />
 
                     {/* City code — on hover, or next race when nothing else is active */}
-                    {(isActive || (isNext && !isPast && activeRace === null && selectedRace === null)) && (
+                    {(isActive || (isNext && !isPast && activeRace === null && selectedRace === null)) && (() => {
+                      // Offset label right for SoCal races where the route line covers the left side
+                      const needsOffset = race.cityCode === 'SDG' || race.cityCode === 'LBC';
+                      return (
                       <text
+                        x={needsOffset ? dotSize + 3 : 0}
                         y={-dotSize - 4}
-                        textAnchor="middle"
+                        textAnchor={needsOffset ? 'start' : 'middle'}
                         style={{
                           fontFamily: 'monospace',
                           fontSize: 7,
@@ -369,10 +367,17 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
                       >
                         {race.cityCode}
                       </text>
-                    )}
+                      );
+                    })()}
                   </Marker>
                 );
               })}
+
+              {/* SF Home — house icon, rendered last so it draws on top */}
+              {/* SF Home — hollow ring to distinguish from filled race dots */}
+              <Marker coordinates={SF_HOME}>
+                <circle r={4} fill="#050505" stroke={themeColor} strokeWidth={1.5} />
+              </Marker>
             </ZoomableGroup>
           </ComposableMap>
         </div>

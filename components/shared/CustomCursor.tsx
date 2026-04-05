@@ -16,11 +16,20 @@ export default function CustomCursor({ themeColor, isDimmed = false }: CustomCur
   const [isTouch, setIsTouch] = useState(false);
 
   useEffect(() => {
+    // Check media query first
     const mq = window.matchMedia('(hover: none)');
     setIsTouch(mq.matches);
-    const handler = (e: MediaQueryListEvent) => setIsTouch(e.matches);
-    mq.addEventListener('change', handler);
-    return () => mq.removeEventListener('change', handler);
+    const mqHandler = (e: MediaQueryListEvent) => setIsTouch(e.matches);
+    mq.addEventListener('change', mqHandler);
+
+    // Also detect actual touch events (catches S-Pen devices that report hover: hover)
+    const onTouch = () => setIsTouch(true);
+    window.addEventListener('touchstart', onTouch, { once: true, passive: true });
+
+    return () => {
+      mq.removeEventListener('change', mqHandler);
+      window.removeEventListener('touchstart', onTouch);
+    };
   }, []);
 
   useEffect(() => {
