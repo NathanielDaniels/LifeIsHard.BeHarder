@@ -12,6 +12,16 @@ import {
 } from 'react-simple-maps';
 import { RACES_2026, SF_HOME, getNextRace, getDaysUntil } from '@/lib/race-data';
 import { haversineDistance, formatMiles } from '@/lib/geo-utils';
+import { Waves, Bike } from 'lucide-react';
+
+function RunShoe({ className, style }: { className?: string; style?: React.CSSProperties }) {
+  return (
+    <svg className={className} style={style} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 18h18v-2c0-1-1-2-2-2h-1l-2-4h-3l-1 2H9L7 8H5L3 14v4z" />
+      <path d="M3 18c0 1 1 2 2 2h14c1 0 2-1 2-2" />
+    </svg>
+  );
+}
 
 interface FullRaceMapProps {
   themeColor: string;
@@ -414,18 +424,10 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        {/* Race type icon */}
-                        {race.type === 'triathlon' ? (
-                          <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke={isPast ? 'rgba(255,255,255,0.3)' : themeColor} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <circle cx="12" cy="5" r="3" />
-                            <path d="M6.5 21L9 12l3 3 3-3 2.5 9" />
-                          </svg>
-                        ) : (
-                          <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke={isPast ? 'rgba(255,255,255,0.3)' : themeColor} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M13 4v4l4 4-4 4v4" />
-                            <path d="M7 4v4l-4 4 4 4v4" />
-                          </svg>
-                        )}
+                        <span
+                          className="w-2 h-2 rounded-full shrink-0"
+                          style={{ backgroundColor: isPast ? 'rgba(255,255,255,0.3)' : themeColor }}
+                        />
                         <span className="font-mono text-[10px] tracking-[0.15em] text-white/50">
                           {raceDate.toUpperCase()}
                         </span>
@@ -462,7 +464,7 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
                         </div>
                       )}
                     </div>
-                    <div className="text-right shrink-0 pt-1">
+                    <div className="flex flex-col items-end shrink-0 pt-1 justify-between">
                       {!isPast && (
                         <>
                           <div className="font-display text-xl" style={{ color: themeColor }}>
@@ -484,6 +486,17 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
                           </div>
                         )
                       )}
+                      <span className="flex items-center gap-1.5 mt-auto pt-1" style={{ color: isPast ? 'rgba(255,255,255,0.2)' : `${themeColor}88` }}>
+                        {race.type === 'triathlon' ? (
+                          <>
+                            <Waves className="w-4 h-4" />
+                            <Bike className="w-4 h-4" />
+                            <RunShoe className="w-4 h-4" />
+                          </>
+                        ) : (
+                          <RunShoe className="w-4 h-4" />
+                        )}
+                      </span>
                     </div>
                   </div>
                 </div>
