@@ -39,7 +39,7 @@ const SPONSORS: Sponsor[] = [
   {
     name: 'Challenged Athletes Foundation',
     description: 'Providing opportunities and support to people with physical challenges so they can pursue active lifestyles through sport.',
-    logo: '/sponsors/CAF_logo.png',
+    logo: '/sponsors/CAF_logo.webp',
     url: 'https://www.challengedathletes.org/',
     logoClass: 'h-16 md:h-20',
   },
@@ -53,7 +53,7 @@ const SPONSORS: Sponsor[] = [
   {
     name: 'So Every Body Can Move',
     description: 'Removing barriers to movement and fitness for people of all abilities. Inclusive wellness, no exceptions.',
-    logo: '/sponsors/SEBCM_color.png',
+    logo: '/sponsors/SEBCM_color.webp',
     url: 'https://soeverybodycanmove.org',
     logoClass: 'h-12 md:h-16 brightness-200',
   },

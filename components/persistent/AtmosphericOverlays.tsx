@@ -42,13 +42,13 @@ export default function AtmosphericOverlays({ themeColor, particleCount = 15, sc
       <div className="fixed inset-0 vignette pointer-events-none z-10" />
 
       <motion.div
-        className="fixed top-[15%] left-[1%] font-display text-[min(12vw,280px)] text-white/[0.02] pointer-events-none z-[1] whitespace-nowrap font-bold tracking-tight will-change-transform"
+        className="fixed top-[15%] left-[1%] font-display text-[min(12vw,280px)] text-white/[0.02] pointer-events-none z-[1] whitespace-nowrap font-bold tracking-tight"
         style={{ x: floatX, opacity: textOpacity }}
       >
         • RELENTLESS • UNSTOPPABLE • UNBROKEN • UNDEFEATED •
       </motion.div>
       <motion.div
-        className="fixed bottom-[15%] right-[-10%] font-display text-[min(12vw,280px)] text-white/[0.02] pointer-events-none z-[1] whitespace-nowrap font-bold tracking-tight will-change-transform"
+        className="fixed bottom-[15%] right-[-10%] font-display text-[min(12vw,280px)] text-white/[0.02] pointer-events-none z-[1] whitespace-nowrap font-bold tracking-tight"
         style={{ x: floatXReverse, opacity: textOpacity }}
       >
         • RECORD BREAKER • DARE2TRI • ADAPTIVE ATHLETE • ELITE •

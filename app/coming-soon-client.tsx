@@ -11,8 +11,10 @@ import FloatingParticles from '@/components/shared/FloatingParticles';
 import BiometricCard from '@/components/shared/BiometricCard';
 import EmailCapture from '@/components/shared/EmailCapture';
 import SocialLinks from '@/components/shared/SocialLinks';
-import RaceCalendar from '@/components/shared/RaceCalendar';
-import RaceGlobe from '@/components/shared/RaceGlobe';
+import dynamic from 'next/dynamic';
+
+const RaceCalendar = dynamic(() => import('@/components/shared/RaceCalendar'), { ssr: false });
+const RaceGlobe = dynamic(() => import('@/components/shared/RaceGlobe'), { ssr: false });
 // import InstagramFeed from '@/components/sections/InstagramFeed';
 import CustomCursor from '@/components/shared/CustomCursor';
 // import PixelRunner from '@/components/shared/PixelRunner';
@@ -279,13 +281,13 @@ export default function ComingSoonClient() {
       {!prefersReducedMotion && (
         <>
           <motion.div
-            className="fixed top-[15%] left-[1%] font-display text-[12vw] text-white/[0.02] pointer-events-none z-[1] whitespace-nowrap font-bold tracking-tight will-change-transform"
+            className="fixed top-[15%] left-[1%] font-display text-[12vw] text-white/[0.02] pointer-events-none z-[1] whitespace-nowrap font-bold tracking-tight"
             style={{ x: floatX }}
           >
             • RELENTLESS • UNSTOPPABLE • UNBROKEN • UNDEFEATED •
           </motion.div>
           <motion.div
-            className="fixed bottom-[15%] right-[-10%] font-display text-[12vw] text-white/[0.02] pointer-events-none z-[1] whitespace-nowrap font-bold tracking-tight will-change-transform"
+            className="fixed bottom-[15%] right-[-10%] font-display text-[12vw] text-white/[0.02] pointer-events-none z-[1] whitespace-nowrap font-bold tracking-tight"
             style={{ x: floatXReverse }}
           >
             • RECORD BREAKER • DARE2TRI • ADAPTIVE ATHLETE • ELITE •
@@ -1081,7 +1083,7 @@ export default function ComingSoonClient() {
       {/* <InstagramFeed themeColor={themeColor} /> */}
 
       {/* === SPONSORS === */}
-      <section className="relative z-20 py-32 md:py-40 px-6 backdrop-blur-2xl border-t border-white/5">
+      <section className="relative z-20 py-32 md:py-40 px-6 backdrop-blur-md border-t border-white/5">
         <motion.div 
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
@@ -1108,9 +1110,9 @@ export default function ComingSoonClient() {
               { src: '/sponsors/performance-wealth-partners-light.svg', link: 'https://performancewealthpartners.com', alt: 'Performance Wealth Partners', className: 'h-16 md:h-20 grayscale group-hover:grayscale-0' },
               { src: '/sponsors/ATF_logo.png', link: 'https://www.adaptivetrainingfoundation.org/', alt: 'Adaptive Training Foundation', className: 'h-28 md:h-36 lg:h-44 invert brightness-200' },
               // Invert turns the white background black and logo white. Mix-blend-screen then makes the black background invisible
-              { src: '/sponsors/CAF_logo.png', link: 'https://www.challengedathletes.org/', alt: 'Sponsor 3', className: 'h-24 md:h-32 mix-blend-screen invert grayscale group-hover:grayscale-0 group-hover:invert-0 opacity-100 rounded-[50%] object-cover' },
+              { src: '/sponsors/CAF_logo.webp', link: 'https://www.challengedathletes.org/', alt: 'Sponsor 3', className: 'h-24 md:h-32 mix-blend-screen invert grayscale group-hover:grayscale-0 group-hover:invert-0 opacity-100 rounded-[50%] object-cover' },
               { src: '/sponsors/david-rotter-logo_orig.png', link: 'https://www.rotterprosthetics.com/', alt: 'David Rotter Prosthetics', className: 'h-16 md:h-20 grayscale group-hover:grayscale-0 brightness-200 group-hover:brightness-100' },
-              { src: '/sponsors/SEBCM_color.png', link: 'https://soeverybodycanmove.org', alt: 'So Every Body Can Move', className: 'h-10 md:h-12 grayscale group-hover:grayscale-0 brightness-200 group-hover:brightness-100' },
+              { src: '/sponsors/SEBCM_color.webp', link: 'https://soeverybodycanmove.org', alt: 'So Every Body Can Move', className: 'h-10 md:h-12 grayscale group-hover:grayscale-0 brightness-200 group-hover:brightness-100' },
             ].map((sponsor, i) => (
               <motion.div
                 key={sponsor.alt}
