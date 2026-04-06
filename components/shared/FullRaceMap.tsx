@@ -167,12 +167,13 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
       {/* Header */}
       <div className="flex items-center justify-between px-6 md:px-10 pt-5 pb-3">
         <div>
-          <h3 className="font-display text-2xl md:text-3xl tracking-[0.15em] text-white">
+          <h3 className="font-display text-2xl md:text-3xl tracking-[0.15em] text-white text-left">
             2026 RACE MAP
           </h3>
           {!selectedData && (
             <p className="font-mono text-[10px] tracking-[0.2em] text-white/40 mt-1">
-              {RACES_2026.length} RACES · CLICK A RACE FOR DETAILS
+              <span className="hidden md:inline">{RACES_2026.length} RACES · CLICK A RACE FOR DETAILS</span>
+              <span className="md:hidden">{RACES_2026.length} RACES · EXPLORE RACES BELOW</span>
             </p>
           )}
           {selectedData && (() => {
@@ -450,7 +451,7 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
                     onMouseEnter={() => setHoverSafe(race.cityCode)}
                     onMouseLeave={() => setHoverSafe(null)}
                     onClick={() => {
-                      if (window.innerWidth < 768) return;
+                      if (window.innerWidth < 768 || isTouchRef.current) return;
                       setSelectedRace(selectedRace === race.cityCode ? null : race.cityCode);
                     }}
                     style={{ default: { cursor: 'pointer' }, hover: { cursor: 'pointer' }, pressed: { cursor: 'pointer' } }}
@@ -720,7 +721,7 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
               const nextIdx = RACES_2026.findIndex((r) => r.date === nextRace?.date);
               setMobileIndex(nextIdx >= 0 ? nextIdx : 0);
             }}
-            className="w-full py-5 font-mono text-sm tracking-[0.2em] transition-all duration-200"
+            className="w-full py-8 font-mono text-base tracking-[0.2em] transition-all duration-200"
             style={{ color: themeColor }}
           >
             EXPLORE RACES →
