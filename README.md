@@ -4,7 +4,7 @@
 
 Premium personal website for Patrick Wingert, adaptive-triathlon athlete and member of the 2026 Dare2Tri Elite Development Team. A cinematic, data-driven web experience integrated with live biometric data from his WHOOP device.
 
-**Domain:** [patrickwingert.com](https://patrickwingert.com) | [View Brand Identity System](public/patrick-wingert-brand-identity.html)
+**Domain:** [patrickwingert.com](https://patrickwingert.com) | [View Brand Identity System](https://patrickwingert.com/patrick-wingert-brand-identity.html)
 
 ---
 
