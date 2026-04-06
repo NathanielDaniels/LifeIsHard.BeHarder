@@ -63,7 +63,7 @@ const TEAM: TeamMember[] = [
     name: "David Rotter",
     role: "Prosthetist / Jedi Master",
     bio: "The engineer behind the leg. David designs and builds the prosthetics that let Patrick live life his way, trek, and push beyond what anyone thought possible. Every stride starts with Dave's work.",
-    image: "/team/Dave.jpg",
+    image: "/team/Dave.webp",
     social: [{ platform: "website", url: "https://www.rotterprosthetics.com/" }, { platform: "instagram", url: "https://www.instagram.com/davidrotterprosthetics/?hl=en" }],
   },
   {

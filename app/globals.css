@@ -109,6 +109,18 @@ img {
   }
 }
 
+/* Reduce expensive blur on mobile GPUs */
+@media (max-width: 768px) {
+  .glass {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+  .glass-card {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+}
+
 /* Animations */
 @keyframes slideInLeft {
   from {
