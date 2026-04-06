@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useCallback, useState } from 'react';
+import { useEffect, useRef, useCallback, useState, useMemo } from 'react';
 import createGlobe from 'cobe';
 
 interface Marker {
@@ -32,6 +32,7 @@ interface CobeGlobeProps {
   theta?: number;
   diffuse?: number;
   mapSamples?: number;
+  paused?: boolean;
 }
 
 function hexToRgb01(hex: string): [number, number, number] {
@@ -58,7 +59,8 @@ export default function CobeGlobe({
   initialPhi = 4.85,
   theta = 0.25,
   diffuse = 1.2,
-  mapSamples = 16000,
+  mapSamples = 10000,
+  paused = false,
 }: CobeGlobeProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -69,9 +71,22 @@ export default function CobeGlobe({
   const phiOffsetRef = useRef(0);
   const thetaOffsetRef = useRef(0);
   const isPausedRef = useRef(false);
+  const externalPausedRef = useRef(paused);
+  externalPausedRef.current = paused;
   const [isVisible, setIsVisible] = useState(false);
 
   const accentRgb = hexToRgb01(themeColor);
+
+  // Memoize marker/arc data so we don't create new arrays every frame
+  const cobeMarkers = useMemo(() => markers.map((m) => ({
+    location: m.location,
+    size: m.size ?? defaultMarkerSize,
+  })), [markers, defaultMarkerSize]);
+
+  const cobeArcs = useMemo(() => arcs.map((a) => ({
+    from: a.from,
+    to: a.to,
+  })), [arcs]);
 
   // Viewport gating — only render globe when visible
   useEffect(() => {
@@ -141,11 +156,15 @@ export default function CobeGlobe({
 
     const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+    let lastFrameTime = 0;
+    const FRAME_INTERVAL = 1000 / 60; // Cap at 60fps
+
     function init() {
       const width = canvas.offsetWidth;
       if (width === 0 || globe) return;
 
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+      const dpr = Math.min(window.devicePixelRatio || 1, isSafari ? 1.5 : 2);
       globe = createGlobe(canvas, {
         devicePixelRatio: dpr,
         width,
@@ -159,21 +178,20 @@ export default function CobeGlobe({
         baseColor,
         markerColor: accentRgb,
         glowColor,
-        markers: markers.map((m) => ({
-          location: m.location,
-          size: m.size ?? defaultMarkerSize,
-        })),
-        arcs: arcs.map((a) => ({
-          from: a.from,
-          to: a.to,
-        })),
+        markers: cobeMarkers,
+        arcs: cobeArcs,
         arcColor: accentRgb,
         arcWidth,
         arcHeight,
         opacity: 0.85,
       });
 
-      function animate() {
+      function animate(time = 0) {
+        animationId = requestAnimationFrame(animate);
+        if (externalPausedRef.current) return; // Skip all work when map overlay is open
+        if (time - lastFrameTime < FRAME_INTERVAL) return;
+        lastFrameTime = time;
+
         if (!prefersReduced && !isPausedRef.current) {
           phi += speed;
           if (
@@ -201,16 +219,9 @@ export default function CobeGlobe({
           markerColor: accentRgb,
           baseColor,
           arcColor: accentRgb,
-          markers: markers.map((m) => ({
-            location: m.location,
-            size: m.size ?? defaultMarkerSize,
-          })),
-          arcs: arcs.map((a) => ({
-            from: a.from,
-            to: a.to,
-          })),
+          markers: cobeMarkers,
+          arcs: cobeArcs,
         });
-        animationId = requestAnimationFrame(animate);
       }
 
       animate();

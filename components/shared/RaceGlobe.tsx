@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import CobeGlobe from '@/components/shared/CobeGlobe';
 import FullRaceMap from '@/components/shared/FullRaceMap';
@@ -37,6 +37,7 @@ const RACE_ARCS = [
 export default function RaceGlobe({ themeColor }: RaceGlobeProps) {
   const [showMap, setShowMap] = useState(false);
   const pointerStart = useRef<{ x: number; y: number } | null>(null);
+  const handleCloseMap = useCallback(() => setShowMap(false), []);
 
   return (
     <div className="flex flex-col items-center text-center">
@@ -66,6 +67,7 @@ export default function RaceGlobe({ themeColor }: RaceGlobeProps) {
           speed={0.002}
           initialPhi={4.85}
           theta={0.25}
+          paused={showMap}
         />
       </div>
 
@@ -86,12 +88,12 @@ export default function RaceGlobe({ themeColor }: RaceGlobeProps) {
           backgroundColor: 'transparent',
         }}
       >
-        VIEW FULL MAP →
+        EXPLORE RACE MAP →
       </button>
 
       <AnimatePresence>
         {showMap && (
-          <FullRaceMap themeColor={themeColor} onClose={() => setShowMap(false)} />
+          <FullRaceMap themeColor={themeColor} onClose={handleCloseMap} />
         )}
       </AnimatePresence>
     </div>

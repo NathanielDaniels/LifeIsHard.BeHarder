@@ -59,8 +59,6 @@ export default function ComingSoonClient() {
   const [daysUntilRace, setDaysUntilRace] = useState(0);
   const [daysUntilNationals, setDaysUntilNationals] = useState(0);
   const [showNationals, setShowNationals] = useState(false);
-  const [dismissedBanner, setDismissedBanner] = useState(false);
-  
   const [showScrollHint, setShowScrollHint] = useState(false);
   const hasScrolledRef = useRef(false);
 

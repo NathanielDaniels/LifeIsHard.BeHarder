@@ -31,6 +31,8 @@ interface FullRaceMapProps {
 const STATES_URL = 'https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json';
 
 const RACE_STATE_FIPS = Array.from(new Set(RACES_2026.map((r) => r.stateFips)));
+const DEFAULT_CENTER: [number, number] = [-96, 38];
+const DEFAULT_ZOOM = 1;
 
 function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
   const nextRace = getNextRace();
@@ -56,9 +58,8 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
   }, [selectedRace, mobileIndex]);
 
   // Animated map center and zoom for smooth "fly to" transitions
-  const DEFAULT_CENTER: [number, number] = [-96, 38];
-  const DEFAULT_ZOOM = 1;
   const targetCenter = selectedData ? selectedData.midpoint : DEFAULT_CENTER;
+  const [targetLng, targetLat] = targetCenter;
   const targetZoom = selectedData ? selectedData.zoom : DEFAULT_ZOOM;
 
   const [mapCenter, setMapCenter] = useState<[number, number]>(DEFAULT_CENTER);
@@ -70,11 +71,11 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
     const DURATION = 0.6;
     const EASE = [0.4, 0, 0.2, 1] as const;
 
-    const ctrlX = animate(centerRef.current[0], targetCenter[0], {
+    const ctrlX = animate(centerRef.current[0], targetLng, {
       duration: DURATION, ease: EASE,
       onUpdate: (v) => { centerRef.current[0] = v; setMapCenter([v, centerRef.current[1]]); },
     });
-    const ctrlY = animate(centerRef.current[1], targetCenter[1], {
+    const ctrlY = animate(centerRef.current[1], targetLat, {
       duration: DURATION, ease: EASE,
       onUpdate: (v) => { centerRef.current[1] = v; setMapCenter([centerRef.current[0], v]); },
     });
@@ -84,7 +85,7 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
     });
 
     return () => { ctrlX.stop(); ctrlY.stop(); ctrlZ.stop(); };
-  }, [targetCenter[0], targetCenter[1], targetZoom]);
+  }, [targetLng, targetLat, targetZoom]);
 
   const isTouchRef = useRef(false);
 
@@ -107,31 +108,43 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
   // Keyboard navigation — Escape, Arrow keys
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
+      const isMobileLayout = window.innerWidth < 768;
       if (e.key === 'Escape') {
-        if (selectedRace) {
+        if (selectedRace || mobileIndex >= 0) {
           setSelectedRace(null);
+          setMobileIndex(-1);
         } else {
           onClose();
         }
       } else if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
         e.preventDefault();
-        const currentIdx = selectedRace
-          ? RACES_2026.findIndex((r) => r.cityCode === selectedRace)
-          : -1;
-        const nextIdx = currentIdx >= RACES_2026.length - 1 ? 0 : currentIdx + 1;
-        setSelectedRace(RACES_2026[nextIdx].cityCode);
+        if (isMobileLayout) {
+          const nextIdx = mobileIndex >= RACES_2026.length - 1 ? 0 : mobileIndex + 1;
+          setMobileIndex(nextIdx);
+        } else {
+          const currentIdx = selectedRace
+            ? RACES_2026.findIndex((r) => r.cityCode === selectedRace)
+            : -1;
+          const nextIdx = currentIdx >= RACES_2026.length - 1 ? 0 : currentIdx + 1;
+          setSelectedRace(RACES_2026[nextIdx].cityCode);
+        }
       } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
         e.preventDefault();
-        const currentIdx = selectedRace
-          ? RACES_2026.findIndex((r) => r.cityCode === selectedRace)
-          : 0;
-        const prevIdx = currentIdx <= 0 ? RACES_2026.length - 1 : currentIdx - 1;
-        setSelectedRace(RACES_2026[prevIdx].cityCode);
+        if (isMobileLayout) {
+          const prevIdx = mobileIndex <= 0 ? RACES_2026.length - 1 : mobileIndex - 1;
+          setMobileIndex(prevIdx);
+        } else {
+          const currentIdx = selectedRace
+            ? RACES_2026.findIndex((r) => r.cityCode === selectedRace)
+            : 0;
+          const prevIdx = currentIdx <= 0 ? RACES_2026.length - 1 : currentIdx - 1;
+          setSelectedRace(RACES_2026[prevIdx].cityCode);
+        }
       }
     };
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
-  }, [selectedRace, onClose]);
+  }, [selectedRace, mobileIndex, onClose]);
 
   // Lock body scroll and stop Lenis while map is open
   useEffect(() => {
@@ -456,9 +469,9 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
                     }}
                     style={{ default: { cursor: 'pointer' }, hover: { cursor: 'pointer' }, pressed: { cursor: 'pointer' } }}
                   >
-                    {/* Nationals — outer glow ring */}
+                    {/* Nationals — outer glow ring (pointer-events: none so nearby dots stay clickable) */}
                     {isTarget && (
-                      <>
+                      <g style={{ pointerEvents: 'none' }}>
                         <circle r={12} fill={themeColor} opacity={isDimmed ? 0.02 : 0.08} style={{ transition: 'opacity 0.3s ease' }} />
                         <circle r={9} fill="none" stroke={themeColor} strokeWidth={0.6} opacity={isDimmed ? 0.05 : 0.25} style={{ transition: 'opacity 0.3s ease' }} />
                         {/* Slow breathing pulse — always on */}
@@ -474,7 +487,7 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
                           opacity={isDimmed ? 0.1 : 0.35}
                           style={{ transition: 'opacity 0.3s ease' }}
                         />
-                      </>
+                      </g>
                     )}
 
                     {/* Glow for next race */}

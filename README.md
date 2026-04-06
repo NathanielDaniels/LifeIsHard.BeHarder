@@ -1,313 +1,148 @@
-# Patrick Wingert - Elite Athlete Site
+# PATRICK WINGERT
 
 **Life is Hard. Be Harder.**
 
-A revolutionary, immersive website for Patrick Wingert, Dare2tri Elite Team athlete, featuring scroll-driven storytelling, live performance data, and dynamic fundraising visualization.
+Premium personal website for Patrick Wingert, adaptive-triathlon athlete and member of the 2026 Dare2Tri Elite Development Team. A cinematic, data-driven web experience integrated with live biometric data from his WHOOP device.
 
-## 🔥 Features
-
-### Revolutionary Design
-- **Breathing Hero Section** - Heartbeat-synced animations with orange glow effects
-- **Scroll Physics** - Kinetic, weighted scrolling with momentum
-- **Live WHOOP Integration** - Real-time performance metrics affecting page energy
-- **Bhutan Trek Panorama** - Horizontal scroll journey with altitude tracking
-- **Dynamic Fundraising** - Mountain elevation visualization for funding progress
-- **Instagram River Feed** - Flowing photo layout with auto-updates
-
-### Technical Excellence
-- Built with **Next.js 14** (App Router)
-- **Framer Motion** for physics-based animations
-- **Tailwind CSS** with custom orange theme system
-- **TypeScript** for type safety
-- Optimized images and performance
-- Mobile-responsive throughout
-- Production-ready architecture
-
-## 🚀 Quick Start
-
-### Installation
-
-```bash
-# Install dependencies
-npm install
-
-# Run development server
-npm run dev
-
-# Build for production
-npm run build
-
-# Start production server
-npm start
-```
-
-Open [http://localhost:3000](http://localhost:3000) to view the site.
-
-## 📁 Project Structure
-
-```
-patrick-wingert-site/
-├── app/
-│   ├── page.tsx              # Main homepage with all sections
-│   ├── layout.tsx            # Root layout with metadata
-│   └── globals.css           # Global styles and theme
-├── components/
-│   └── sections/
-│       ├── HeroSection.tsx         # Breathing hero with heartbeat
-│       ├── LiveStats.tsx           # WHOOP data visualization
-│       ├── TheShift.tsx            # Culinary to athletic transition
-│       ├── ByTheNumbers.tsx        # Animated stat counters
-│       ├── BhutanJourney.tsx       # Horizontal scroll trek
-│       ├── TheMission.tsx          # Dare2tri Elite Team info
-│       ├── InstagramFeed.tsx       # Live Instagram integration
-│       └── SupportCTA.tsx          # Fundraising with sponsors
-├── public/                   # Static assets (add photos here)
-├── package.json
-├── tailwind.config.js        # Orange theme configuration
-└── tsconfig.json
-
-```
-
-## 🎨 Design System
-
-### Orange Theme
-The site uses a custom orange palette representing determination and energy:
-
-```css
---orange-primary: #f97316
---orange-secondary: #ea580c
---orange-glow: rgba(249, 115, 22, 0.6)
-```
-
-All components use this system for consistency and can dynamically adjust intensity based on WHOOP recovery data.
-
-### Typography
-- Headlines: Inter Black (font-black)
-- Body: Inter Regular/Light
-- Data: Monospace for metrics
-
-### Animations
-- Scroll-triggered reveals
-- Physics-based momentum
-- Breathing/pulse effects
-- Kinetic text arrivals
-
-## 🔌 API Integrations
-
-### WHOOP API Integration
-
-**Setup:**
-1. Register for WHOOP Developer access at https://developer.whoop.com
-2. Get API credentials (Client ID, Client Secret)
-3. Add to environment variables:
-
-```bash
-NEXT_PUBLIC_WHOOP_CLIENT_ID=your_client_id
-WHOOP_CLIENT_SECRET=your_client_secret
-```
-
-**Implementation:**
-Create `/app/api/whoop/route.ts`:
-
-```typescript
-export async function GET() {
-  const response = await fetch('https://api.whoop.com/developer/v1/cycle', {
-    headers: {
-      'Authorization': `Bearer ${process.env.WHOOP_ACCESS_TOKEN}`
-    }
-  });
-  const data = await response.json();
-  return Response.json(data);
-}
-```
-
-Update `LiveStats.tsx` to fetch real data instead of mock data.
-
-### Instagram Feed Integration
-
-**Option 1: Instagram Basic Display API**
-1. Create Facebook Developer App
-2. Add Instagram Basic Display product
-3. Generate access token
-4. Add to environment:
-
-```bash
-NEXT_PUBLIC_INSTAGRAM_ACCESS_TOKEN=your_token
-INSTAGRAM_USER_ID=your_user_id
-```
-
-**Option 2: Cross-posting Panel**
-Create admin route `/admin/post` where Patrick can post content that goes to both Instagram and the website.
-
-**Implementation:**
-Update `InstagramFeed.tsx` to fetch from:
-```typescript
-const response = await fetch('/api/instagram');
-```
-
-## 🏔️ Adding Patrick's Photos
-
-Replace placeholder images with Patrick's actual photos:
-
-1. Add photos to `/public/images/`
-2. Update image sources in components:
-
-```typescript
-// Before
-src="https://images.unsplash.com/..."
-
-// After
-src="/images/bhutan-day1.jpg"
-```
-
-**Recommended naming:**
-- `hero-main.jpg` - Main hero section
-- `bhutan-day1.jpg`, `bhutan-day2.jpg`, etc.
-- `training-*.jpg` - Training shots
-- `race-*.jpg` - Race photos
-- `culinary-*.jpg` - Pre-accident culinary work
-
-## 📊 Fundraising Configuration
-
-Update funding data in `SupportCTA.tsx`:
-
-```typescript
-const [fundingData] = useState({
-  current: 12500,  // Update with actual amount raised
-  goal: 25000,     // Update with actual goal
-  supporters: 47   // Update with actual count
-});
-```
-
-For live updates, connect to fundraising platform API (e.g., GoFundMe, Donor Box).
-
-## 🎯 Customization
-
-### Update Personal Information
-
-**In `HeroSection.tsx`:**
-- Name display
-- Subtitle/credentials
-- Mock heartbeat BPM (will connect to WHOOP)
-
-**In `ByTheNumbers.tsx`:**
-```typescript
-const stats = [
-  { label: "Miles Trained", value: 2847 },     // Update values
-  { label: "Elevation Climbed", value: 127500 },
-  { label: "Records Set", value: 3 },
-  { label: "Days Since Accident", value: 892 }
-];
-```
-
-**In `TheMission.tsx`:**
-- Update acceptance year
-- Modify cost estimates
-- Add specific race information
-
-### Adding New Sections
-
-Create new component in `/components/sections/`:
-```typescript
-'use client';
-import { motion } from 'framer-motion';
-
-export default function NewSection() {
-  return (
-    <section className="relative min-h-screen py-32 px-6">
-      {/* Content */}
-    </section>
-  );
-}
-```
-
-Import in `app/page.tsx` and add to the render.
-
-## 🚢 Deployment
-
-### Vercel (Recommended)
-```bash
-# Install Vercel CLI
-npm i -g vercel
-
-# Deploy
-vercel
-```
-
-### Environment Variables
-Set in Vercel dashboard or `.env.local`:
-```
-NEXT_PUBLIC_WHOOP_CLIENT_ID=
-WHOOP_CLIENT_SECRET=
-NEXT_PUBLIC_INSTAGRAM_ACCESS_TOKEN=
-INSTAGRAM_USER_ID=
-```
-
-## 📱 Mobile Optimization
-
-The site is fully responsive with:
-- Touch-optimized interactions
-- Mobile-first breakpoints
-- Reduced motion support
-- Optimized image loading
-
-## ♿ Accessibility
-
-- Semantic HTML structure
-- ARIA labels where needed
-- Keyboard navigation support
-- High contrast ratios
-- Reduced motion preferences respected
-
-## 🔧 Performance
-
-- Image optimization via Next.js Image component
-- Code splitting via Next.js app router
-- Lazy loading for off-screen content
-- Minimal JavaScript bundles
-- CSS animations over JavaScript where possible
-
-## 📈 Analytics (To Add)
-
-Recommended: Vercel Analytics or Google Analytics
-
-```bash
-npm install @vercel/analytics
-```
-
-Add to `layout.tsx`:
-```typescript
-import { Analytics } from '@vercel/analytics/react';
-
-export default function RootLayout({ children }) {
-  return (
-    <html>
-      <body>
-        {children}
-        <Analytics />
-      </body>
-    </html>
-  );
-}
-```
-
-## 🎬 Next Steps
-
-1. **Replace placeholder images** with Patrick's 500+ photos
-2. **Connect WHOOP API** for live performance data
-3. **Set up Instagram integration** for automatic feed updates
-4. **Configure fundraising platform** for live donation tracking
-5. **Add domain** and custom email (patrick@patrickwingert.com)
-6. **Set up analytics** to track visitor engagement
-7. **Create blog/news CMS** (Sanity, Contentful, or similar)
-8. **Add race calendar** with upcoming events
-9. **Build sponsor dashboard** for partner assets
-10. **Create press kit** downloadable page
-
-## 🤝 Support
-
-For questions or customization requests, contact the development team.
+**Domain:** [patrickwingert.com](https://patrickwingert.com) | [View Brand Identity System](public/patrick-wingert-brand-identity.html)
 
 ---
 
-**Built with determination. Powered by orange. Zero limits.**
+## The Story
+
+Patrick Wingert lost his right leg below the knee on November 1, 2020 when his motorcycle was hit by a car in Chicago. Nine months earlier he had gotten sober. His marriage had ended. The restaurant group he'd spent years building collapsed during COVID. Then he lost his leg.
+
+In October 2022, less than two years after amputation, Patrick flew to Bhutan alone and walked 250 miles across the Trans Bhutan Trail, crossing 12 mountain passes and climbing 14,000+ feet of elevation. First American. First below-knee amputee. Ever.
+
+Today he competes in triathlon and marathon events with the Dare2Tri Elite Development Team, targeting the 2026 USA Para Triathlon National Championships in Milwaukee.
+
+---
+
+## Tech Stack
+
+- **Next.js 14** (App Router) with **TypeScript**
+- **Framer Motion** for animations and scroll-driven interactions
+- **Lenis** for smooth scrolling
+- **Tailwind CSS** with custom theme system
+- **WHOOP API** integration via OAuth 2.0 for live biometric data
+- **Cobe** for 3D interactive globe
+- **react-simple-maps** for 2D race map
+- **Resend** for transactional email
+- **Supabase** for token persistence
+- **Vercel** for deployment
+
+## Getting Started
+
+```bash
+npm install
+npm run dev      # Development server
+npm run build    # Production build
+npm run start    # Production server
+npm run lint     # ESLint
+```
+
+Open [http://localhost:3000](http://localhost:3000)
+
+### Environment Variables
+
+```env
+WHOOP_ENABLED=true
+WHOOP_CLIENT_ID=
+WHOOP_CLIENT_SECRET=
+WHOOP_REDIRECT_URI=https://patrickwingert.com/api/whoop/callback
+RESEND_API_KEY=
+SUBSCRIBE_NOTIFY_EMAIL=
+NEXT_PUBLIC_GA_ID=
+NEXT_PUBLIC_META_PIXEL_ID=
+```
+
+The site runs in demo mode when WHOOP credentials are unavailable.
+
+---
+
+## Brand Identity
+
+### Positioning
+
+Patrick occupies the raw, confrontational end of the adaptive athlete spectrum. Most adaptive athlete brands sit in soft inspiration. Patrick's is cinematic, data-driven, unapologetic. Think sports documentary, not charity campaign.
+
+### Colors
+
+| Name | Hex | Role |
+|------|-----|------|
+| Void Black | `#050505` | Primary background. 80%+ of visual real estate. |
+| Pulse Orange | `#F97316` | The heartbeat. Primary accent. Earned, not sprayed. |
+| Signal White | `#FFFFFF` | Primary text. Various opacities for hierarchy. |
+| Cyan | `#00FFFC` | Glitch effects only |
+| Magenta | `#FF00FF` | Glitch effects only |
+
+**Orange is earned.** Use for the moment that needs to hit hardest. One word in a headline, one stat in a grid, one CTA. White/gray hierarchy does the heavy lifting.
+
+### Typography
+
+| Font | Role | Usage |
+|------|------|-------|
+| **Bebas Neue** | Display | Headlines, stats, tagline. Always uppercase, tracking >= 0.04em. The serifed "I" is a signature character. |
+| **Inter** | Body | Clean, invisible. Body copy, descriptions, longer text. Weights 300-700. |
+| **Space Mono** | UI/Data | Labels, status messages, tracking text, timestamps. Always uppercase with wide letter-spacing. |
+
+### Voice
+
+Direct, punchy, zero fluff. Short sentences that hit hard. Earned confidence, not arrogance. Story speaks for itself.
+
+**The brand does:** Use short direct sentences. Let data speak. Show confidence earned through results. Confront.
+
+**The brand never:** Uses soft motivational cliches. Over-explains. Reduces story to "overcoming disability" feel-good narrative. Victimizes.
+
+### Brand Rules
+
+1. **THE TAGLINE IS SACRED** - "Life is Hard. Be Harder." Always Bebas Neue, always caps, "BE HARDER." always in Pulse Orange.
+2. **ORANGE IS EARNED** - Never spray across layout. Use for emphasis moments only.
+3. **DARK FIRST** - Primary context always dark. Light backgrounds are exception, never default.
+4. **NEVER SOFT** - No pastels. No rounded-everything. No soft gradients. This brand confronts.
+5. **DATA IS REAL** - Never fabricate biometric numbers. Use demo mode with realistic ranges if API unavailable.
+6. **THE PROSTHETIC IS VISIBLE** - Never hide or minimize. It's equipment, not limitation.
+7. **NO INSPIRATION PORN** - Never frame as "overcoming disability" in a way that reduces Patrick to feel-good story.
+8. **CINEMATIC STANDARD** - Every deliverable should feel like a Netflix sports documentary opening sequence.
+
+---
+
+## Architecture
+
+### Two-Version System
+
+- **`coming-soon-client.tsx`** - Currently deployed and live
+- **`page_full-site.tsx`** - Full multi-section storytelling site, in development
+
+### WHOOP Integration
+
+```
+Browser -> WhoopProvider (Context) -> /api/whoop/stats -> WHOOP API
+                                           ^
+                                 /api/whoop/webhook (push updates)
+```
+
+Dual-mode: live data when connected, realistic demo data as fallback. Heart rate displays post-workout average that decays to resting over ~2 hours. Server-side caching at 5-min intervals keeps API usage at ~3% of rate limits.
+
+### Key Features
+
+- **Heartbeat visualization** synced to actual heart rate
+- **Cinematic boot sequence** with WHOOP connection progress
+- **Interactive race map** with fly-to zoom, keyboard nav, state highlighting
+- **3D globe** with race markers and route arcs
+- **Glitch typography** with chromatic aberration
+- **Film grain, scanlines, floating particles** for documentary feel
+- **Custom crosshair cursor** with smooth follow
+- **Animated counters** for key stats
+- **Live biometric dashboard** (recovery, strain, HR, HRV, SpO2)
+
+---
+
+## Social
+
+- **Instagram:** [@patwingit](https://www.instagram.com/patwingit)
+- **Dare2Tri:** [dare2tri.org](https://www.dare2tri.org)
+
+---
+
+Built by [Nathaniel Daniels](https://github.com/NathanielDaniels). Powered by Pulse Orange.
