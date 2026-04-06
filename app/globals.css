@@ -43,6 +43,7 @@ body {
   background: linear-gradient(180deg, #fb923c 0%, #f97316 100%);
 }
 
+
 /* Selection color */
 ::selection {
   background: rgba(249, 115, 22, 0.3);
