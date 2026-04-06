@@ -1,0 +1,1692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Patrick Wingert — Brand Identity System</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #050505;
+    --orange-500: #f97316;
+    --orange-600: #ea580c;
+    --orange-700: #c2410c;
+    --orange-400: #fb923c;
+    --orange-300: #fdba74;
+    --white: #ffffff;
+    --gray-100: rgba(255,255,255,0.87);
+    --gray-200: rgba(255,255,255,0.70);
+    --gray-300: rgba(255,255,255,0.50);
+    --gray-400: rgba(255,255,255,0.30);
+    --gray-500: rgba(255,255,255,0.15);
+    --gray-600: rgba(255,255,255,0.08);
+    --gray-700: rgba(255,255,255,0.04);
+    --cyan: #00fffc;
+    --magenta: #ff00ff;
+    --green: #00e676;
+    --yellow: #ffab00;
+    --red: #ff5252;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    background: rgba(249, 115, 22, 0.3);
+    color: #fff;
+  }
+
+  /* Noise overlay */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.03;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  }
+
+  .section {
+    padding: 100px 60px;
+    border-bottom: 1px solid var(--gray-600);
+    position: relative;
+  }
+
+  @media (max-width: 768px) {
+    .section { padding: 60px 24px; }
+  }
+
+  .section-number {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.5em;
+    color: var(--gray-400);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .section-number::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--gray-600);
+    max-width: 120px;
+  }
+
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    letter-spacing: 0.05em;
+    line-height: 0.95;
+    margin-bottom: 40px;
+  }
+
+  .section-title span {
+    color: var(--orange-500);
+  }
+
+  .subsection-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.4em;
+    color: var(--gray-300);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--gray-600);
+  }
+
+  .body-text {
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--gray-200);
+    max-width: 640px;
+  }
+
+  /* ========== COVER ========== */
+  .cover {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cover::before {
+    content: '';
+    position: absolute;
+    top: -30%;
+    left: -20%;
+    width: 140%;
+    height: 140%;
+    background: radial-gradient(ellipse at 30% 40%, rgba(249,115,22,0.08) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .cover-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.6em;
+    color: var(--gray-400);
+    margin-bottom: 40px;
+  }
+
+  .cover-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(4rem, 12vw, 10rem);
+    line-height: 0.85;
+    letter-spacing: 0.02em;
+    margin-bottom: 20px;
+  }
+
+  .cover-title .orange { color: var(--orange-500); }
+
+  .cover-subtitle {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.5em;
+    color: var(--gray-300);
+    margin-bottom: 60px;
+  }
+
+  .cover-meta {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    color: var(--gray-400);
+    display: flex;
+    gap: 40px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .cover-line {
+    width: 1px;
+    height: 80px;
+    background: linear-gradient(to bottom, var(--orange-500), transparent);
+    margin: 40px auto 0;
+  }
+
+  /* ECG decoration */
+  .ecg-line {
+    position: absolute;
+    bottom: 30%;
+    left: 0;
+    width: 200%;
+    height: 100px;
+    opacity: 0.04;
+    animation: ecg-scroll 4s linear infinite;
+  }
+
+  @keyframes ecg-scroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  /* ========== BRAND STORY ========== */
+  .story-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    margin-top: 40px;
+  }
+
+  @media (max-width: 900px) {
+    .story-grid { grid-template-columns: 1fr; gap: 40px; }
+  }
+
+  .pull-quote {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(1.8rem, 3vw, 2.5rem);
+    line-height: 1.1;
+    color: var(--gray-100);
+    border-left: 3px solid var(--orange-500);
+    padding-left: 24px;
+    margin: 40px 0;
+  }
+
+  .values-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 24px;
+    margin-top: 24px;
+  }
+
+  .value-card {
+    background: var(--gray-700);
+    border: 1px solid var(--gray-600);
+    padding: 28px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .value-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, var(--orange-500), transparent);
+  }
+
+  .value-card h4 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.4rem;
+    letter-spacing: 0.08em;
+    color: var(--orange-500);
+    margin-bottom: 8px;
+  }
+
+  .value-card p {
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--gray-300);
+  }
+
+  /* ========== COLOR PALETTE ========== */
+  .palette-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-top: 24px;
+  }
+
+  .color-card {
+    border: 1px solid var(--gray-600);
+    overflow: hidden;
+  }
+
+  .color-swatch {
+    height: 120px;
+    position: relative;
+  }
+
+  .color-swatch .hex {
+    position: absolute;
+    bottom: 10px;
+    right: 12px;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    background: rgba(0,0,0,0.6);
+    padding: 3px 8px;
+    border-radius: 2px;
+  }
+
+  .color-info {
+    padding: 14px 16px;
+    background: var(--gray-700);
+  }
+
+  .color-info .name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 14px;
+    letter-spacing: 0.15em;
+    margin-bottom: 4px;
+  }
+
+  .color-info .usage {
+    font-size: 11px;
+    color: var(--gray-300);
+    line-height: 1.5;
+  }
+
+  /* Hierarchy demo */
+  .hierarchy-demo {
+    background: var(--gray-700);
+    border: 1px solid var(--gray-600);
+    padding: 40px;
+    margin-top: 32px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+  }
+
+  @media (max-width: 768px) {
+    .hierarchy-demo { grid-template-columns: 1fr; }
+  }
+
+  .hierarchy-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .hierarchy-bar {
+    width: 40px;
+    height: 6px;
+    flex-shrink: 0;
+    border-radius: 1px;
+  }
+
+  .hierarchy-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    color: var(--gray-300);
+  }
+
+  /* ========== TYPOGRAPHY ========== */
+  .type-specimen {
+    margin-top: 32px;
+  }
+
+  .type-card {
+    border: 1px solid var(--gray-600);
+    padding: 48px 40px;
+    margin-bottom: 16px;
+    background: var(--gray-700);
+    position: relative;
+  }
+
+  .type-meta {
+    position: absolute;
+    top: 16px;
+    right: 20px;
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--gray-400);
+    text-align: right;
+  }
+
+  .type-meta span {
+    display: block;
+    margin-bottom: 2px;
+  }
+
+  .type-display {
+    font-family: 'Bebas Neue', sans-serif;
+  }
+
+  .type-body {
+    font-family: 'Inter', sans-serif;
+  }
+
+  .type-mono {
+    font-family: 'Space Mono', monospace;
+  }
+
+  .type-pairing {
+    margin-top: 40px;
+    padding: 48px;
+    background: var(--gray-700);
+    border: 1px solid var(--gray-600);
+  }
+
+  .type-pairing h3 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 3rem;
+    letter-spacing: 0.04em;
+    line-height: 0.95;
+    margin-bottom: 16px;
+  }
+
+  .type-pairing .mono-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.4em;
+    color: var(--orange-500);
+    margin-bottom: 12px;
+  }
+
+  .type-pairing p {
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--gray-200);
+    max-width: 540px;
+  }
+
+  /* ========== LOGO / WORDMARK ========== */
+  .wordmark-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 32px;
+  }
+
+  @media (max-width: 768px) {
+    .wordmark-container { grid-template-columns: 1fr; }
+  }
+
+  .wordmark-card {
+    padding: 60px 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    border: 1px solid var(--gray-600);
+    position: relative;
+    min-height: 280px;
+  }
+
+  .wordmark-card .variant-label {
+    position: absolute;
+    top: 16px;
+    left: 20px;
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    color: var(--gray-400);
+  }
+
+  .wordmark-primary {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 4rem;
+    letter-spacing: 0.08em;
+    line-height: 0.9;
+  }
+
+  .wordmark-tagline {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.5rem;
+    letter-spacing: 0.15em;
+    margin-top: 8px;
+  }
+
+  /* ========== VOICE ========== */
+  .voice-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-top: 24px;
+  }
+
+  @media (max-width: 768px) {
+    .voice-grid { grid-template-columns: 1fr; }
+  }
+
+  .voice-card {
+    padding: 28px;
+    border: 1px solid var(--gray-600);
+    background: var(--gray-700);
+  }
+
+  .voice-card.do { border-top: 2px solid var(--green); }
+  .voice-card.dont { border-top: 2px solid var(--red); }
+
+  .voice-card h4 {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    margin-bottom: 16px;
+  }
+
+  .voice-card.do h4 { color: var(--green); }
+  .voice-card.dont h4 { color: var(--red); }
+
+  .voice-card ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  .voice-card li {
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--gray-200);
+    padding: 6px 0;
+    border-bottom: 1px solid var(--gray-700);
+  }
+
+  .voice-card li::before {
+    margin-right: 8px;
+    font-size: 11px;
+  }
+
+  .voice-card.do li::before { content: '✓'; color: var(--green); }
+  .voice-card.dont li::before { content: '✕'; color: var(--red); }
+
+  .copy-examples {
+    margin-top: 40px;
+  }
+
+  .copy-example {
+    background: var(--gray-700);
+    border: 1px solid var(--gray-600);
+    padding: 32px;
+    margin-bottom: 12px;
+  }
+
+  .copy-example .context {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    color: var(--orange-500);
+    margin-bottom: 12px;
+  }
+
+  .copy-example .text {
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--gray-100);
+  }
+
+  .copy-example .text em {
+    font-style: normal;
+    color: var(--orange-500);
+  }
+
+  /* ========== MOTIFS ========== */
+  .motif-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+    margin-top: 24px;
+  }
+
+  .motif-card {
+    background: var(--gray-700);
+    border: 1px solid var(--gray-600);
+    padding: 32px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .motif-card .icon {
+    font-size: 32px;
+    margin-bottom: 16px;
+    display: block;
+  }
+
+  .motif-card h4 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.3rem;
+    letter-spacing: 0.1em;
+    margin-bottom: 8px;
+    color: var(--orange-500);
+  }
+
+  .motif-card p {
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--gray-300);
+  }
+
+  /* ========== PHOTOGRAPHY ========== */
+  .photo-guidelines {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-top: 24px;
+  }
+
+  @media (max-width: 768px) {
+    .photo-guidelines { grid-template-columns: 1fr; }
+  }
+
+  .photo-card {
+    background: var(--gray-700);
+    border: 1px solid var(--gray-600);
+    overflow: hidden;
+  }
+
+  .photo-placeholder {
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    color: var(--gray-400);
+    position: relative;
+  }
+
+  .photo-card .caption {
+    padding: 16px 20px;
+    border-top: 1px solid var(--gray-600);
+  }
+
+  .photo-card .caption h4 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1rem;
+    letter-spacing: 0.12em;
+    margin-bottom: 4px;
+  }
+
+  .photo-card .caption p {
+    font-size: 12px;
+    color: var(--gray-300);
+    line-height: 1.5;
+  }
+
+  /* ========== USAGE RULES ========== */
+  .rules-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-top: 24px;
+  }
+
+  @media (max-width: 768px) {
+    .rules-grid { grid-template-columns: 1fr; }
+  }
+
+  .rule-card {
+    background: var(--gray-700);
+    border: 1px solid var(--gray-600);
+    padding: 28px;
+  }
+
+  .rule-card h4 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.2rem;
+    letter-spacing: 0.1em;
+    color: var(--orange-500);
+    margin-bottom: 12px;
+  }
+
+  .rule-card p {
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--gray-300);
+  }
+
+  /* ========== APPLICATIONS ========== */
+  .app-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 16px;
+    margin-top: 24px;
+  }
+
+  .app-mockup {
+    background: var(--gray-700);
+    border: 1px solid var(--gray-600);
+    overflow: hidden;
+    position: relative;
+  }
+
+  .app-mockup .preview {
+    height: 220px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    text-align: center;
+  }
+
+  .app-mockup .label {
+    padding: 14px 20px;
+    border-top: 1px solid var(--gray-600);
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    color: var(--gray-400);
+  }
+
+  /* Email signature mockup */
+  .email-sig {
+    text-align: left;
+    padding: 20px;
+    border: 1px solid var(--gray-600);
+    background: rgba(249,115,22,0.02);
+  }
+
+  .email-sig .name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.5rem;
+    letter-spacing: 0.1em;
+  }
+
+  .email-sig .title-line {
+    font-size: 11px;
+    color: var(--orange-500);
+    letter-spacing: 0.15em;
+    font-family: 'Space Mono', monospace;
+    margin-bottom: 8px;
+  }
+
+  .email-sig .divider {
+    width: 40px;
+    height: 2px;
+    background: var(--orange-500);
+    margin: 8px 0;
+  }
+
+  .email-sig .contact {
+    font-size: 12px;
+    color: var(--gray-300);
+    line-height: 1.6;
+  }
+
+  /* Social card mockup */
+  .social-card-mock {
+    background: linear-gradient(135deg, #0a0a0a, #111);
+    padding: 32px;
+    text-align: left;
+    border: 1px solid var(--gray-600);
+  }
+
+  .social-card-mock .tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.4em;
+    color: var(--orange-500);
+    margin-bottom: 12px;
+  }
+
+  .social-card-mock h3 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.2rem;
+    line-height: 0.95;
+    margin-bottom: 8px;
+  }
+
+  .social-card-mock p {
+    font-size: 12px;
+    color: var(--gray-300);
+  }
+
+  /* ========== FOOTER ========== */
+  .brand-footer {
+    padding: 60px;
+    text-align: center;
+    border-top: 1px solid var(--gray-600);
+  }
+
+  .brand-footer .mark {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.5rem;
+    letter-spacing: 0.15em;
+    color: var(--gray-400);
+    margin-bottom: 8px;
+  }
+
+  .brand-footer .note {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    color: var(--gray-500);
+  }
+
+  /* Glitch animation for cover */
+  @keyframes glitch-cover {
+    0%, 90%, 100% { clip-path: inset(0 0 0 0); transform: translate(0); }
+    92% { clip-path: inset(20% 0 60% 0); transform: translate(-3px, 0); }
+    94% { clip-path: inset(60% 0 10% 0); transform: translate(3px, 0); }
+    96% { clip-path: inset(40% 0 30% 0); transform: translate(-2px, 0); }
+  }
+
+  .glitch-ghost {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    pointer-events: none;
+  }
+  
+  .glitch-ghost.cyan {
+    color: var(--cyan);
+    opacity: 0.5;
+    animation: glitch-cover 3.5s infinite;
+  }
+  
+  .glitch-ghost.magenta {
+    color: var(--magenta);
+    opacity: 0.5;
+    animation: glitch-cover 3.5s infinite 0.1s;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 8px; }
+  ::-webkit-scrollbar-track { background: #0a0a0a; }
+  ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, var(--orange-500), var(--orange-600)); border-radius: 4px; }
+
+  /* Table of contents */
+  .toc {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 24px;
+    margin-top: 24px;
+  }
+
+  .toc a {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--gray-300);
+    text-decoration: none;
+    padding: 6px 0;
+    border-bottom: 1px solid transparent;
+    transition: all 0.3s;
+  }
+
+  .toc a:hover {
+    color: var(--orange-500);
+    border-bottom-color: var(--orange-500);
+  }
+
+  /* Orange rule principle */
+  .orange-rule {
+    background: linear-gradient(135deg, rgba(249,115,22,0.06), rgba(249,115,22,0.02));
+    border: 1px solid rgba(249,115,22,0.15);
+    padding: 32px;
+    margin-top: 32px;
+  }
+
+  .orange-rule h4 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.6rem;
+    letter-spacing: 0.08em;
+    color: var(--orange-500);
+    margin-bottom: 12px;
+  }
+
+  .orange-rule p {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--gray-200);
+  }
+
+  .spectrum-bar {
+    display: flex;
+    height: 8px;
+    margin: 24px 0 8px;
+    overflow: hidden;
+    gap: 2px;
+  }
+
+  .spectrum-bar div {
+    flex: 1;
+    border-radius: 1px;
+  }
+
+  .spectrum-labels {
+    display: flex;
+    justify-content: space-between;
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    color: var(--gray-400);
+  }
+</style>
+</head>
+<body>
+
+<!-- ================================================
+     COVER
+     ================================================ -->
+<section class="cover section">
+  <svg class="ecg-line" viewBox="0 0 1200 150" preserveAspectRatio="none">
+    <path d="M0,75 L100,75 L120,75 L140,20 L160,130 L180,40 L200,110 L220,75 L300,75 L320,75 L340,20 L360,130 L380,40 L400,110 L420,75 L500,75 L520,75 L540,20 L560,130 L580,40 L600,110 L620,75 L700,75 L720,75 L740,20 L760,130 L780,40 L800,110 L820,75 L900,75 L920,75 L940,20 L960,130 L980,40 L1000,110 L1020,75 L1100,75 L1120,75 L1140,20 L1160,130 L1180,40 L1200,110" fill="none" stroke="#f97316" stroke-width="2" opacity="0.3"/>
+  </svg>
+  <div class="cover-label">BRAND IDENTITY SYSTEM</div>
+  <div style="position: relative;">
+    <h1 class="cover-title">
+      PATRICK<br><span class="orange">WINGERT</span>
+    </h1>
+  </div>
+  <div class="cover-subtitle">LIFE IS HARD. BE HARDER.</div>
+  <div class="cover-meta">
+    <span>VERSION 1.0</span>
+    <span>PROJECT PULSE</span>
+    <span>FEBRUARY 2026</span>
+  </div>
+  <div class="cover-line"></div>
+</section>
+
+<!-- ================================================
+     TABLE OF CONTENTS
+     ================================================ -->
+<section class="section" style="padding-top: 60px; padding-bottom: 60px;">
+  <div class="section-number">00 — CONTENTS</div>
+  <div class="toc">
+    <a href="#story">01 BRAND STORY</a>
+    <a href="#positioning">02 POSITIONING</a>
+    <a href="#colors">03 COLOR SYSTEM</a>
+    <a href="#typography">04 TYPOGRAPHY</a>
+    <a href="#wordmark">05 WORDMARK</a>
+    <a href="#voice">06 VOICE & TONE</a>
+    <a href="#motifs">07 VISUAL MOTIFS</a>
+    <a href="#photography">08 PHOTOGRAPHY</a>
+    <a href="#applications">09 APPLICATIONS</a>
+    <a href="#rules">10 USAGE RULES</a>
+  </div>
+</section>
+
+<!-- ================================================
+     01 — BRAND STORY
+     ================================================ -->
+<section class="section" id="story">
+  <div class="section-number">01 — BRAND STORY</div>
+  <h2 class="section-title">THE <span>ORIGIN</span></h2>
+  
+  <div class="story-grid">
+    <div>
+      <p class="body-text">
+        Patrick Wingert lost his right leg below the knee on November 1, 2020 — hit by a car on his motorcycle in Chicago. Nine months earlier he'd gotten sober. His marriage had ended. The restaurant group he built for years collapsed during COVID.
+      </p>
+      <p class="body-text" style="margin-top: 16px;">
+        Then he lost his leg.
+      </p>
+      <p class="body-text" style="margin-top: 16px;">
+        Less than two years later, he flew to Bhutan alone and walked 250 miles across the Trans Bhutan Trail — 12 mountain passes, 14,000+ feet of elevation gain. First American. First below-knee amputee. Ever.
+      </p>
+      <p class="body-text" style="margin-top: 16px;">
+        Now he races triathlons as a member of the Dare2Tri Elite Development Team, targeting the USA Para Triathlon National Championships.
+      </p>
+    </div>
+    <div>
+      <div class="pull-quote">
+        "HE DIDN'T GO LOOKING FOR MEANING. HE WENT TO FINISH SOMETHING HE STARTED IN HIS HEAD TWENTY YEARS AGO."
+      </div>
+      <p class="body-text" style="margin-top: 24px; font-size: 13px; color: var(--gray-300);">
+        This brand exists to document the journey — not to inspire in a soft, motivational-poster way, but to confront. Every visual choice, every word, every data point on this site serves one purpose: proving that the only limit is the one you accept.
+      </p>
+    </div>
+  </div>
+
+  <div style="margin-top: 60px;">
+    <div class="subsection-title">BRAND VALUES</div>
+    <div class="values-grid">
+      <div class="value-card">
+        <h4>RELENTLESS</h4>
+        <p>Forward motion is non-negotiable. Progress isn't always visible but it never stops. The brand reflects an engine that doesn't idle.</p>
+      </div>
+      <div class="value-card">
+        <h4>AUTHENTIC</h4>
+        <p>No filters. No sanitized story. This is real sobriety, real loss, real pain, and real comebacks. Earned, not performed.</p>
+      </div>
+      <div class="value-card">
+        <h4>DEFIANT</h4>
+        <p>"They said it was impossible. They were wrong." The brand rejects limits imposed from outside. Not with anger — with proof.</p>
+      </div>
+      <div class="value-card">
+        <h4>ALIVE</h4>
+        <p>Connected to real biometrics, real heartbeats, real data. This isn't a static brand — it breathes. It pulses. It trains.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================
+     02 — POSITIONING
+     ================================================ -->
+<section class="section" id="positioning">
+  <div class="section-number">02 — POSITIONING</div>
+  <h2 class="section-title">WHO <span>THIS IS</span></h2>
+
+  <div class="story-grid">
+    <div>
+      <div class="subsection-title">BRAND POSITIONING STATEMENT</div>
+      <p class="body-text">
+        Patrick Wingert is a para-triathlon athlete and record-setting trekker who proves — through live biometric data and documented results — that losing everything can be the beginning of something extraordinary.
+      </p>
+      <p class="body-text" style="margin-top: 16px;">
+        Unlike motivational speakers or corporate athlete ambassadors, Patrick's brand is data-verified and unfiltered. His heartbeat is literally on the page.
+      </p>
+    </div>
+    <div>
+      <div class="subsection-title">AUDIENCE</div>
+      <div style="margin-bottom: 20px;">
+        <p class="body-text" style="font-size: 13px;"><strong style="color: var(--orange-500);">Primary:</strong> Potential sponsors, adaptive sports organizations, endurance sport brands seeking authentic athlete partnerships</p>
+      </div>
+      <div style="margin-bottom: 20px;">
+        <p class="body-text" style="font-size: 13px;"><strong style="color: var(--orange-500);">Secondary:</strong> Amputee and adaptive athlete community, people in recovery, endurance sport enthusiasts</p>
+      </div>
+      <div>
+        <p class="body-text" style="font-size: 13px;"><strong style="color: var(--orange-500);">Tertiary:</strong> Media and documentary outlets, Dare2Tri supporters and donors</p>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top: 48px;">
+    <div class="subsection-title">COMPETITIVE LANDSCAPE</div>
+    <div class="spectrum-bar">
+      <div style="background: var(--gray-500);"></div>
+      <div style="background: var(--gray-500);"></div>
+      <div style="background: var(--gray-400);"></div>
+      <div style="background: var(--gray-300);"></div>
+      <div style="background: var(--orange-700);"></div>
+      <div style="background: var(--orange-600);"></div>
+      <div style="background: var(--orange-500);"></div>
+      <div style="background: var(--orange-500);"></div>
+    </div>
+    <div class="spectrum-labels">
+      <span>SOFT / INSPIRATIONAL</span>
+      <span>←  PATRICK WINGERT  →</span>
+      <span>RAW / CONFRONTATIONAL</span>
+    </div>
+    <p class="body-text" style="margin-top: 16px; font-size: 13px;">
+      Most adaptive athlete brands sit in the "soft inspiration" zone — gentle stories of overcoming. Patrick's brand occupies the confrontational end: cinematic, data-driven, unapologetic. Think sports documentary, not charity campaign.
+    </p>
+  </div>
+
+  <div style="margin-top: 48px;">
+    <div class="subsection-title">PRIMARY TAGLINE</div>
+    <div style="font-family: 'Bebas Neue', sans-serif; font-size: clamp(3rem, 7vw, 5rem); letter-spacing: 0.04em; line-height: 0.9; margin-bottom: 16px;">
+      LIFE IS HARD. <span style="color: var(--orange-500);">BE HARDER.</span>
+    </div>
+    <p class="body-text" style="font-size: 13px; color: var(--gray-300);">
+      This is the brand's core declaration. It is always typeset in Bebas Neue, all caps. "BE HARDER." always appears in the brand orange. No period after the second sentence is optional — it lands the punch.
+    </p>
+  </div>
+
+  <div style="margin-top: 32px;">
+    <div class="subsection-title">SECONDARY TAGLINES</div>
+    <div style="display: flex; flex-wrap: wrap; gap: 12px;">
+      <div style="font-family: 'Bebas Neue', sans-serif; font-size: 1.3rem; letter-spacing: 0.1em; padding: 12px 20px; border: 1px solid var(--gray-600); background: var(--gray-700);">ONE INSPIRES MANY</div>
+      <div style="font-family: 'Bebas Neue', sans-serif; font-size: 1.3rem; letter-spacing: 0.1em; padding: 12px 20px; border: 1px solid var(--gray-600); background: var(--gray-700);">THEY SAID IT WAS IMPOSSIBLE. <span style="color: var(--orange-500);">THEY WERE WRONG.</span></div>
+      <div style="font-family: 'Bebas Neue', sans-serif; font-size: 1.3rem; letter-spacing: 0.1em; padding: 12px 20px; border: 1px solid var(--gray-600); background: var(--gray-700);">UNSTOPPABLE</div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================
+     03 — COLOR SYSTEM
+     ================================================ -->
+<section class="section" id="colors">
+  <div class="section-number">03 — COLOR SYSTEM</div>
+  <h2 class="section-title">COLOR <span>PALETTE</span></h2>
+
+  <div class="subsection-title">PRIMARY PALETTE</div>
+  <div class="palette-grid">
+    <div class="color-card">
+      <div class="color-swatch" style="background: #050505;">
+        <span class="hex">#050505</span>
+      </div>
+      <div class="color-info">
+        <div class="name">VOID BLACK</div>
+        <div class="usage">Primary background. The stage. 80%+ of all visual real estate.</div>
+      </div>
+    </div>
+    <div class="color-card">
+      <div class="color-swatch" style="background: #f97316;">
+        <span class="hex" style="color: #000;">#F97316</span>
+      </div>
+      <div class="color-info">
+        <div class="name">PULSE ORANGE</div>
+        <div class="usage">The heartbeat. Primary accent. Used for emphasis moments — earned, not sprayed.</div>
+      </div>
+    </div>
+    <div class="color-card">
+      <div class="color-swatch" style="background: #ffffff;">
+        <span class="hex" style="color: #000;">#FFFFFF</span>
+      </div>
+      <div class="color-info">
+        <div class="name">SIGNAL WHITE</div>
+        <div class="usage">Primary text. Full opacity for headlines, reduced for body and UI.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="subsection-title" style="margin-top: 48px;">EXTENDED ORANGE SCALE</div>
+  <div class="palette-grid" style="grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));">
+    <div class="color-card">
+      <div class="color-swatch" style="background: #fdba74; height: 70px;">
+        <span class="hex" style="color: #000; font-size: 9px;">#FDBA74</span>
+      </div>
+      <div class="color-info"><div class="name" style="font-size: 11px;">ORANGE 300</div></div>
+    </div>
+    <div class="color-card">
+      <div class="color-swatch" style="background: #fb923c; height: 70px;">
+        <span class="hex" style="color: #000; font-size: 9px;">#FB923C</span>
+      </div>
+      <div class="color-info"><div class="name" style="font-size: 11px;">ORANGE 400</div></div>
+    </div>
+    <div class="color-card">
+      <div class="color-swatch" style="background: #f97316; height: 70px;">
+        <span class="hex" style="color: #000; font-size: 9px;">#F97316</span>
+      </div>
+      <div class="color-info"><div class="name" style="font-size: 11px;">ORANGE 500 ★</div></div>
+    </div>
+    <div class="color-card">
+      <div class="color-swatch" style="background: #ea580c; height: 70px;">
+        <span class="hex" style="font-size: 9px;">#EA580C</span>
+      </div>
+      <div class="color-info"><div class="name" style="font-size: 11px;">ORANGE 600</div></div>
+    </div>
+    <div class="color-card">
+      <div class="color-swatch" style="background: #c2410c; height: 70px;">
+        <span class="hex" style="font-size: 9px;">#C2410C</span>
+      </div>
+      <div class="color-info"><div class="name" style="font-size: 11px;">ORANGE 700</div></div>
+    </div>
+  </div>
+
+  <div class="subsection-title" style="margin-top: 48px;">EFFECT COLORS (GLITCH ONLY)</div>
+  <div class="palette-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+    <div class="color-card">
+      <div class="color-swatch" style="background: #00fffc; height: 80px;">
+        <span class="hex" style="color: #000;">#00FFFC</span>
+      </div>
+      <div class="color-info">
+        <div class="name">GLITCH CYAN</div>
+        <div class="usage">Chromatic aberration ghost layer only. Never standalone.</div>
+      </div>
+    </div>
+    <div class="color-card">
+      <div class="color-swatch" style="background: #ff00ff; height: 80px;">
+        <span class="hex" style="color: #000;">#FF00FF</span>
+      </div>
+      <div class="color-info">
+        <div class="name">GLITCH MAGENTA</div>
+        <div class="usage">Chromatic aberration ghost layer only. Never standalone.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="subsection-title" style="margin-top: 48px;">SEMANTIC COLORS (DATA ONLY)</div>
+  <div class="palette-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
+    <div class="color-card">
+      <div class="color-swatch" style="background: #00e676; height: 70px;">
+        <span class="hex" style="color: #000;">#00E676</span>
+      </div>
+      <div class="color-info">
+        <div class="name">RECOVERY GREEN</div>
+        <div class="usage">Recovery ≥67%. Health positive.</div>
+      </div>
+    </div>
+    <div class="color-card">
+      <div class="color-swatch" style="background: #ffab00; height: 70px;">
+        <span class="hex" style="color: #000;">#FFAB00</span>
+      </div>
+      <div class="color-info">
+        <div class="name">CAUTION YELLOW</div>
+        <div class="usage">Recovery 34–66%. Moderate.</div>
+      </div>
+    </div>
+    <div class="color-card">
+      <div class="color-swatch" style="background: #ff5252; height: 70px;">
+        <span class="hex">#FF5252</span>
+      </div>
+      <div class="color-info">
+        <div class="name">ALERT RED</div>
+        <div class="usage">Recovery <34%. Warning state.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="subsection-title" style="margin-top: 48px;">WHITE OPACITY HIERARCHY</div>
+  <div class="hierarchy-demo">
+    <div>
+      <div class="hierarchy-item">
+        <div class="hierarchy-bar" style="background: rgba(255,255,255,1);"></div>
+        <div>
+          <span style="color: rgba(255,255,255,1); font-size: 14px;">100% — Headlines</span>
+          <div class="hierarchy-label">PRIMARY</div>
+        </div>
+      </div>
+      <div class="hierarchy-item">
+        <div class="hierarchy-bar" style="background: rgba(255,255,255,0.7);"></div>
+        <div>
+          <span style="color: rgba(255,255,255,0.7); font-size: 14px;">70% — Body Text</span>
+          <div class="hierarchy-label">SECONDARY</div>
+        </div>
+      </div>
+      <div class="hierarchy-item">
+        <div class="hierarchy-bar" style="background: rgba(255,255,255,0.5);"></div>
+        <div>
+          <span style="color: rgba(255,255,255,0.5); font-size: 14px;">50% — Captions</span>
+          <div class="hierarchy-label">TERTIARY</div>
+        </div>
+      </div>
+      <div class="hierarchy-item">
+        <div class="hierarchy-bar" style="background: rgba(255,255,255,0.3);"></div>
+        <div>
+          <span style="color: rgba(255,255,255,0.3); font-size: 14px;">30% — Labels / Dates</span>
+          <div class="hierarchy-label">QUATERNARY</div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="orange-rule" style="margin-top: 0;">
+        <h4>"ORANGE IS EARNED, NOT SPRAYED."</h4>
+        <p>The accent color is reserved for emphasis moments: the tagline word that hits hardest, the stat that matters most, the CTA that needs to land. If everything is orange, nothing is. White and gray hierarchy does 90% of the visual work.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================
+     04 — TYPOGRAPHY
+     ================================================ -->
+<section class="section" id="typography">
+  <div class="section-number">04 — TYPOGRAPHY</div>
+  <h2 class="section-title">TYPE <span>SYSTEM</span></h2>
+
+  <div class="type-specimen">
+    <div class="type-card">
+      <div class="type-meta">
+        <span>GOOGLE FONTS</span>
+        <span>WEIGHT: 400</span>
+        <span>ROLE: DISPLAY / HEADLINES</span>
+      </div>
+      <div class="type-display" style="font-size: clamp(4rem, 8vw, 7rem); letter-spacing: 0.04em; line-height: 0.9;">
+        BEBAS NEUE
+      </div>
+      <div style="margin-top: 20px; font-family: 'Bebas Neue'; font-size: 1.2rem; letter-spacing: 0.1em; color: var(--gray-300);">
+        ABCDEFGHIJKLMNOPQRSTUVWXYZ<br>
+        0123456789
+      </div>
+      <p style="margin-top: 16px; font-size: 12px; color: var(--gray-300); line-height: 1.6; max-width: 480px;">
+        The workhorse. Used for all major headlines, stats, section titles, and the primary tagline. The distinctive serifed "I" is a signature character — always preserve it. Always uppercase. Always tracking ≥0.04em.
+      </p>
+    </div>
+
+    <div class="type-card">
+      <div class="type-meta">
+        <span>GOOGLE FONTS</span>
+        <span>WEIGHTS: 300–700</span>
+        <span>ROLE: BODY / PROSE</span>
+      </div>
+      <div class="type-body" style="font-size: clamp(2.5rem, 5vw, 4rem); font-weight: 300; line-height: 1.1;">
+        Inter
+      </div>
+      <div style="margin-top: 20px; font-family: 'Inter'; font-size: 14px; color: var(--gray-300); letter-spacing: 0.02em;">
+        AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz<br>
+        0123456789 — !@#$%&*()
+      </div>
+      <p style="margin-top: 16px; font-size: 12px; color: var(--gray-300); line-height: 1.6; max-width: 480px;">
+        Clean and invisible. Used for body copy, descriptions, and longer-form text. Light (300) for elegant prose, Regular (400) for body, Semibold (600) for inline emphasis.
+      </p>
+    </div>
+
+    <div class="type-card">
+      <div class="type-meta">
+        <span>GOOGLE FONTS</span>
+        <span>WEIGHTS: 400, 700</span>
+        <span>ROLE: UI / DATA / LABELS</span>
+      </div>
+      <div class="type-mono" style="font-size: clamp(1.8rem, 4vw, 3rem); line-height: 1.1;">
+        Space Mono
+      </div>
+      <div style="margin-top: 20px; font-family: 'Space Mono'; font-size: 12px; color: var(--gray-300); letter-spacing: 0.1em;">
+        AaBbCcDdEeFfGgHhIiJjKkLlMmNn<br>
+        0123456789 &lt;&gt; {} [] // — ★
+      </div>
+      <p style="margin-top: 16px; font-size: 12px; color: var(--gray-300); line-height: 1.6; max-width: 480px;">
+        The technical voice. Used for data labels, status messages, tracking text, timestamps, and the "Vitality Engine" boot sequence. Always uppercase with wide letter-spacing (0.2em–0.5em) for labels. Reinforces the biometric/data-driven identity.
+      </p>
+    </div>
+  </div>
+
+  <div class="subsection-title" style="margin-top: 48px;">TYPE SCALE & USAGE</div>
+  <div class="type-card" style="padding: 32px 40px;">
+    <div style="font-family: 'Bebas Neue'; font-size: clamp(4rem, 10vw, 8rem); letter-spacing: 0.04em; line-height: 0.85; margin-bottom: 4px;">HERO DISPLAY</div>
+    <span style="font-family: 'Space Mono'; font-size: 10px; letter-spacing: 0.3em; color: var(--gray-400);">BEBAS NEUE / CLAMP(4REM, 15VW, 13REM) / HERO ONLY</span>
+  </div>
+  <div class="type-card" style="padding: 24px 40px;">
+    <div style="font-family: 'Bebas Neue'; font-size: clamp(2rem, 5vw, 4rem); letter-spacing: 0.05em; line-height: 0.95; margin-bottom: 4px;">SECTION HEADLINE</div>
+    <span style="font-family: 'Space Mono'; font-size: 10px; letter-spacing: 0.3em; color: var(--gray-400);">BEBAS NEUE / CLAMP(2.5REM, 6VW, 5REM)</span>
+  </div>
+  <div class="type-card" style="padding: 20px 40px;">
+    <div style="font-family: 'Bebas Neue'; font-size: clamp(3rem, 8vw, 5rem); letter-spacing: 0.03em; line-height: 1; margin-bottom: 4px; color: var(--orange-500);">1,892</div>
+    <span style="font-family: 'Space Mono'; font-size: 10px; letter-spacing: 0.3em; color: var(--gray-400);">BEBAS NEUE / STAT NUMBERS / ORANGE ACCENT</span>
+  </div>
+  <div class="type-card" style="padding: 20px 40px;">
+    <div style="font-family: 'Space Mono'; font-size: 10px; letter-spacing: 0.5em; color: var(--orange-500); margin-bottom: 4px;">LIVE BIOMETRICS — FEB 17, 2026</div>
+    <span style="font-family: 'Space Mono'; font-size: 10px; letter-spacing: 0.3em; color: var(--gray-400);">SPACE MONO / 10–11PX / SECTION LABELS</span>
+  </div>
+  <div class="type-card" style="padding: 20px 40px;">
+    <div style="font-family: 'Inter'; font-size: 15px; line-height: 1.7; color: var(--gray-200); margin-bottom: 4px;">An immersive digital experience documenting the journey of breaking every limit. Be the first to witness it.</div>
+    <span style="font-family: 'Space Mono'; font-size: 10px; letter-spacing: 0.3em; color: var(--gray-400);">INTER / 15–16PX / BODY COPY</span>
+  </div>
+
+  <div class="subsection-title" style="margin-top: 48px;">TYPE PAIRING IN CONTEXT</div>
+  <div class="type-pairing">
+    <div class="mono-label">DARE2TRI ELITE TEAM ATHLETE</div>
+    <h3>THEY SAID IT WAS <span style="color: var(--orange-500);">IMPOSSIBLE.</span><br>THEY WERE WRONG.</h3>
+    <p>Less than two years after losing his right leg, Patrick Wingert became the first American and first below-knee amputee to walk all 250 miles of the Trans Bhutan Trail.</p>
+  </div>
+</section>
+
+<!-- ================================================
+     05 — WORDMARK
+     ================================================ -->
+<section class="section" id="wordmark">
+  <div class="section-number">05 — WORDMARK & IDENTITY MARK</div>
+  <h2 class="section-title">THE <span>MARK</span></h2>
+
+  <p class="body-text" style="margin-bottom: 32px;">
+    Patrick's brand uses a typographic wordmark — no logomark or icon. The identity lives in the type treatment itself. Bebas Neue's distinctive character (especially the serifed "I") makes the wordmark instantly recognizable.
+  </p>
+
+  <div class="wordmark-container">
+    <div class="wordmark-card" style="background: #050505;">
+      <span class="variant-label">PRIMARY — DARK</span>
+      <div class="wordmark-primary" style="color: #fff;">PATRICK<br><span style="color: var(--orange-500);">WINGERT</span></div>
+      <div class="wordmark-tagline" style="color: var(--gray-400); margin-top: 12px;">LIFE IS HARD. BE HARDER.</div>
+    </div>
+    <div class="wordmark-card" style="background: #ffffff;">
+      <span class="variant-label" style="color: var(--gray-500);">SECONDARY — LIGHT</span>
+      <div class="wordmark-primary" style="color: #050505;">PATRICK<br><span style="color: var(--orange-600);">WINGERT</span></div>
+      <div class="wordmark-tagline" style="color: #666; margin-top: 12px;">LIFE IS HARD. BE HARDER.</div>
+    </div>
+    <div class="wordmark-card" style="background: #050505;">
+      <span class="variant-label">COMPACT — INLINE</span>
+      <div style="font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem; letter-spacing: 0.2em; color: var(--gray-200);">PATRICK WINGERT</div>
+    </div>
+    <div class="wordmark-card" style="background: var(--orange-500);">
+      <span class="variant-label" style="color: rgba(0,0,0,0.4);">MONOCHROME — ON ORANGE</span>
+      <div class="wordmark-primary" style="color: #fff; text-shadow: 2px 2px 0 rgba(0,0,0,0.2);">PATRICK<br>WINGERT</div>
+    </div>
+  </div>
+
+  <div style="margin-top: 40px;">
+    <div class="subsection-title">CLEAR SPACE & SIZING</div>
+    <p class="body-text" style="font-size: 13px;">
+      Minimum clear space around the wordmark equals the cap-height of the "P" in PATRICK on all sides. Minimum width for digital use: 180px. The wordmark should never appear smaller than 14px in Bebas Neue for readability.
+    </p>
+  </div>
+</section>
+
+<!-- ================================================
+     06 — VOICE & TONE
+     ================================================ -->
+<section class="section" id="voice">
+  <div class="section-number">06 — VOICE & TONE</div>
+  <h2 class="section-title">HOW WE <span>SPEAK</span></h2>
+
+  <p class="body-text" style="margin-bottom: 32px;">
+    The brand voice is direct, punchy, and built on earned confidence. Short sentences that hit hard. The story speaks for itself — never over-explain. Every word must earn its place.
+  </p>
+
+  <div class="voice-grid">
+    <div class="voice-card do">
+      <h4>✓ THE BRAND DOES</h4>
+      <ul>
+        <li>Use short, direct sentences that land like punches</li>
+        <li>Let data and facts speak — no puffery</li>
+        <li>Show confidence earned through documented results</li>
+        <li>Use present tense and active voice</li>
+        <li>Confront — the story doesn't ask for sympathy</li>
+        <li>Include real metrics: distances, days, heart rates</li>
+      </ul>
+    </div>
+    <div class="voice-card dont">
+      <h4>✕ THE BRAND NEVER</h4>
+      <ul>
+        <li>Uses soft motivational clichés ("believe in yourself")</li>
+        <li>Over-explains or hedges with qualifiers</li>
+        <li>Reduces the story to "disability inspiration porn"</li>
+        <li>Uses passive voice or corporate speak</li>
+        <li>Asks for pity or frames adversity as victimhood</li>
+        <li>Uses exclamation marks excessively</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="copy-examples">
+    <div class="subsection-title">COPY EXAMPLES</div>
+    
+    <div class="copy-example">
+      <div class="context">HERO — WEBSITE</div>
+      <div class="text" style="font-family: 'Bebas Neue'; font-size: 2rem; letter-spacing: 0.04em;">LIFE IS HARD. <em>BE HARDER.</em></div>
+    </div>
+
+    <div class="copy-example">
+      <div class="context">SECTION HEADER — STORYTELLING</div>
+      <div class="text" style="font-family: 'Bebas Neue'; font-size: 1.5rem; letter-spacing: 0.04em;">THEY SAID IT WAS <em>IMPOSSIBLE.</em> THEY WERE WRONG.</div>
+    </div>
+
+    <div class="copy-example">
+      <div class="context">BIO — SHORT FORMAT</div>
+      <div class="text">Patrick Wingert lost his right leg in 2020. Less than two years later he walked 250 miles across Bhutan — first American, first below-knee amputee to complete the trail. Now he races triathlons.</div>
+    </div>
+
+    <div class="copy-example">
+      <div class="context">BIO — EDITORIAL VOICE</div>
+      <div class="text">He didn't go looking for meaning. He went to finish something he started in his head twenty years ago. 250 miles. 12 mountain passes. One leg. <em>Zero excuses.</em></div>
+    </div>
+
+    <div class="copy-example">
+      <div class="context">CTA — EMAIL CAPTURE</div>
+      <div class="text">An immersive digital experience documenting the journey of breaking every limit. Be the first to witness it.</div>
+    </div>
+
+    <div class="copy-example">
+      <div class="context">SOCIAL — RACE DAY</div>
+      <div class="text">Race day. <em>Recovery: 89%. Strain: 14.2.</em> The data says ready. The mind already knew.</div>
+    </div>
+
+    <div class="copy-example">
+      <div class="context">SPONSOR PITCH — OPENING</div>
+      <div class="text">This isn't a sponsorship. It's a front-row seat to a story that's still being written — backed by live biometric proof that the work is real.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================
+     07 — VISUAL MOTIFS
+     ================================================ -->
+<section class="section" id="motifs">
+  <div class="section-number">07 — VISUAL MOTIFS</div>
+  <h2 class="section-title">SIGNATURE <span>ELEMENTS</span></h2>
+
+  <p class="body-text" style="margin-bottom: 32px;">
+    These recurring visual motifs create the brand's cinematic language. Each connects back to Patrick's story and the "Vitality Engine" concept — a living, breathing, data-driven identity.
+  </p>
+
+  <div class="motif-grid">
+    <div class="motif-card">
+      <span class="icon">♡</span>
+      <h4>THE HEARTBEAT</h4>
+      <p>ECG lines, pulsing elements synced to real heart rate data. The central metaphor — this brand is literally alive. Speed varies with Patrick's actual biometric state.</p>
+    </div>
+    <div class="motif-card">
+      <span class="icon" style="font-family: 'Bebas Neue'; font-size: 28px; color: var(--cyan);">BE</span>
+      <h4>GLITCH TYPOGRAPHY</h4>
+      <p>Chromatic aberration with cyan/magenta ghost layers on key phrases. Represents disruption, the break from normal, the signal cutting through noise. Reserved for "BE HARDER." and rare emphasis moments.</p>
+    </div>
+    <div class="motif-card">
+      <span class="icon">▪▪▪</span>
+      <h4>FILM GRAIN & SCANLINES</h4>
+      <p>Subtle noise overlay and CRT-style scanlines across the entire experience. Creates the "sports documentary" feel — as if you're watching raw footage, not a polished ad.</p>
+    </div>
+    <div class="motif-card">
+      <span class="icon">◉</span>
+      <h4>FLOATING PARTICLES</h4>
+      <p>Orange particles drifting upward. Energy being released. Embers from a fire that won't go out. Scale and density can reflect biometric intensity.</p>
+    </div>
+    <div class="motif-card">
+      <span class="icon">⊞</span>
+      <h4>DATA GRID</h4>
+      <p>Subtle background grid pattern. References the biometric dashboard, the structured reality of training data. Always at very low opacity (5–10%).</p>
+    </div>
+    <div class="motif-card">
+      <span class="icon">⧫</span>
+      <h4>ORANGE JOURNEY LINE</h4>
+      <p>A vertical line that tracks scroll progress on the full site. Represents forward motion — the journey from accident to athlete. Tip pulses with the heartbeat.</p>
+    </div>
+    <div class="motif-card">
+      <span class="icon">◧</span>
+      <h4>VIGNETTE</h4>
+      <p>Darkened edges framing each viewport. Creates the cinematic "looking through a lens" feeling. Standard radial gradient: transparent center, 70% black at edges.</p>
+    </div>
+    <div class="motif-card">
+      <span class="icon">+</span>
+      <h4>CROSSHAIR CURSOR</h4>
+      <p>Custom cursor with smooth follow delay and hover scaling. You're not just browsing — you're tracking, locking on, targeting. Precision as identity.</p>
+    </div>
+    <div class="motif-card">
+      <span class="icon">▶</span>
+      <h4>BOOT SEQUENCE</h4>
+      <p>The cinematic loading screen that syncs to real WHOOP connection. Status logs, progress bar, "CONNECTING TO PATRICK'S BIOMETRICS." The first impression — always preserved.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================
+     08 — PHOTOGRAPHY
+     ================================================ -->
+<section class="section" id="photography">
+  <div class="section-number">08 — PHOTOGRAPHY DIRECTION</div>
+  <h2 class="section-title">IMAGE <span>LANGUAGE</span></h2>
+
+  <p class="body-text" style="margin-bottom: 32px;">
+    Photography should feel pulled from a documentary — real moments, not posed shots. Dark, high-contrast, desaturated with occasional orange warmth. The prosthetic is shown naturally, never hidden, never fetishized.
+  </p>
+
+  <div class="photo-guidelines">
+    <div class="photo-card">
+      <div class="photo-placeholder" style="background: linear-gradient(135deg, #0a0a0a, #1a1a1a);">
+        <span>ACTION / TRAINING</span>
+      </div>
+      <div class="caption">
+        <h4>IN MOTION</h4>
+        <p>Training shots, race moments, Bhutan trek footage. High contrast, shallow depth of field, capturing intensity and effort. Motion blur acceptable.</p>
+      </div>
+    </div>
+    <div class="photo-card">
+      <div class="photo-placeholder" style="background: linear-gradient(135deg, #111, #0a0808);">
+        <span>PORTRAIT / EDITORIAL</span>
+      </div>
+      <div class="caption">
+        <h4>THE GAZE</h4>
+        <p>Direct eye contact. Dramatic lighting — hard shadows, rim light. No smiling required. Let the confidence speak. Dark backgrounds that match the site palette.</p>
+      </div>
+    </div>
+    <div class="photo-card">
+      <div class="photo-placeholder" style="background: linear-gradient(135deg, #0d0d0d, #1a1208);">
+        <span>PROSTHETIC / DETAIL</span>
+      </div>
+      <div class="caption">
+        <h4>THE TOOL</h4>
+        <p>Close-ups of the prosthetic as engineered equipment. Shot like product photography — the prosthetic as technology, as instrument, as extension of will.</p>
+      </div>
+    </div>
+    <div class="photo-card">
+      <div class="photo-placeholder" style="background: linear-gradient(135deg, #0a0a0a, #151510);">
+        <span>LANDSCAPE / ENVIRONMENT</span>
+      </div>
+      <div class="caption">
+        <h4>THE ARENA</h4>
+        <p>Mountains, trails, race courses, transition zones. Wide and dramatic. Human figure small against vast landscape to show scale of the challenge.</p>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top: 40px;">
+    <div class="subsection-title">POST-PROCESSING STYLE</div>
+    <div class="values-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
+      <div class="value-card">
+        <h4>DESATURATED</h4>
+        <p>Pull saturation 30–50%. Let orange tones survive, cool everything else.</p>
+      </div>
+      <div class="value-card">
+        <h4>HIGH CONTRAST</h4>
+        <p>Deep blacks, bright highlights. Crush the shadows slightly for that documentary grade.</p>
+      </div>
+      <div class="value-card">
+        <h4>GRAIN</h4>
+        <p>Add subtle film grain in post to match the site's noise overlay aesthetic.</p>
+      </div>
+      <div class="value-card">
+        <h4>ORANGE WASH</h4>
+        <p>For select hero images, allow warm orange color grading in highlights.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================
+     09 — APPLICATIONS
+     ================================================ -->
+<section class="section" id="applications">
+  <div class="section-number">09 — APPLICATIONS</div>
+  <h2 class="section-title">BRAND IN <span>USE</span></h2>
+
+  <div class="app-grid">
+    <!-- Social Card -->
+    <div class="app-mockup">
+      <div class="preview" style="padding: 0;">
+        <div class="social-card-mock" style="width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: flex-end;">
+          <div class="tag">RACE DAY — APR 11, 2026</div>
+          <h3 style="font-family: 'Bebas Neue'; font-size: 2rem; line-height: 0.95;">CALIFORNIA STATE<br><span style="color: var(--orange-500);">CHAMPIONSHIP</span></h3>
+          <p style="font-size: 11px; color: var(--gray-400); margin-top: 8px;">NAPA VALLEY TRIATHLON</p>
+        </div>
+      </div>
+      <div class="label">SOCIAL MEDIA — RACE ANNOUNCEMENT</div>
+    </div>
+
+    <!-- Email Signature -->
+    <div class="app-mockup">
+      <div class="preview" style="padding: 0; align-items: stretch; justify-content: stretch;">
+        <div class="email-sig" style="width: 100%; display: flex; flex-direction: column; justify-content: center;">
+          <div class="name">PATRICK WINGERT</div>
+          <div class="title-line">DARE2TRI ELITE TEAM ATHLETE</div>
+          <div class="divider"></div>
+          <div class="contact">
+            patrickwingert.com<br>
+            @patwingzzz<br>
+            <span style="font-style: italic; color: var(--gray-400);">Life is Hard. Be Harder.</span>
+          </div>
+        </div>
+      </div>
+      <div class="label">EMAIL SIGNATURE</div>
+    </div>
+
+    <!-- Stats Card -->
+    <div class="app-mockup">
+      <div class="preview" style="background: #050505; flex-direction: column; align-items: flex-start; padding: 24px;">
+        <div style="font-family: 'Space Mono'; font-size: 10px; letter-spacing: 0.4em; color: var(--orange-500); margin-bottom: 12px;">TRANS BHUTAN TRAIL</div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; width: 100%;">
+          <div>
+            <div style="font-family: 'Bebas Neue'; font-size: 2.5rem; color: var(--orange-500); line-height: 1;">250</div>
+            <div style="font-family: 'Space Mono'; font-size: 9px; letter-spacing: 0.2em; color: var(--gray-400);">MILES</div>
+          </div>
+          <div>
+            <div style="font-family: 'Bebas Neue'; font-size: 2.5rem; color: var(--orange-500); line-height: 1;">29</div>
+            <div style="font-family: 'Space Mono'; font-size: 9px; letter-spacing: 0.2em; color: var(--gray-400);">DAYS</div>
+          </div>
+          <div>
+            <div style="font-family: 'Bebas Neue'; font-size: 2.5rem; color: var(--orange-500); line-height: 1;">12</div>
+            <div style="font-family: 'Space Mono'; font-size: 9px; letter-spacing: 0.2em; color: var(--gray-400);">MOUNTAIN PASSES</div>
+          </div>
+          <div>
+            <div style="font-family: 'Bebas Neue'; font-size: 2.5rem; color: var(--orange-500); line-height: 1;">1<sup style="font-size: 1rem;">ST</sup></div>
+            <div style="font-family: 'Space Mono'; font-size: 9px; letter-spacing: 0.2em; color: var(--gray-400);">AMPUTEE EVER</div>
+          </div>
+        </div>
+      </div>
+      <div class="label">SOCIAL MEDIA — STATS CARD</div>
+    </div>
+
+    <!-- Sponsor Tier -->
+    <div class="app-mockup">
+      <div class="preview" style="background: #050505; flex-direction: column; align-items: center; justify-content: center;">
+        <div style="font-family: 'Space Mono'; font-size: 10px; letter-spacing: 0.5em; color: var(--gray-400); margin-bottom: 16px;">PARTNER WITH</div>
+        <div style="font-family: 'Bebas Neue'; font-size: 2.5rem; letter-spacing: 0.1em; margin-bottom: 4px;">PATRICK <span style="color: var(--orange-500);">WINGERT</span></div>
+        <div style="width: 40px; height: 2px; background: var(--orange-500); margin: 12px 0;"></div>
+        <div style="font-family: 'Space Mono'; font-size: 10px; letter-spacing: 0.3em; color: var(--gray-300);">2026 RACE SEASON</div>
+      </div>
+      <div class="label">SPONSORSHIP DECK — COVER</div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================
+     10 — USAGE RULES
+     ================================================ -->
+<section class="section" id="rules">
+  <div class="section-number">10 — USAGE RULES</div>
+  <h2 class="section-title">NON-<span>NEGOTIABLES</span></h2>
+
+  <div class="rules-grid">
+    <div class="rule-card">
+      <h4>01 — THE TAGLINE IS SACRED</h4>
+      <p>"Life is Hard. Be Harder." — always in Bebas Neue, always uppercase, "BE HARDER." always in Pulse Orange. Never rewrite, rephrase, or split across inconsistent type treatments.</p>
+    </div>
+    <div class="rule-card">
+      <h4>02 — ORANGE IS EARNED</h4>
+      <p>Never spray orange across an entire layout. Use it for the moment that needs to hit hardest: one word in a headline, one stat in a grid, one CTA. White hierarchy does the heavy lifting.</p>
+    </div>
+    <div class="rule-card">
+      <h4>03 — DARK FIRST</h4>
+      <p>The primary context is always dark (#050505). Light backgrounds are the exception, never the default. The brand lives in darkness — the orange burns brighter that way.</p>
+    </div>
+    <div class="rule-card">
+      <h4>04 — NEVER SOFT</h4>
+      <p>No pastel variations of brand colors. No rounded-everything. No soft gradients that bleed into motivational poster territory. This brand confronts — it doesn't comfort.</p>
+    </div>
+    <div class="rule-card">
+      <h4>05 — DATA IS REAL</h4>
+      <p>When displaying biometric data, never fabricate numbers. Use demo mode with realistic ranges if API is unavailable, but never invent stats for marketing. Authenticity is the brand's backbone.</p>
+    </div>
+    <div class="rule-card">
+      <h4>06 — THE PROSTHETIC IS VISIBLE</h4>
+      <p>Never hide, crop out, or minimize the prosthetic in photography. It's not a limitation to be managed — it's equipment. Show it like you'd show an athlete's shoes.</p>
+    </div>
+    <div class="rule-card">
+      <h4>07 — NO INSPIRATION PORN</h4>
+      <p>Never frame content as "overcoming disability" in a way that reduces Patrick to a feel-good story. This is about athletic performance and documented achievement.</p>
+    </div>
+    <div class="rule-card">
+      <h4>08 — CINEMATIC STANDARD</h4>
+      <p>Every deliverable should feel like it belongs in a Netflix sports documentary opening sequence. If it looks like a template, it's not done. Push until it stops people.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================
+     FOOTER
+     ================================================ -->
+<footer class="brand-footer">
+  <div class="mark">PATRICK WINGERT — BRAND IDENTITY SYSTEM</div>
+  <div class="note">VERSION 1.0 — PROJECT PULSE — FEBRUARY 2026</div>
+  <div class="note" style="margin-top: 4px;">CONFIDENTIAL — FOR INTERNAL USE ONLY</div>
+</footer>
+
+</body>
+</html>
