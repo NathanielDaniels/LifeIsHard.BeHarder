@@ -80,7 +80,7 @@ Next Race:      April 11, 2026 (AlphaWin Napa Valley Triathlon - California Stat
 - The distinctive serifed "I" in Bebas Neue is a key character of the typography - preserve this
 
 ### Visual Effects (Current Implementation)
-- **ECG heartbeat line** - SVG animation behind hero, speed synced to actual heart rate
+- **Heartbeat visualization** - SVG animation behind hero, speed synced to actual heart rate
 - **Glitch typography** - chromatic aberration (cyan/magenta ghosts) on "BE HARDER."
 - **Film grain / noise overlay** - subtle texture across entire page
 - **Scanlines** - CRT monitor effect
@@ -91,6 +91,8 @@ Next Race:      April 11, 2026 (AlphaWin Napa Valley Triathlon - California Stat
 - **Vignette** - edge darkening
 - **Floating background text** - huge ghosted text scrolling in background
 - **Animated counters** - numbers count up with eased animation
+- **Interactive 3D globe** - cobe WebGL globe with race markers and route arcs
+- **Interactive 2D race map** - fly-to zoom, state highlighting, keyboard nav, Nationals treatment
 
 ---
 
@@ -103,6 +105,12 @@ Next Race:      April 11, 2026 (AlphaWin Napa Valley Triathlon - California Stat
 - **Lenis** - smooth scrolling (via SmoothScroll component)
 - **Tailwind CSS 3.4** - styling
 - **TypeScript** - strict mode
+- **Cobe** - 3D WebGL globe (dynamically imported)
+- **react-simple-maps** - 2D SVG race map (dynamically imported)
+- **React Three Fiber / Drei** - 3D prosthetic scene (dynamically imported)
+- **Resend** - transactional email
+- **Supabase** - WHOOP token persistence
+- **Lucide React** - icons (optimized via optimizePackageImports)
 
 ### Project Structure
 ```
@@ -110,48 +118,112 @@ patrick-wingert-site/
 ├── app/
 │   ├── page.tsx                    # Currently renders ComingSoonClient
 │   ├── coming-soon-client.tsx      # ACTIVE - the deployed coming soon page
-│   ├── page_full-site.tsx          # IN DEVELOPMENT - the full multi-section site
+│   ├── page.full-site.tsx          # IN DEVELOPMENT - the full multi-section site
 │   ├── layout.tsx                  # Root layout (Inter + Bebas Neue fonts, Providers)
 │   ├── globals.css                 # Global styles, animations, utilities
+│   ├── schedule/page.tsx           # /schedule route
+│   ├── sponsors/page.tsx           # /sponsors route
+│   ├── team/page.tsx               # /team route
+│   ├── admin/                      # Admin dashboard (WHOOP management)
+│   │   ├── page.tsx
+│   │   ├── admin-client.tsx
+│   │   └── whoop/page.tsx
 │   └── api/
-│       ├── subscribe/              # Email capture endpoint
+│       ├── subscribe/route.ts      # Email capture
+│       ├── contact/route.ts        # Contact form
+│       ├── admin/                   # Admin auth + WHOOP reconnect
+│       │   ├── login/route.ts
+│       │   ├── logout/route.ts
+│       │   ├── reconnect/route.ts
+│       │   └── status/route.ts
+│       ├── cron/health-check/route.ts  # WHOOP token health check
 │       └── whoop/                  # WHOOP OAuth + data endpoints
 │           ├── auth/route.ts
 │           ├── callback/route.ts
 │           ├── stats/route.ts
 │           ├── webhook/route.ts
-│           └── disconnect/route.ts
+│           ├── disconnect/route.ts
+│           └── debug/route.ts
 ├── components/
 │   ├── Providers.tsx               # Context wrappers
 │   ├── SmoothScroll.tsx            # Lenis smooth scroll
-│   ├── SoundController.tsx         # Audio management
-│   └── sections/                   # Full site sections
-│       ├── HeroSection.tsx
-│       ├── TheShift.tsx
-│       ├── ProstheticReveal.tsx
-│       ├── ByTheNumbers.tsx
-│       ├── BhutanJourney.tsx
-│       ├── LiveStats.tsx
-│       ├── TheMission.tsx
-│       ├── SupportCTA.tsx
-│       └── InstagramFeed.tsx
+│   ├── SiteControls.tsx            # Site-wide controls
+│   ├── WhoopStats.tsx              # WHOOP stats display
+│   ├── persistent/                 # Always-visible overlay elements
+│   │   ├── AtmosphericOverlays.tsx # Background text, vignette, particles
+│   │   ├── JourneyLine.tsx         # Orange journey progress line
+│   │   └── PersistentECG.tsx       # Heartbeat line overlay
+│   ├── sections/                   # Full site sections
+│   │   ├── HeroSection.tsx
+│   │   ├── ColdOpen.tsx
+│   │   ├── TheFall.tsx
+│   │   ├── TheRebuild.tsx
+│   │   ├── TheShift.tsx
+│   │   ├── TheMachine.tsx
+│   │   ├── TheProof.tsx
+│   │   ├── TheAsk.tsx
+│   │   ├── ProstheticReveal.tsx
+│   │   ├── ByTheNumbers.tsx
+│   │   ├── BhutanJourney.tsx
+│   │   ├── LiveStats.tsx
+│   │   ├── TheMission.tsx
+│   │   ├── SupportCTA.tsx
+│   │   ├── SponsorsShowcase.tsx
+│   │   ├── TeamShowcase.tsx
+│   │   ├── SchedulePage.tsx
+│   │   ├── SiteFooter.tsx
+│   │   └── InstagramFeed.tsx
+│   └── shared/                     # Reusable UI components
+│       ├── AnimatedCounter.tsx
+│       ├── BiometricCard.tsx
+│       ├── CobeGlobe.tsx           # 3D interactive globe (cobe)
+│       ├── CustomCursor.tsx        # Crosshair cursor with follow
+│       ├── EmailCapture.tsx
+│       ├── FloatingParticles.tsx
+│       ├── FullRaceMap.tsx         # 2D interactive race map (react-simple-maps)
+│       ├── GlitchText.tsx          # Chromatic aberration text
+│       ├── MiniRouteMap.tsx        # Small route preview in calendar
+│       ├── PixelRunner.tsx         # Pixel art runner sprite
+│       ├── ProstheticScene.tsx     # 3D prosthetic (React Three Fiber)
+│       ├── RaceCalendar.tsx        # Race schedule with countdown
+│       ├── RaceGlobe.tsx           # Globe + map overlay wrapper
+│       ├── RaceRouteMap.tsx        # Individual race route map
+│       └── SocialLinks.tsx
 ├── contexts/
 │   ├── VitalityContext.tsx          # Theme + energy state management
 │   └── WhoopContext.tsx             # WHOOP data + connection state
 ├── lib/
+│   ├── race-data.ts                # Race definitions, coordinates, helpers
+│   ├── geo-utils.ts                # Haversine distance, formatting
 │   ├── whoop-client.ts             # WHOOP API client
-│   ├── whoop-storage.ts            # Token persistence
-│   └── whoop-cache.ts              # Response caching
+│   ├── whoop-token-storage.ts      # Token persistence (Supabase)
+│   ├── whoop-cache.ts              # Response caching
+│   ├── whoop.ts                    # WHOOP utilities
+│   ├── supabase.ts                 # Supabase client
+│   ├── admin-auth.ts               # Admin HMAC auth
+│   ├── api-connections.ts          # API connection helpers
+│   ├── instagram.ts                # Instagram API client
+│   ├── rate-limit.ts               # Rate limiting
+│   └── services/
+│       ├── index.ts
+│       └── whoop-service.ts        # WHOOP service layer
+├── emails/                          # React Email templates
+│   ├── welcome-email.tsx
+│   ├── site-launch-email.tsx
+│   ├── season-update-email.tsx
+│   └── send-test-hybrid.ts
 ├── types/
-│   └── whoop.ts                    # WHOOP TypeScript types
+│   ├── whoop.ts                    # WHOOP TypeScript types
+│   └── api-tokens.ts              # Token types
 ├── tailwind.config.js
+├── next.config.mjs
 ├── tsconfig.json
 └── package.json
 ```
 
 ### Two-Version System
 - **`coming-soon-client.tsx`** - Currently deployed and live. This is the page visitors see.
-- **`page_full-site.tsx`** - The full multi-section storytelling site, in active development. Once complete, it replaces the coming soon page.
+- **`page.full-site.tsx`** - The full multi-section storytelling site, in active development. Once complete, it replaces the coming soon page.
 
 When editing, be clear about which version you're modifying.
 
@@ -191,7 +263,7 @@ WHOOP doesn't provide real-time HR streaming via API. Instead:
 - After a workout completes (via webhook), show the **workout average HR**
 - Over ~2 hours, the displayed HR **decays back to resting HR**
 - This creates an "echo of training" effect - visitors see the aftermath of real effort
-- The heartbeat ECG animation speed syncs to the current displayed HR
+- The heartbeat animation speed syncs to the current displayed HR
 
 ### Rate Limits
 - 100 requests/minute, 10,000 requests/day
@@ -236,7 +308,7 @@ Smooth animation eases between milestones. If API hangs, forced completion at 8 
 
 ## Coming Soon Page - Sections
 
-1. **Hero** - "LIFE IS HARD. BE HARDER." with ECG line, parallax, glitch text, live HR display
+1. **Hero** - "LIFE IS HARD. BE HARDER." with heartbeat line, parallax, glitch text, live HR display
 2. **The Story / Stats** - "THEY SAID IT WAS IMPOSSIBLE. THEY WERE WRONG." + three animated counters (Days Since Accident, Days Sober, Days Until Next Race)
 3. **Live Biometrics** - Full WHOOP data dashboard (recovery, strain, HR, HRV, SpO2, temp, calories, last workout)
 4. **Email Capture** - "DON'T MISS THE MOMENT." + email subscription form with glow effects
@@ -246,17 +318,30 @@ Smooth animation eases between milestones. If API hangs, forced completion at 8 
 
 ## Full Site - Sections (In Development)
 
-The full site (`page_full-site.tsx`) uses scroll-driven storytelling with an orange journey line tracking progress:
+The full site (`page.full-site.tsx`) uses scroll-driven storytelling with an orange journey line tracking progress:
 
-1. **HeroSection** - Main entrance
-2. **TheShift** - The turning point in Patrick's life
-3. **ProstheticReveal** - The prosthetic as identity, not limitation
-4. **LiveStats** - WHOOP biometric dashboard
-5. **ByTheNumbers** - Key stats and achievements
-6. **BhutanJourney** - The Trans Bhutan Trail story
-7. **TheMission** - Dare2Tri and advocacy work
-8. **InstagramFeed** - Dynamic social content
-9. **SupportCTA** - Sponsorship and donation (Dare2Tri general fund + direct athlete sponsorship)
+1. **ColdOpen** - Cinematic opening
+2. **HeroSection** - Main entrance
+3. **TheFall** - The accident and what was lost
+4. **TheRebuild** - Recovery and prosthetic (3D scene)
+5. **TheShift** - The turning point
+6. **TheMachine** - Training and biometric data
+7. **TheProof** - Results and achievements
+8. **ByTheNumbers** - Key stats and animated counters
+9. **BhutanJourney** - The Trans Bhutan Trail story
+10. **LiveStats** - WHOOP biometric dashboard
+11. **TheMission** - Dare2Tri and advocacy work
+12. **TheAsk** - Sponsorship pitch
+13. **SponsorsShowcase** - Current supporters
+14. **TeamShowcase** - Team behind Patrick
+15. **SupportCTA** - Donation and sponsorship
+16. **InstagramFeed** - Dynamic social content
+17. **SiteFooter** - Footer with links
+
+### Additional Pages
+- **/schedule** - Full race calendar (SchedulePage component)
+- **/sponsors** - Sponsors page
+- **/team** - Team page
 
 ---
 
