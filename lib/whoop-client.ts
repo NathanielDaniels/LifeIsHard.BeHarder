@@ -232,6 +232,109 @@ export async function getLatestWorkout(accessToken: string): Promise<WhoopWorkou
 }
 
 // ============================================
+// Historical Data Fetching (paginated)
+// ============================================
+
+interface PaginatedResponse<T> {
+  records: T[];
+  next_token?: string;
+}
+
+/**
+ * Fetches all recovery records within a date range.
+ * Paginates automatically (WHOOP API max 25 per page).
+ */
+export async function getRecoveryHistory(
+  accessToken: string,
+  startDate: string,
+  endDate: string,
+): Promise<WhoopRecovery[]> {
+  const all: WhoopRecovery[] = [];
+  let nextToken: string | undefined;
+
+  do {
+    const params = new URLSearchParams({
+      limit: '25',
+      start: startDate,
+      end: endDate,
+    });
+    if (nextToken) params.set('nextToken', nextToken);
+
+    const response = await whoopFetch<PaginatedResponse<WhoopRecovery>>(
+      `/v2/recovery?${params}`,
+      accessToken,
+    );
+
+    all.push(...response.records);
+    nextToken = response.next_token;
+  } while (nextToken);
+
+  return all;
+}
+
+/**
+ * Fetches all cycle records within a date range.
+ */
+export async function getCycleHistory(
+  accessToken: string,
+  startDate: string,
+  endDate: string,
+): Promise<WhoopCycle[]> {
+  const all: WhoopCycle[] = [];
+  let nextToken: string | undefined;
+
+  do {
+    const params = new URLSearchParams({
+      limit: '25',
+      start: startDate,
+      end: endDate,
+    });
+    if (nextToken) params.set('nextToken', nextToken);
+
+    const response = await whoopFetch<PaginatedResponse<WhoopCycle>>(
+      `/v2/cycle?${params}`,
+      accessToken,
+    );
+
+    all.push(...response.records);
+    nextToken = response.next_token;
+  } while (nextToken);
+
+  return all;
+}
+
+/**
+ * Fetches all workout records within a date range.
+ */
+export async function getWorkoutHistory(
+  accessToken: string,
+  startDate: string,
+  endDate: string,
+): Promise<WhoopWorkout[]> {
+  const all: WhoopWorkout[] = [];
+  let nextToken: string | undefined;
+
+  do {
+    const params = new URLSearchParams({
+      limit: '25',
+      start: startDate,
+      end: endDate,
+    });
+    if (nextToken) params.set('nextToken', nextToken);
+
+    const response = await whoopFetch<PaginatedResponse<WhoopWorkout>>(
+      `/v2/activity/workout?${params}`,
+      accessToken,
+    );
+
+    all.push(...response.records);
+    nextToken = response.next_token;
+  } while (nextToken);
+
+  return all;
+}
+
+// ============================================
 // Aggregated Stats
 // ============================================
 
