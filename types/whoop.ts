@@ -197,6 +197,44 @@ export interface WhoopStats {
 }
 
 // ============================================
+// Historical Data (90-day storage)
+// ============================================
+
+export interface DailySnapshot {
+  id?: number;
+  date: string;                    // YYYY-MM-DD
+  recovery_score: number | null;
+  resting_heart_rate: number | null;
+  hrv: number | null;              // ms (RMSSD)
+  spo2: number | null;
+  skin_temp: number | null;        // celsius
+  strain: number | null;           // 0-21
+  calories: number | null;
+  average_heart_rate: number | null;
+  max_heart_rate: number | null;
+  workout_sport: string | null;
+  workout_strain: number | null;
+  workout_duration_minutes: number | null;
+  workout_avg_hr: number | null;
+  workout_max_hr: number | null;
+  workout_calories: number | null;
+  created_at?: string;
+}
+
+// ============================================
+// AI Daily Briefing
+// ============================================
+
+export interface DailyBriefing {
+  id?: number;
+  date: string;                    // YYYY-MM-DD
+  briefing_markdown: string;       // AI-generated analysis
+  model_used: string;              // e.g. "claude-haiku-4-5-20251001"
+  snapshot_count: number;          // how many days of data were used
+  generated_at: string;
+}
+
+// ============================================
 // Demo/Fallback Data
 // ============================================
 
