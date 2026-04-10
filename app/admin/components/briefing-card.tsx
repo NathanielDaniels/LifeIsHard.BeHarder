@@ -41,18 +41,29 @@ export default function BriefingCard() {
     setBackfillLoading(true);
     setBackfillResult(null);
     try {
+      // Step 1: Import historical snapshots
       const res = await fetch('/api/admin/backfill', { method: 'POST' });
       if (!res.ok) {
         setBackfillResult(`Error: Server returned ${res.status}`);
         return;
       }
       const data = await res.json();
-      if (data.success) {
-        setBackfillResult(`Imported ${data.inserted} days of data`);
-        await fetchBriefing();
-      } else {
+      if (!data.success) {
         setBackfillResult(`Error: ${data.error}`);
+        return;
       }
+
+      setBackfillResult(`Imported ${data.inserted} days. Generating AI briefing...`);
+
+      // Step 2: Trigger briefing generation via cron endpoint
+      const cronRes = await fetch('/api/cron/daily-briefing');
+      if (!cronRes.ok) {
+        setBackfillResult(`Data imported, but briefing generation failed (${cronRes.status})`);
+        return;
+      }
+
+      setBackfillResult(null);
+      await fetchBriefing();
     } catch (err) {
       console.error('Backfill failed:', err);
       setBackfillResult('Network error');
