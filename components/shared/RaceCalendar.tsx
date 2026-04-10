@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { RACES_2026, Race, getNextRace, getDaysUntil } from '@/lib/race-data';
+import { RACES_2026, Race, getNextRace, getDaysUntil, parseLocalDate } from '@/lib/race-data';
 import MiniRouteMap from '@/components/shared/MiniRouteMap';
 
 interface RaceCalendarProps {
@@ -14,8 +14,8 @@ export default function RaceCalendar({ themeColor }: RaceCalendarProps) {
   const triathlonRaces = RACES_2026.filter(r => r.type === 'triathlon');
   const runningRaces = RACES_2026.filter(r => r.type === 'running');
   const nationals = RACES_2026.find(r => r.isTarget);
-  const daysUntilNationals = nationals ? getDaysUntil(new Date(nationals.date)) : 0;
-  const daysUntilNext = nextRace ? getDaysUntil(new Date(nextRace.date)) : 0;
+  const daysUntilNationals = nationals ? getDaysUntil(parseLocalDate(nationals.date)) : 0;
+  const daysUntilNext = nextRace ? getDaysUntil(parseLocalDate(nextRace.date)) : 0;
   const [showNationals, setShowNationals] = useState(true);
 
   return (
@@ -137,7 +137,7 @@ interface RaceCardProps {
 
 function RaceCard({ race, isNext, themeColor }: RaceCardProps) {
   const [expanded, setExpanded] = useState(false);
-  const raceDate = new Date(race.date);
+  const raceDate = parseLocalDate(race.date);
   const isPast = raceDate < new Date();
   const daysUntil = getDaysUntil(raceDate);
   const hasDetails = race.distance || race.course || race.description || race.championship || race.website;

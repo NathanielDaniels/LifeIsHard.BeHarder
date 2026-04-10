@@ -11,6 +11,7 @@ import FloatingParticles from '@/components/shared/FloatingParticles';
 import BiometricCard from '@/components/shared/BiometricCard';
 import EmailCapture from '@/components/shared/EmailCapture';
 import SocialLinks from '@/components/shared/SocialLinks';
+import { getDaysUntil, getDaysSince, parseLocalDate } from '@/lib/race-data';
 import dynamic from 'next/dynamic';
 
 const RaceCalendar = dynamic(() => import('@/components/shared/RaceCalendar'), { ssr: false });
@@ -19,10 +20,10 @@ const RaceGlobe = dynamic(() => import('@/components/shared/RaceGlobe'), { ssr: 
 import CustomCursor from '@/components/shared/CustomCursor';
 // import PixelRunner from '@/components/shared/PixelRunner';
 
-const ACCIDENT_DATE = new Date('2020-11-01');
-const SOBRIETY_DATE = new Date('2020-01-20');
-const NEXT_RACE_DATE = new Date('2026-04-11');
-const NATIONALS_DATE = new Date('2026-08-09');
+const ACCIDENT_DATE = parseLocalDate('2020-11-01');
+const SOBRIETY_DATE = parseLocalDate('2020-01-20');
+const NEXT_RACE_DATE = parseLocalDate('2026-04-11');
+const NATIONALS_DATE = parseLocalDate('2026-08-09');
 
 export default function ComingSoonClient() {
   const { energyState, theme } = useVitality();
@@ -136,11 +137,10 @@ export default function ComingSoonClient() {
   const themeColor = theme.primaryColor;
 
   useEffect(() => {
-    const today = new Date();
-    setDaysSinceAccident(Math.floor((today.getTime() - ACCIDENT_DATE.getTime()) / (1000 * 60 * 60 * 24)));
-    setDaysSober(Math.floor((today.getTime() - SOBRIETY_DATE.getTime()) / (1000 * 60 * 60 * 24)));
-    setDaysUntilRace(Math.max(0, Math.floor((NEXT_RACE_DATE.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))));
-    setDaysUntilNationals(Math.max(0, Math.floor((NATIONALS_DATE.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))));
+    setDaysSinceAccident(getDaysSince(ACCIDENT_DATE));
+    setDaysSober(getDaysSince(SOBRIETY_DATE));
+    setDaysUntilRace(getDaysUntil(NEXT_RACE_DATE));
+    setDaysUntilNationals(getDaysUntil(NATIONALS_DATE));
   }, []);
 
 

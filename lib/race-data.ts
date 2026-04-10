@@ -160,14 +160,35 @@ export const KEY_DATES = {
 } as const;
 
 export function getNextRace(): Race | undefined {
-  const today = new Date();
-  return RACES_2026.find((r) => new Date(r.date) > today);
+  const today = todayLocal();
+  return RACES_2026.find((r) => parseLocalDate(r.date) >= today);
+}
+
+// Parse 'YYYY-MM-DD' as local midnight, not UTC midnight.
+// new Date('2026-04-11') = UTC midnight = April 10 5pm PST (wrong).
+// parseLocalDate('2026-04-11') = local midnight April 11 (correct).
+export function parseLocalDate(dateStr: string): Date {
+  const [y, m, d] = dateStr.split('-').map(Number);
+  return new Date(y, m - 1, d);
+}
+
+function todayLocal(): Date {
+  const now = new Date();
+  return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+}
+
+function toLocalMidnight(date: Date): Date {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
 }
 
 export function getDaysUntil(date: Date): number {
-  return Math.max(0, Math.floor((date.getTime() - Date.now()) / (1000 * 60 * 60 * 24)));
+  const target = toLocalMidnight(date);
+  const now = todayLocal();
+  return Math.max(0, Math.round((target.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)));
 }
 
 export function getDaysSince(date: Date): number {
-  return Math.floor((Date.now() - date.getTime()) / (1000 * 60 * 60 * 24));
+  const target = toLocalMidnight(date);
+  const now = todayLocal();
+  return Math.round((now.getTime() - target.getTime()) / (1000 * 60 * 60 * 24));
 }
