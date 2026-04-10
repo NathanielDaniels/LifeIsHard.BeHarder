@@ -10,7 +10,7 @@ import {
   Line,
   ZoomableGroup,
 } from 'react-simple-maps';
-import { RACES_2026, SF_HOME, getNextRace, getDaysUntil } from '@/lib/race-data';
+import { RACES_2026, SF_HOME, getNextRace, getDaysUntil, parseLocalDate } from '@/lib/race-data';
 import { haversineDistance, formatMiles } from '@/lib/geo-utils';
 import { Waves, Bike } from 'lucide-react';
 
@@ -39,7 +39,7 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
   const [hoveredRace, setHoveredRace] = useState<string | null>(null);
   const [selectedRace, setSelectedRace] = useState<string | null>(null);
   const [mobileIndex, setMobileIndex] = useState(-1); // -1 = overview, 0+ = race index
-  const activeRace = hoveredRace || selectedRace || (mobileIndex >= 0 ? RACES_2026[mobileIndex]?.cityCode : null);
+  const activeRace = selectedRace || hoveredRace || (mobileIndex >= 0 ? RACES_2026[mobileIndex]?.cityCode : null);
   const cardRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   const selectedData = useMemo(() => {
@@ -191,14 +191,14 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
           )}
           {selectedData && (() => {
             const { race, distance } = selectedData;
-            const isPast = new Date(race.date) < new Date();
-            const daysUntil = getDaysUntil(new Date(race.date));
+            const isPast = parseLocalDate(race.date) < new Date();
+            const daysUntil = getDaysUntil(parseLocalDate(race.date));
             const raceDate = new Intl.DateTimeFormat('en-US', {
               month: 'long',
               day: 'numeric',
               year: 'numeric',
               timeZone: 'UTC',
-            }).format(new Date(race.date));
+            }).format(parseLocalDate(race.date));
             return (
               <div className="hidden md:block mt-2 space-y-1">
                 {/* Line 1: Name + countdown */}
@@ -314,7 +314,7 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
               {/* "LET'S GO!" inside Wisconsin for Nationals */}
               {(() => {
                 const target = RACES_2026.find((r) => r.isTarget);
-                if (!target || new Date(target.date) < new Date()) return null;
+                if (!target || parseLocalDate(target.date) < new Date()) return null;
                 const isNationalsActive = activeRace === target.cityCode;
                 // Approximate center of Wisconsin
                 const wiCenter: [number, number] = [-89.8, 44.6];
@@ -364,7 +364,7 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
               {/* "Road to Nationals" label along target route line — angled to match */}
               {(() => {
                 const target = RACES_2026.find((r) => r.isTarget);
-                if (!target || new Date(target.date) < new Date()) return null;
+                if (!target || parseLocalDate(target.date) < new Date()) return null;
                 const showLabel = activeRace === target.cityCode;
                 const mid: [number, number] = [
                   (SF_HOME[0] + target.coords[0]) / 2,
@@ -451,7 +451,7 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
               {/* Race markers */}
               {RACES_2026.map((race) => {
                 const isNext = nextRace?.date === race.date;
-                const isPast = new Date(race.date) < new Date();
+                const isPast = parseLocalDate(race.date) < new Date();
                 const isActive = activeRace === race.cityCode;
                 const isDimmed = activeRace !== null && !isActive;
                 const isTarget = race.isTarget && !isPast;
@@ -576,15 +576,15 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
             onTouchMove={(e) => e.stopPropagation()}
           >
             {RACES_2026.map((race) => {
-              const isPast = new Date(race.date) < new Date();
+              const isPast = parseLocalDate(race.date) < new Date();
               const isNext = nextRace?.date === race.date;
-              const daysUntil = getDaysUntil(new Date(race.date));
+              const daysUntil = getDaysUntil(parseLocalDate(race.date));
               const isActive = activeRace === race.cityCode;
               const raceDate = new Intl.DateTimeFormat('en-US', {
                 month: 'short',
                 day: 'numeric',
                 timeZone: 'UTC',
-              }).format(new Date(race.date));
+              }).format(parseLocalDate(race.date));
 
               return (
                 <div
@@ -760,13 +760,13 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
                 {(() => {
                   const race = RACES_2026[mobileIndex];
                   if (!race) return null;
-                  const isPast = new Date(race.date) < new Date();
-                  const daysUntil = getDaysUntil(new Date(race.date));
+                  const isPast = parseLocalDate(race.date) < new Date();
+                  const daysUntil = getDaysUntil(parseLocalDate(race.date));
                   const raceDate = new Intl.DateTimeFormat('en-US', {
                     month: 'short',
                     day: 'numeric',
                     timeZone: 'UTC',
-                  }).format(new Date(race.date));
+                  }).format(parseLocalDate(race.date));
                   return (
                     <>
                       {/* Discipline icons */}
