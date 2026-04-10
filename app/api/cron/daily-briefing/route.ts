@@ -2,19 +2,19 @@
 // GET /api/cron/daily-briefing
 //
 // Runs daily via Vercel cron. Steps:
-// 1. Snapshot today's WHOOP data
-// 2. Load 90 days of snapshots
-// 3. Generate AI briefing
-// 4. Prune snapshots older than 90 days
+// 1. Snapshot today's WHOOP data to Supabase
+// 2. Prune snapshots older than 90 days
+//
+// AI briefing generation + email is handled locally
+// via Claude Code (no Anthropic API cost).
 // ============================================
 
 import { NextResponse } from 'next/server';
 import { getValidAccessToken } from '@/lib/whoop-token-storage';
-import { snapshotToday, getSnapshots, pruneOldSnapshots } from '@/lib/whoop-history';
-import { generateBriefing, saveBriefing } from '@/lib/ai-briefing';
+import { snapshotToday, pruneOldSnapshots } from '@/lib/whoop-history';
 
 export const dynamic = 'force-dynamic';
-export const maxDuration = 30; // seconds
+export const maxDuration = 30;
 
 export async function GET() {
   const startTime = Date.now();
@@ -24,8 +24,8 @@ export async function GET() {
     const accessToken = await getValidAccessToken();
     if (!accessToken) {
       return NextResponse.json(
-        { error: 'WHOOP not connected — skipping briefing' },
-        { status: 200 }, // Don't fail the cron
+        { error: 'WHOOP not connected — skipping snapshot' },
+        { status: 200 },
       );
     }
 
@@ -33,17 +33,7 @@ export async function GET() {
     const snapshot = await snapshotToday(accessToken);
     console.log(`[daily-briefing] Snapshot saved for ${snapshot.date}`);
 
-    // 3. Load 90 days of history
-    const snapshots = await getSnapshots(90);
-    console.log(`[daily-briefing] Loaded ${snapshots.length} days of history`);
-
-    // 4. Generate AI briefing
-    const markdown = await generateBriefing(snapshots);
-    const today = new Date().toISOString().split('T')[0];
-    await saveBriefing(today, markdown, snapshots.length);
-    console.log(`[daily-briefing] Briefing generated and saved`);
-
-    // 5. Prune old data
+    // 3. Prune old data
     const pruned = await pruneOldSnapshots();
     if (pruned > 0) {
       console.log(`[daily-briefing] Pruned ${pruned} old snapshots`);
@@ -52,17 +42,14 @@ export async function GET() {
     const elapsed = Date.now() - startTime;
     return NextResponse.json({
       success: true,
-      date: today,
-      snapshotCount: snapshots.length,
+      date: snapshot.date,
       prunedCount: pruned,
       elapsedMs: elapsed,
     });
   } catch (error) {
     console.error('[daily-briefing] Cron error:', error);
     return NextResponse.json(
-      {
-        error: error instanceof Error ? error.message : 'Unknown error',
-      },
+      { error: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 },
     );
   }

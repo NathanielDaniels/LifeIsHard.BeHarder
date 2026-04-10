@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { rateLimit, getClientIP, rateLimitResponse } from '@/lib/rate-limit';
 import WelcomeEmail from '@/emails/welcome-email';
+import { supabase } from '@/lib/supabase';
 
 // Lazy-init so build doesn't crash when env vars are missing
 let _resend: Resend | null = null;
@@ -96,6 +97,15 @@ export async function POST(request: NextRequest) {
         { error: `Resend Error: ${error.message}` },
         { status: 500 }
       );
+    }
+
+    // Persist to Supabase
+    try {
+      await supabase
+        .from('subscribers')
+        .upsert({ email, source: 'coming-soon' }, { onConflict: 'email' });
+    } catch (dbErr) {
+      console.error('Supabase subscriber insert failed:', dbErr);
     }
 
     // Send welcome email
