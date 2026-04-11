@@ -26,7 +26,7 @@ export const RACES_2026: Race[] = [
     type: 'triathlon',
     distance: 'Sprint',
     course: '750m swim · 20km bike · 5km run',
-    description: 'First race of the season. Setting the tone.',
+    description: 'Season opener in wine country. 55 degrees, overcast skies, and a chance of rain over Lake Berryessa. Rolling backcountry roads above the lake on the bike. Not the easy start. The right start. First race, first statement.',
     championship: 'CA North State Championship',
     website: 'https://alpha.win/event/napa-valley-ca-2/',
     cityCode: 'NPA',
