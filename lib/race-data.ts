@@ -1,3 +1,9 @@
+export interface RaceSplit {
+  leg: string;
+  time: string;
+  pace?: string;
+}
+
 export interface Race {
   date: string;
   name: string;
@@ -6,6 +12,7 @@ export interface Race {
   type: 'triathlon' | 'running';
   isTarget?: boolean;
   result?: string;
+  splits?: RaceSplit[];
   distance?: string;
   course?: string;
   description?: string;
@@ -29,6 +36,14 @@ export const RACES_2026: Race[] = [
     description: 'Season opener in wine country. 55 degrees, overcast skies, and a chance of rain over Lake Berryessa. Rolling backcountry roads above the lake on the bike. Not the easy start. The right start. First race, first statement.',
     championship: 'CA North State Championship',
     website: 'https://alpha.win/event/napa-valley-ca-2/',
+    result: '1st · 1:29:05',
+    splits: [
+      { leg: 'Swim', time: '19:07', pace: '2:32/100m' },
+      { leg: 'T1', time: '3:05' },
+      { leg: 'Bike', time: '41:37', pace: '17.8 mph' },
+      { leg: 'T2', time: '1:59' },
+      { leg: 'Run', time: '23:15', pace: '7:29/mi' },
+    ],
     cityCode: 'NPA',
     stateFips: '06',
   },
@@ -161,7 +176,7 @@ export const KEY_DATES = {
 
 export function getNextRace(): Race | undefined {
   const today = todayLocal();
-  return RACES_2026.find((r) => parseLocalDate(r.date) >= today);
+  return RACES_2026.find((r) => parseLocalDate(r.date) >= today && !r.result);
 }
 
 // Parse 'YYYY-MM-DD' as local midnight, not UTC midnight.
