@@ -34,7 +34,7 @@ const RACE_STATE_FIPS = Array.from(new Set(RACES_2026.map((r) => r.stateFips)));
 const DEFAULT_CENTER: [number, number] = [-96, 38];
 const DEFAULT_ZOOM = 1;
 
-function isRaceToday(dateStr: string): boolean {
+function isRaceSameDay(dateStr: string): boolean {
   const d = parseLocalDate(dateStr);
   const now = new Date();
   return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth() && d.getDate() === now.getDate();
@@ -197,8 +197,9 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
           )}
           {selectedData && (() => {
             const { race, distance } = selectedData;
-            const isToday = isRaceToday(race.date);
-            const isPast = parseLocalDate(race.date) < new Date() && !isToday;
+            const isSameDay = isRaceSameDay(race.date);
+            const isToday = isSameDay && !race.result;
+            const isPast = (parseLocalDate(race.date) < new Date() && !isSameDay) || (isSameDay && !!race.result);
             const daysUntil = getDaysUntil(parseLocalDate(race.date));
             const raceDate = new Intl.DateTimeFormat('en-US', {
               month: 'long',
@@ -463,8 +464,9 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
               {/* Race markers */}
               {RACES_2026.map((race) => {
                 const isNext = nextRace?.date === race.date;
-                const isToday = isRaceToday(race.date);
-                const isPast = parseLocalDate(race.date) < new Date() && !isToday;
+                const isSameDay = isRaceSameDay(race.date);
+                const isToday = isSameDay && !race.result;
+                const isPast = (parseLocalDate(race.date) < new Date() && !isSameDay) || (isSameDay && !!race.result);
                 const isActive = activeRace === race.cityCode;
                 const isDimmed = activeRace !== null && !isActive;
                 const isTarget = race.isTarget && !isPast;
@@ -604,8 +606,9 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
             onTouchMove={(e) => e.stopPropagation()}
           >
             {RACES_2026.map((race) => {
-              const isToday = isRaceToday(race.date);
-              const isPast = parseLocalDate(race.date) < new Date() && !isToday;
+              const isSameDay = isRaceSameDay(race.date);
+              const isToday = isSameDay && !race.result;
+              const isPast = (parseLocalDate(race.date) < new Date() && !isSameDay) || (isSameDay && !!race.result);
               const isNext = nextRace?.date === race.date;
               const daysUntil = getDaysUntil(parseLocalDate(race.date));
               const isActive = activeRace === race.cityCode;
@@ -710,6 +713,20 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
                           <RunShoe className="w-4 h-4" />
                         )}
                       </div>
+                      {/* Splits — shown when race is selected */}
+                      {race.splits && selectedRace === race.cityCode && (
+                        <div className="mt-2 pt-2 border-t border-white/10 space-y-1">
+                          {race.splits.map((split) => (
+                            <div key={split.leg} className="flex items-center gap-2">
+                              <span className="font-mono text-[9px] tracking-[0.15em] text-white/30 w-8 shrink-0">{split.leg}</span>
+                              <span className="font-mono text-[11px] font-medium" style={{ color: themeColor }}>{split.time}</span>
+                              {split.pace && (
+                                <span className="font-mono text-[10px] text-white/30">{split.pace}</span>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                     {/* Right — countdown pinned */}
                     <div className="flex flex-col items-end shrink-0 pt-0.5">
@@ -804,8 +821,9 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
                 {(() => {
                   const race = RACES_2026[mobileIndex];
                   if (!race) return null;
-                  const isToday = isRaceToday(race.date);
-                  const isPast = parseLocalDate(race.date) < new Date() && !isToday;
+                  const isSameDay = isRaceSameDay(race.date);
+                  const isToday = isSameDay && !race.result;
+                  const isPast = (parseLocalDate(race.date) < new Date() && !isSameDay) || (isSameDay && !!race.result);
                   const daysUntil = getDaysUntil(parseLocalDate(race.date));
                   const raceDate = new Intl.DateTimeFormat('en-US', {
                     month: 'short',

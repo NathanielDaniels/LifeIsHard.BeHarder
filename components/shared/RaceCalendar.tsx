@@ -141,10 +141,11 @@ function RaceCard({ race, isNext, themeColor }: RaceCardProps) {
   const [expanded, setExpanded] = useState(false);
   const raceDate = parseLocalDate(race.date);
   const now = new Date();
-  const isToday = raceDate.getFullYear() === now.getFullYear() && raceDate.getMonth() === now.getMonth() && raceDate.getDate() === now.getDate();
-  const isPast = raceDate < now && !isToday;
+  const isSameDay = raceDate.getFullYear() === now.getFullYear() && raceDate.getMonth() === now.getMonth() && raceDate.getDate() === now.getDate();
+  const isToday = isSameDay && !race.result;
+  const isPast = (raceDate < now && !isSameDay) || (isSameDay && !!race.result);
   const daysUntil = getDaysUntil(raceDate);
-  const hasDetails = race.distance || race.course || race.description || race.championship || race.website;
+  const hasDetails = race.distance || race.course || race.description || race.championship || race.website || race.splits;
 
   const formattedDate = new Intl.DateTimeFormat('en-US', {
     month: 'short',
@@ -188,6 +189,26 @@ function RaceCard({ race, isNext, themeColor }: RaceCardProps) {
                   <p className="font-mono text-sm text-white/50 italic pt-2">
                     &ldquo;{race.description}&rdquo;
                   </p>
+                )}
+                {race.splits && (
+                  <div className="pt-3 space-y-1.5">
+                    <div className="font-mono text-[10px] tracking-[0.2em] text-white/30 uppercase mb-2">Splits</div>
+                    {race.splits.map((split) => (
+                      <div key={split.leg} className="flex items-center gap-3">
+                        <span className="font-mono text-[10px] tracking-[0.2em] text-white/30 uppercase w-12 shrink-0">{split.leg}</span>
+                        <span className="font-mono text-sm font-medium" style={{ color: themeColor }}>{split.time}</span>
+                        {split.pace && (
+                          <span className="font-mono text-xs text-white/40">{split.pace}</span>
+                        )}
+                      </div>
+                    ))}
+                    {race.result && (
+                      <div className="flex items-center gap-3 pt-1.5 mt-1.5 border-t border-white/10">
+                        <span className="font-mono text-[10px] tracking-[0.2em] text-white/30 uppercase w-12 shrink-0">Total</span>
+                        <span className="font-mono text-sm font-bold" style={{ color: themeColor }}>{race.result}</span>
+                      </div>
+                    )}
+                  </div>
                 )}
                 {race.website && (
                   <a

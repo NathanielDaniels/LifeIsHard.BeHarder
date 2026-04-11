@@ -11,7 +11,7 @@ import FloatingParticles from '@/components/shared/FloatingParticles';
 import BiometricCard from '@/components/shared/BiometricCard';
 import EmailCapture from '@/components/shared/EmailCapture';
 import SocialLinks from '@/components/shared/SocialLinks';
-import { getDaysUntil, getDaysSince, parseLocalDate } from '@/lib/race-data';
+import { getDaysUntil, getDaysSince, parseLocalDate, getNextRace } from '@/lib/race-data';
 import dynamic from 'next/dynamic';
 
 const RaceCalendar = dynamic(() => import('@/components/shared/RaceCalendar'), { ssr: false });
@@ -22,7 +22,6 @@ import CustomCursor from '@/components/shared/CustomCursor';
 
 const ACCIDENT_DATE = parseLocalDate('2020-11-01');
 const SOBRIETY_DATE = parseLocalDate('2020-01-20');
-const NEXT_RACE_DATE = parseLocalDate('2026-04-11');
 const NATIONALS_DATE = parseLocalDate('2026-08-09');
 
 export default function ComingSoonClient() {
@@ -139,7 +138,8 @@ export default function ComingSoonClient() {
   useEffect(() => {
     setDaysSinceAccident(getDaysSince(ACCIDENT_DATE));
     setDaysSober(getDaysSince(SOBRIETY_DATE));
-    setDaysUntilRace(getDaysUntil(NEXT_RACE_DATE));
+    const next = getNextRace();
+    setDaysUntilRace(next ? getDaysUntil(parseLocalDate(next.date)) : 0);
     setDaysUntilNationals(getDaysUntil(NATIONALS_DATE));
   }, []);
 
@@ -632,7 +632,7 @@ export default function ComingSoonClient() {
           whileInView={{ opacity: 1 }}
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 1 }}
-          className="max-w-6xl text-center"
+          className="max-w-4xl text-center"
         >
           <motion.div
             initial={{ opacity: 0, y: 50 }}
@@ -688,7 +688,7 @@ export default function ComingSoonClient() {
             </div>
           </motion.div>
 
-          <div className={`grid grid-cols-1 gap-8 ${daysUntilRace === 0 ? 'lg:grid-cols-3 lg:gap-12' : 'md:grid-cols-3 md:gap-12'}`}>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
             {[
               { value: daysSinceAccident, label: 'DAYS SINCE ACCIDENT' },
               { value: daysSober, label: 'DAYS SOBER' },
@@ -739,14 +739,10 @@ export default function ComingSoonClient() {
                       className="font-display text-[clamp(3.5rem,10vw,7rem)] font-bold leading-none"
                       style={{ color: themeColor }}
                     >
-                      {!showNationals && daysUntilRace === 0
-                        ? <span className="whitespace-nowrap">RACE DAY</span>
-                        : <AnimatedCounter value={showNationals ? daysUntilNationals : daysUntilRace} duration={2600} />}
+                      <AnimatedCounter value={showNationals ? daysUntilNationals : daysUntilRace} duration={2600} />
                     </div>
                     <div className="font-mono text-[0.7rem] md:text-[0.8rem] tracking-[0.3em] text-white/70 mt-2 font-medium">
-                      {!showNationals && daysUntilRace === 0
-                        ? 'NAPA VALLEY TRIATHLON'
-                        : showNationals ? 'DAYS UNTIL NATIONALS' : 'DAYS UNTIL NEXT RACE'}
+                      {showNationals ? 'DAYS UNTIL NATIONALS' : 'DAYS UNTIL NEXT RACE'}
                     </div>
                   </motion.div>
                 </AnimatePresence>
