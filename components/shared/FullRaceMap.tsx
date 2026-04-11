@@ -34,6 +34,12 @@ const RACE_STATE_FIPS = Array.from(new Set(RACES_2026.map((r) => r.stateFips)));
 const DEFAULT_CENTER: [number, number] = [-96, 38];
 const DEFAULT_ZOOM = 1;
 
+function isRaceToday(dateStr: string): boolean {
+  const d = parseLocalDate(dateStr);
+  const now = new Date();
+  return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth() && d.getDate() === now.getDate();
+}
+
 function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
   const nextRace = getNextRace();
   const [hoveredRace, setHoveredRace] = useState<string | null>(null);
@@ -191,7 +197,8 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
           )}
           {selectedData && (() => {
             const { race, distance } = selectedData;
-            const isPast = parseLocalDate(race.date) < new Date();
+            const isToday = isRaceToday(race.date);
+            const isPast = parseLocalDate(race.date) < new Date() && !isToday;
             const daysUntil = getDaysUntil(parseLocalDate(race.date));
             const raceDate = new Intl.DateTimeFormat('en-US', {
               month: 'long',
@@ -206,7 +213,12 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
                   <span className="font-display text-xl md:text-2xl tracking-wide text-white">
                     {race.name}
                   </span>
-                  {!isPast && (
+                  {isToday && (
+                    <span className="font-mono text-xs tracking-[0.15em] font-bold shrink-0 animate-pulse" style={{ color: themeColor }}>
+                      RACE DAY
+                    </span>
+                  )}
+                  {!isPast && !isToday && (
                     <span className="font-mono text-xs tracking-[0.15em] font-medium shrink-0" style={{ color: themeColor }}>
                       {daysUntil} DAYS
                     </span>
@@ -451,11 +463,12 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
               {/* Race markers */}
               {RACES_2026.map((race) => {
                 const isNext = nextRace?.date === race.date;
-                const isPast = parseLocalDate(race.date) < new Date();
+                const isToday = isRaceToday(race.date);
+                const isPast = parseLocalDate(race.date) < new Date() && !isToday;
                 const isActive = activeRace === race.cityCode;
                 const isDimmed = activeRace !== null && !isActive;
                 const isTarget = race.isTarget && !isPast;
-                const dotSize = isTarget ? 5 : isNext ? 4 : isActive ? 4 : 3;
+                const dotSize = isTarget ? 5 : isToday ? 5 : isNext ? 4 : isActive ? 4 : 3;
 
                 return (
                   <Marker
@@ -490,13 +503,28 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
                       </g>
                     )}
 
+                    {/* Race day — double pulse + glow */}
+                    {isToday && !isTarget && (
+                      <g style={{ pointerEvents: 'none' }}>
+                        <circle r={10} fill={themeColor} opacity={isDimmed ? 0.03 : 0.15} style={{ transition: 'opacity 0.3s ease' }} />
+                        <circle r={dotSize * 2} fill="none" stroke={themeColor} strokeWidth={1.2} opacity={0.4}>
+                          <animate attributeName="r" from={dotSize * 1.5} to={dotSize * 4} dur="1.2s" repeatCount="indefinite" />
+                          <animate attributeName="opacity" from="0.7" to="0" dur="1.2s" repeatCount="indefinite" />
+                        </circle>
+                        <circle r={dotSize * 2} fill="none" stroke={themeColor} strokeWidth={0.8} opacity={0.3}>
+                          <animate attributeName="r" from={dotSize * 1.5} to={dotSize * 4} dur="1.2s" begin="0.6s" repeatCount="indefinite" />
+                          <animate attributeName="opacity" from="0.5" to="0" dur="1.2s" begin="0.6s" repeatCount="indefinite" />
+                        </circle>
+                      </g>
+                    )}
+
                     {/* Glow for next race */}
-                    {isNext && !isPast && !isTarget && (
+                    {isNext && !isPast && !isToday && !isTarget && (
                       <circle r={7} fill={themeColor} opacity={isDimmed ? 0.03 : 0.12} style={{ transition: 'opacity 0.3s ease' }} />
                     )}
 
                     {/* Pulse for next race or active selection */}
-                    {(isNext || isActive) && !isPast && !isTarget && (
+                    {(isNext || isActive) && !isPast && !isToday && !isTarget && (
                       <circle r={dotSize * 2.5} fill="none" stroke={themeColor} strokeWidth={isNext ? 1 : 0.5} opacity={0.3}>
                         <animate attributeName="r" from={dotSize * 1.5} to={dotSize * 3.5} dur={isNext ? '1.5s' : '2s'} repeatCount="indefinite" />
                         <animate attributeName="opacity" from="0.6" to="0" dur={isNext ? '1.5s' : '2s'} repeatCount="indefinite" />
@@ -576,7 +604,8 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
             onTouchMove={(e) => e.stopPropagation()}
           >
             {RACES_2026.map((race) => {
-              const isPast = parseLocalDate(race.date) < new Date();
+              const isToday = isRaceToday(race.date);
+              const isPast = parseLocalDate(race.date) < new Date() && !isToday;
               const isNext = nextRace?.date === race.date;
               const daysUntil = getDaysUntil(parseLocalDate(race.date));
               const isActive = activeRace === race.cityCode;
@@ -626,7 +655,15 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
                         <span className="font-mono text-[11px] tracking-[0.15em] text-white/60">
                           {raceDate.toUpperCase()}
                         </span>
-                        {isNext && !isPast && (
+                        {isToday && (
+                          <span
+                            className="font-mono text-[8px] tracking-[0.15em] px-2 py-0.5 rounded-full animate-pulse font-bold"
+                            style={{ backgroundColor: `${themeColor}33`, color: themeColor, border: `1px solid ${themeColor}66` }}
+                          >
+                            RACE DAY
+                          </span>
+                        )}
+                        {isNext && !isPast && !isToday && (
                           <span
                             className="font-mono text-[8px] tracking-[0.15em] px-2 py-0.5 rounded-full animate-pulse"
                             style={{ backgroundColor: `${themeColor}22`, color: themeColor }}
@@ -676,7 +713,14 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
                     </div>
                     {/* Right — countdown pinned */}
                     <div className="flex flex-col items-end shrink-0 pt-0.5">
-                      {!isPast && (
+                      {isToday && (
+                        <div className="text-right">
+                          <div className="font-display text-xl leading-none animate-pulse" style={{ color: themeColor }}>
+                            TODAY
+                          </div>
+                        </div>
+                      )}
+                      {!isPast && !isToday && (
                         <div className="text-right">
                           <div className="font-display text-3xl leading-none" style={{ color: themeColor }}>
                             {daysUntil}
@@ -760,7 +804,8 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
                 {(() => {
                   const race = RACES_2026[mobileIndex];
                   if (!race) return null;
-                  const isPast = parseLocalDate(race.date) < new Date();
+                  const isToday = isRaceToday(race.date);
+                  const isPast = parseLocalDate(race.date) < new Date() && !isToday;
                   const daysUntil = getDaysUntil(parseLocalDate(race.date));
                   const raceDate = new Intl.DateTimeFormat('en-US', {
                     month: 'short',
@@ -796,8 +841,13 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
                           {race.course}
                         </div>
                       )}
-                      {/* Days until */}
-                      {!isPast && (
+                      {/* Days until / Race Day */}
+                      {isToday && (
+                        <div className="font-mono text-[11px] tracking-[0.1em] font-bold mt-1 text-center animate-pulse" style={{ color: themeColor }}>
+                          RACE DAY
+                        </div>
+                      )}
+                      {!isPast && !isToday && (
                         <div className="font-mono text-[11px] tracking-[0.1em] font-medium mt-1 text-center" style={{ color: themeColor }}>
                           {daysUntil} DAYS
                         </div>

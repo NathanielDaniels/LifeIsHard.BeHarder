@@ -51,13 +51,15 @@ export default function RaceCalendar({ themeColor }: RaceCalendarProps) {
               transition={{ duration: 0.25 }}
             >
               <div className="font-mono text-xs tracking-[0.3em] text-white/50 mb-3">
-                {showNationals ? 'DAYS UNTIL NATIONALS' : 'DAYS UNTIL NEXT RACE'}
+                {!showNationals && daysUntilNext === 0
+                  ? 'RIGHT NOW'
+                  : showNationals ? 'DAYS UNTIL NATIONALS' : 'DAYS UNTIL NEXT RACE'}
               </div>
               <div
-                className="font-display text-7xl md:text-8xl lg:text-9xl tracking-wider mb-2"
+                className={`font-display tracking-wider mb-2 ${!showNationals && daysUntilNext === 0 ? 'text-5xl md:text-6xl lg:text-7xl' : 'text-7xl md:text-8xl lg:text-9xl'}`}
                 style={{ color: themeColor }}
               >
-                {showNationals ? daysUntilNationals : daysUntilNext}
+                {!showNationals && daysUntilNext === 0 ? 'RACE DAY!' : showNationals ? daysUntilNationals : daysUntilNext}
               </div>
               <div className="font-mono text-sm tracking-[0.2em] text-white/60">
                 {showNationals
@@ -138,7 +140,9 @@ interface RaceCardProps {
 function RaceCard({ race, isNext, themeColor }: RaceCardProps) {
   const [expanded, setExpanded] = useState(false);
   const raceDate = parseLocalDate(race.date);
-  const isPast = raceDate < new Date();
+  const now = new Date();
+  const isToday = raceDate.getFullYear() === now.getFullYear() && raceDate.getMonth() === now.getMonth() && raceDate.getDate() === now.getDate();
+  const isPast = raceDate < now && !isToday;
   const daysUntil = getDaysUntil(raceDate);
   const hasDetails = race.distance || race.course || race.description || race.championship || race.website;
 
@@ -335,13 +339,23 @@ function RaceCard({ race, isNext, themeColor }: RaceCardProps) {
               {formattedDate.toUpperCase()}
             </div>
 
-            {isNext && !isPast && (
+            {isNext && !isPast && !isToday && (
               <div
                 className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono tracking-[0.15em]"
                 style={{ backgroundColor: `${themeColor}22`, color: themeColor }}
               >
                 <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: themeColor }} />
                 NEXT // {daysUntil} DAYS
+              </div>
+            )}
+
+            {isToday && (
+              <div
+                className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono tracking-[0.15em]"
+                style={{ backgroundColor: `${themeColor}22`, color: themeColor }}
+              >
+                <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: themeColor }} />
+                RACE DAY!
               </div>
             )}
 

@@ -632,7 +632,7 @@ export default function ComingSoonClient() {
           whileInView={{ opacity: 1 }}
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 1 }}
-          className="max-w-4xl text-center"
+          className="max-w-6xl text-center"
         >
           <motion.div
             initial={{ opacity: 0, y: 50 }}
@@ -688,7 +688,7 @@ export default function ComingSoonClient() {
             </div>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
+          <div className={`grid grid-cols-1 gap-8 ${daysUntilRace === 0 ? 'lg:grid-cols-3 lg:gap-12' : 'md:grid-cols-3 md:gap-12'}`}>
             {[
               { value: daysSinceAccident, label: 'DAYS SINCE ACCIDENT' },
               { value: daysSober, label: 'DAYS SOBER' },
@@ -739,10 +739,14 @@ export default function ComingSoonClient() {
                       className="font-display text-[clamp(3.5rem,10vw,7rem)] font-bold leading-none"
                       style={{ color: themeColor }}
                     >
-                      <AnimatedCounter value={showNationals ? daysUntilNationals : daysUntilRace} duration={2600} />
+                      {!showNationals && daysUntilRace === 0
+                        ? <span className="whitespace-nowrap">RACE DAY</span>
+                        : <AnimatedCounter value={showNationals ? daysUntilNationals : daysUntilRace} duration={2600} />}
                     </div>
                     <div className="font-mono text-[0.7rem] md:text-[0.8rem] tracking-[0.3em] text-white/70 mt-2 font-medium">
-                      {showNationals ? 'DAYS UNTIL NATIONALS' : 'DAYS UNTIL NEXT RACE'}
+                      {!showNationals && daysUntilRace === 0
+                        ? 'NAPA VALLEY TRIATHLON'
+                        : showNationals ? 'DAYS UNTIL NATIONALS' : 'DAYS UNTIL NEXT RACE'}
                     </div>
                   </motion.div>
                 </AnimatePresence>
