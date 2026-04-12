@@ -7,7 +7,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyAdminRequest } from '@/lib/admin-auth';
 import { getValidAccessToken } from '@/lib/whoop-token-storage';
-import { backfillHistory } from '@/lib/whoop-history';
+import { backfillHistory, backfillWorkouts } from '@/lib/whoop-history';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60; // backfill needs time
@@ -28,11 +28,17 @@ export async function POST(request: NextRequest) {
     }
 
     const { days = 90 } = await request.json().catch(() => ({}));
-    const result = await backfillHistory(accessToken, Math.min(days, 90));
+    const cappedDays = Math.min(days, 365);
+
+    const [snapshotResult, workoutResult] = await Promise.all([
+      backfillHistory(accessToken, Math.min(cappedDays, 90)),
+      backfillWorkouts(accessToken, cappedDays),
+    ]);
 
     return NextResponse.json({
       success: true,
-      ...result,
+      snapshots: snapshotResult,
+      workouts: workoutResult,
     });
   } catch (error) {
     console.error('[backfill] Error:', error);
