@@ -16,9 +16,10 @@ import {
   getCycleHistory,
   getWorkoutHistory,
 } from './whoop-client';
-import type { DailySnapshot, WhoopRecovery, WhoopCycle, WhoopWorkout } from '@/types/whoop';
+import type { DailySnapshot, WorkoutRecord, WhoopRecovery, WhoopCycle, WhoopWorkout } from '@/types/whoop';
 
 const TABLE = 'whoop_daily_snapshots';
+const WORKOUTS_TABLE = 'whoop_workouts';
 
 // Minimum workout duration to include (matches whoop-client.ts)
 const MIN_WORKOUT_DURATION_MINUTES = 19;
@@ -216,6 +217,111 @@ export async function pruneOldSnapshots(): Promise<number> {
   }
 
   return count ?? 0;
+}
+
+// ============================================
+// Workout Storage — ALL workouts, no filtering
+// ============================================
+
+function buildWorkoutRecord(workout: WhoopWorkout): WorkoutRecord {
+  const duration = workout.start && workout.end
+    ? Math.round((new Date(workout.end).getTime() - new Date(workout.start).getTime()) / 60000)
+    : null;
+
+  const calories = workout.score?.kilojoule
+    ? Math.round(workout.score.kilojoule * 0.239)
+    : null;
+
+  const zones = workout.score?.zone_durations;
+
+  return {
+    whoop_workout_id: workout.id,
+    date: toDateString(workout.start),
+    sport_name: workout.sport_name ?? null,
+    strain: workout.score?.strain ?? null,
+    avg_hr: workout.score?.average_heart_rate ?? null,
+    max_hr: workout.score?.max_heart_rate ?? null,
+    duration_minutes: duration,
+    calories,
+    distance_meters: workout.score?.distance_meter ?? null,
+    zone_zero_ms: zones?.zone_zero_milli ?? null,
+    zone_one_ms: zones?.zone_one_milli ?? null,
+    zone_two_ms: zones?.zone_two_milli ?? null,
+    zone_three_ms: zones?.zone_three_milli ?? null,
+    zone_four_ms: zones?.zone_four_milli ?? null,
+    zone_five_ms: zones?.zone_five_milli ?? null,
+    score_state: workout.score_state ?? null,
+  };
+}
+
+export async function saveAllWorkouts(
+  accessToken: string,
+): Promise<{ saved: number; errors: string[] }> {
+  const today = new Date().toISOString().split('T')[0];
+  const start = `${today}T00:00:00.000Z`;
+  const end = `${today}T23:59:59.999Z`;
+  const errors: string[] = [];
+
+  const workouts = await getWorkoutHistory(accessToken, start, end);
+  if (workouts.length === 0) return { saved: 0, errors };
+
+  const records = workouts.map(buildWorkoutRecord);
+
+  const { error } = await supabase
+    .from(WORKOUTS_TABLE)
+    .upsert(records, { onConflict: 'whoop_workout_id' });
+
+  if (error) {
+    errors.push(`Supabase upsert error: ${error.message}`);
+    return { saved: 0, errors };
+  }
+
+  return { saved: records.length, errors };
+}
+
+export async function backfillWorkouts(
+  accessToken: string,
+  days: number = 90,
+): Promise<{ saved: number; errors: string[] }> {
+  const end = new Date();
+  const start = new Date(end);
+  start.setDate(start.getDate() - days);
+
+  const errors: string[] = [];
+  const workouts = await getWorkoutHistory(accessToken, start.toISOString(), end.toISOString());
+
+  if (workouts.length === 0) return { saved: 0, errors };
+
+  const records = workouts.map(buildWorkoutRecord);
+
+  const { error } = await supabase
+    .from(WORKOUTS_TABLE)
+    .upsert(records, { onConflict: 'whoop_workout_id' });
+
+  if (error) {
+    errors.push(`Supabase upsert error: ${error.message}`);
+    return { saved: 0, errors };
+  }
+
+  return { saved: records.length, errors };
+}
+
+export async function getWorkouts(days: number = 90): Promise<WorkoutRecord[]> {
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - days);
+
+  const { data, error } = await supabase
+    .from(WORKOUTS_TABLE)
+    .select('*')
+    .gte('date', cutoff.toISOString().split('T')[0])
+    .order('date', { ascending: true });
+
+  if (error) {
+    console.error('[whoop-history] getWorkouts error:', error);
+    return [];
+  }
+
+  return (data ?? []) as WorkoutRecord[];
 }
 
 // ============================================

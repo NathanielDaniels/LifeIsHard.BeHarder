@@ -234,6 +234,25 @@ export interface DailyBriefing {
   generated_at: string;
 }
 
+export interface WorkoutRecord {
+  whoop_workout_id: string;        // WHOOP UUID — upsert key
+  date: string;                    // YYYY-MM-DD derived from workout start
+  sport_name: string | null;
+  strain: number | null;
+  avg_hr: number | null;
+  max_hr: number | null;
+  duration_minutes: number | null;
+  calories: number | null;
+  distance_meters: number | null;
+  zone_zero_ms: number | null;
+  zone_one_ms: number | null;
+  zone_two_ms: number | null;
+  zone_three_ms: number | null;
+  zone_four_ms: number | null;
+  zone_five_ms: number | null;
+  score_state: string | null;      // SCORED | PENDING_SCORE | UNSCORABLE
+}
+
 // ============================================
 // Demo/Fallback Data
 // ============================================

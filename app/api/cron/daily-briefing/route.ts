@@ -11,7 +11,7 @@
 
 import { NextResponse } from 'next/server';
 import { getValidAccessToken } from '@/lib/whoop-token-storage';
-import { snapshotToday, pruneOldSnapshots } from '@/lib/whoop-history';
+import { snapshotToday, saveAllWorkouts, pruneOldSnapshots } from '@/lib/whoop-history';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 30;
@@ -29,9 +29,15 @@ export async function GET() {
       );
     }
 
-    // 2. Snapshot today's data
-    const snapshot = await snapshotToday(accessToken);
-    console.log(`[daily-briefing] Snapshot saved for ${snapshot.date}`);
+    // 2. Snapshot today's data + save all workouts in parallel
+    const [snapshot, workoutResult] = await Promise.all([
+      snapshotToday(accessToken),
+      saveAllWorkouts(accessToken).catch((err) => {
+        console.error('[daily-briefing] saveAllWorkouts failed (non-fatal):', err);
+        return { saved: 0, errors: [String(err)] };
+      }),
+    ]);
+    console.log(`[daily-briefing] Snapshot saved for ${snapshot.date}, ${workoutResult.saved} workout(s) stored`);
 
     // 3. Prune old data
     const pruned = await pruneOldSnapshots();
@@ -43,6 +49,7 @@ export async function GET() {
     return NextResponse.json({
       success: true,
       date: snapshot.date,
+      workoutsSaved: workoutResult.saved,
       prunedCount: pruned,
       elapsedMs: elapsed,
     });
