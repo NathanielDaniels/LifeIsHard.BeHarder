@@ -430,6 +430,18 @@ export interface BriefingData {
 export async function generateStructuredBriefing(
   snapshots: DailySnapshot[],
 ): Promise<BriefingData> {
+  if (snapshots.length === 0) {
+    return {
+      date: new Date().toISOString().split('T')[0],
+      recoveryScore: null,
+      recoveryColor: 'yellow',
+      headline: 'No WHOOP data available yet',
+      trainingCall: 'Check back after the first day of data collection.',
+      keyNumbers: [],
+      coachNote: 'No data to analyze. Once WHOOP snapshots start flowing, the daily briefing will kick in.',
+    };
+  }
+
   const today = snapshots[snapshots.length - 1];
   const tier = getDataTier(snapshots.length);
   const dataContext = buildDataContext(snapshots);

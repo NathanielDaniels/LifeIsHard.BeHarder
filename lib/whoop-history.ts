@@ -169,6 +169,7 @@ export async function backfillHistory(
   }
 
   // Batch upsert
+  let inserted = 0;
   if (snapshots.length > 0) {
     const { error } = await supabase
       .from(TABLE)
@@ -176,10 +177,12 @@ export async function backfillHistory(
 
     if (error) {
       errors.push(`Supabase upsert error: ${error.message}`);
+    } else {
+      inserted = snapshots.length;
     }
   }
 
-  return { inserted: snapshots.length, errors };
+  return { inserted, errors };
 }
 
 // ============================================

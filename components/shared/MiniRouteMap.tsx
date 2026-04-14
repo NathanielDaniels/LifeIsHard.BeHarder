@@ -121,6 +121,11 @@ function RouteArc({ from, to, themeColor, cityCode, isCA }: RouteArcProps) {
 
 function MiniRouteMap({ destination, themeColor, isTarget, cityCode, stateFips }: MiniRouteMapProps) {
   const [expanded, setExpanded] = useState(false);
+  const [prefersReduced, setPrefersReduced] = useState(false);
+
+  useEffect(() => {
+    setPrefersReduced(window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  }, []);
 
   const isLocal = Math.abs(destination[0] - SF_HOME[0]) < 0.5 &&
                   Math.abs(destination[1] - SF_HOME[1]) < 0.5;
@@ -138,7 +143,7 @@ function MiniRouteMap({ destination, themeColor, isTarget, cityCode, stateFips }
   );
   const showDistance = distance >= MIN_DISTANCE_LABEL;
 
-  const handleOpen = useCallback((e: React.MouseEvent) => {
+  const handleOpen = useCallback((e: { stopPropagation: () => void }) => {
     e.stopPropagation();
     setExpanded(true);
   }, []);
@@ -288,7 +293,7 @@ function MiniRouteMap({ destination, themeColor, isTarget, cityCode, stateFips }
           fill={isTarget ? themeColor : 'white'}
           opacity={isTarget ? 1 : 0.8}
         />
-        {isTarget && (
+        {isTarget && !prefersReduced && (
           <circle r={5} fill="none" stroke={themeColor} strokeWidth={0.6} opacity={0.4}>
             <animate attributeName="r" values="5;11;5" dur="3s" repeatCount="indefinite" />
             <animate attributeName="opacity" values="0.4;0;0.4" dur="3s" repeatCount="indefinite" />
@@ -327,7 +332,7 @@ function MiniRouteMap({ destination, themeColor, isTarget, cityCode, stateFips }
         role="button"
         tabIndex={0}
         onClick={handleOpen}
-        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleOpen(e as unknown as React.MouseEvent); } }}
+        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleOpen(e); } }}
         title="Click to expand map"
         aria-label="Expand route map"
       >

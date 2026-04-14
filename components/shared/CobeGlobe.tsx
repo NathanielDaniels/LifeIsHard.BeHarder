@@ -152,6 +152,7 @@ export default function CobeGlobe({
     const canvas = canvasRef.current;
     let globe: ReturnType<typeof createGlobe> | null = null;
     let animationId: number;
+    let ro: ResizeObserver | null = null;
     let phi = initialPhi;
 
     const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -233,9 +234,10 @@ export default function CobeGlobe({
     if (canvas.offsetWidth > 0) {
       init();
     } else {
-      const ro = new ResizeObserver((entries) => {
+      ro = new ResizeObserver((entries) => {
         if (entries[0]?.contentRect.width > 0) {
-          ro.disconnect();
+          ro?.disconnect();
+          ro = null;
           init();
         }
       });
@@ -243,6 +245,7 @@ export default function CobeGlobe({
     }
 
     return () => {
+      ro?.disconnect();
       if (animationId) cancelAnimationFrame(animationId);
       if (globe) globe.destroy();
     };
