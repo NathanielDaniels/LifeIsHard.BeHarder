@@ -447,23 +447,26 @@ function RaceCard({ race, isNext, themeColor }: RaceCardProps) {
             {hasStamped && race.result && (
               <motion.div
                 initial={{ scale: 2.5, opacity: 0, rotate: -12 }}
-                animate={{ scale: 1, opacity: 0.8, rotate: -12 }}
+                animate={{ scale: 1, opacity: 1, rotate: -12 }}
                 transition={{
                   scale: { type: "spring", stiffness: 600, damping: 20 },
                   opacity: { duration: 0.1 },
                 }}
                 className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none"
               >
-                <Image
-                  src="/icons/Mission_Accomplished_Volt.webp"
-                  alt="Mission Accomplished"
-                  width={320}
-                  height={140}
-                  className="select-none"
-                  style={{
-                    filter: "drop-shadow(0 4px 12px rgba(249, 115, 22, 0.3))",
-                  }}
-                />
+                <div className="relative">
+                  <div className="absolute inset-0 bg-black/60 rounded-xl blur-md" />
+                  <Image
+                    src="/icons/Mission_Accomplished_Volt.webp"
+                    alt="Mission Accomplished"
+                    width={320}
+                    height={140}
+                    className="relative select-none"
+                    style={{
+                      filter: "drop-shadow(0 4px 16px rgba(249, 115, 22, 0.4))",
+                    }}
+                  />
+                </div>
               </motion.div>
             )}
           </AnimatePresence>
@@ -583,23 +586,26 @@ function RaceCard({ race, isNext, themeColor }: RaceCardProps) {
           {hasStamped && race.result && (
             <motion.div
               initial={{ scale: 2.5, opacity: 0, rotate: -12 }}
-              animate={{ scale: 1, opacity: 0.8, rotate: -12 }}
+              animate={{ scale: 1, opacity: 1, rotate: -12 }}
               transition={{
                 scale: { type: "spring", stiffness: 600, damping: 20 },
                 opacity: { duration: 0.1 },
               }}
               className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none"
             >
-              <Image
-                src="/icons/Mission_Accomplished_Volt.webp"
-                alt="Mission Accomplished"
-                width={280}
-                height={120}
-                className="select-none"
-                style={{
-                  filter: "drop-shadow(0 4px 12px rgba(249, 115, 22, 0.3))",
-                }}
-              />
+              <div className="relative">
+                <div className="absolute inset-0 bg-black/60 rounded-xl blur-md" />
+                <Image
+                  src="/icons/Mission_Accomplished_Volt.webp"
+                  alt="Mission Accomplished"
+                  width={280}
+                  height={120}
+                  className="relative select-none"
+                  style={{
+                    filter: "drop-shadow(0 4px 16px rgba(249, 115, 22, 0.4))",
+                  }}
+                />
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
