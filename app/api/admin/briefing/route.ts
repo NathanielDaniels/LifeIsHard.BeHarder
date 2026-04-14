@@ -11,24 +11,30 @@ import { getTodayBriefing, getLatestBriefing } from '@/lib/ai-briefing';
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
-  // Verify admin session
-  const isAuthed = await verifyAdminRequest(request);
-  if (!isAuthed) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  try {
+    const isAuthed = await verifyAdminRequest(request);
+    if (!isAuthed) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
 
-  // Try today's briefing first, fall back to most recent
-  const briefing = await getTodayBriefing() ?? await getLatestBriefing();
+    const briefing = await getTodayBriefing() ?? await getLatestBriefing();
 
-  if (!briefing) {
+    if (!briefing) {
+      return NextResponse.json({
+        available: false,
+        message: 'No briefing generated yet. Run the daily briefing cron or wait for the morning run.',
+      });
+    }
+
     return NextResponse.json({
-      available: false,
-      message: 'No briefing generated yet. Run the daily briefing cron or wait for the morning run.',
+      available: true,
+      ...briefing,
     });
+  } catch (error) {
+    console.error('[admin/briefing] Error:', error);
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : 'Briefing fetch failed' },
+      { status: 500 },
+    );
   }
-
-  return NextResponse.json({
-    available: true,
-    ...briefing,
-  });
 }

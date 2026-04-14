@@ -467,7 +467,7 @@ export default function ComingSoonClient() {
               className="h-12 md:h-14 w-auto cursor-pointer opacity-70 hover:opacity-100 transition-opacity duration-200"
             />
           </a>
-          <div className="absolute top-full left-0 mt-2 w-72 p-4 rounded-xl bg-black/90 backdrop-blur-xl border border-white/10 opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto transition-all duration-300">
+          <div role="tooltip" className="absolute top-full left-0 mt-2 w-72 p-4 rounded-xl bg-black/90 backdrop-blur-xl border border-white/10 opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto group-focus-within:opacity-100 group-focus-within:translate-y-0 group-focus-within:pointer-events-auto transition-all duration-300">
             <p className="font-mono text-[10px] tracking-[0.2em] text-orange-500 mb-2">
               APRIL IS LIMB LOSS & LIMB DIFFERENCE AWARENESS MONTH
             </p>

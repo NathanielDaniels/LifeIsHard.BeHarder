@@ -1,6 +1,6 @@
 'use client';
 
-import { memo } from 'react';
+import { memo, useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
   ComposableMap,
@@ -40,6 +40,11 @@ const RACE_ARCS = RACE_POINTS
   }));
 
 function RaceRouteMap({ themeColor }: RaceRouteMapProps) {
+  const [prefersReduced, setPrefersReduced] = useState(false);
+  useEffect(() => {
+    setPrefersReduced(window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  }, []);
+
   return (
     <div className="w-full max-w-4xl mx-auto mt-16 md:mt-24">
       <div className="relative rounded-xl border border-white/[0.06] bg-white/[0.02] p-4 md:p-8 overflow-hidden">
@@ -117,10 +122,12 @@ function RaceRouteMap({ themeColor }: RaceRouteMapProps) {
               transition={{ duration: 0.5, delay: 0.2 }}
             >
               {/* Pulse ring */}
-              <circle r={10} fill="none" stroke="white" strokeWidth={0.8} opacity={0.3}>
-                <animate attributeName="r" values="10;20;10" dur="4s" repeatCount="indefinite" />
-                <animate attributeName="opacity" values="0.3;0;0.3" dur="4s" repeatCount="indefinite" />
-              </circle>
+              {!prefersReduced && (
+                <circle r={10} fill="none" stroke="white" strokeWidth={0.8} opacity={0.3}>
+                  <animate attributeName="r" values="10;20;10" dur="4s" repeatCount="indefinite" />
+                  <animate attributeName="opacity" values="0.3;0;0.3" dur="4s" repeatCount="indefinite" />
+                </circle>
+              )}
               <circle r={8} fill="white" opacity={0.15} style={{ filter: 'blur(4px)' }} />
               <circle r={6} fill="white" opacity={0.9} />
               <text
@@ -156,7 +163,7 @@ function RaceRouteMap({ themeColor }: RaceRouteMapProps) {
                 transition={{ duration: 0.4, delay: 0.4 + i * 0.1 }}
               >
                 {/* Pulse ring for target */}
-                {point.isTarget && (
+                {point.isTarget && !prefersReduced && (
                   <circle r={18} fill="none" stroke={themeColor} strokeWidth={1} opacity={0.3}>
                     <animate attributeName="r" values="10;22;10" dur="3s" repeatCount="indefinite" />
                     <animate attributeName="opacity" values="0.4;0;0.4" dur="3s" repeatCount="indefinite" />

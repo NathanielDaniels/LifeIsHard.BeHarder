@@ -8,11 +8,19 @@ import { resolve } from 'path';
 
 // Load .env.local manually (Next.js handles this normally, but we're outside Next)
 const envPath = resolve(__dirname, '..', '.env.local');
-const envContent = readFileSync(envPath, 'utf-8');
-for (const line of envContent.split('\n')) {
-  if (line.startsWith('#') || !line.includes('=')) continue;
-  const [key, ...rest] = line.split('=');
-  process.env[key.trim()] = rest.join('=').trim();
+try {
+  const envContent = readFileSync(envPath, 'utf-8');
+  for (const line of envContent.split('\n')) {
+    if (line.startsWith('#') || !line.includes('=')) continue;
+    const [key, ...rest] = line.split('=');
+    let value = rest.join('=').trim();
+    if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
+      value = value.slice(1, -1);
+    }
+    process.env[key.trim()] = value;
+  }
+} catch {
+  console.error(`Could not read ${envPath} — run with env vars set directly`);
 }
 
 import React from 'react';

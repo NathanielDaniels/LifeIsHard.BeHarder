@@ -1,9 +1,16 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { RACES_2026, Race, getNextRace, getDaysUntil, parseLocalDate } from '@/lib/race-data';
-import MiniRouteMap from '@/components/shared/MiniRouteMap';
+import { useState, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import Image from "next/image";
+import {
+  RACES_2026,
+  Race,
+  getNextRace,
+  getDaysUntil,
+  parseLocalDate,
+} from "@/lib/race-data";
+import MiniRouteMap from "@/components/shared/MiniRouteMap";
 
 interface RaceCalendarProps {
   themeColor: string;
@@ -11,11 +18,15 @@ interface RaceCalendarProps {
 
 export default function RaceCalendar({ themeColor }: RaceCalendarProps) {
   const nextRace = getNextRace();
-  const triathlonRaces = RACES_2026.filter(r => r.type === 'triathlon');
-  const runningRaces = RACES_2026.filter(r => r.type === 'running');
-  const nationals = RACES_2026.find(r => r.isTarget);
-  const daysUntilNationals = nationals ? getDaysUntil(parseLocalDate(nationals.date)) : 0;
-  const daysUntilNext = nextRace ? getDaysUntil(parseLocalDate(nextRace.date)) : 0;
+  const triathlonRaces = RACES_2026.filter((r) => r.type === "triathlon");
+  const runningRaces = RACES_2026.filter((r) => r.type === "running");
+  const nationals = RACES_2026.find((r) => r.isTarget);
+  const daysUntilNationals = nationals
+    ? getDaysUntil(parseLocalDate(nationals.date))
+    : 0;
+  const daysUntilNext = nextRace
+    ? getDaysUntil(parseLocalDate(nextRace.date))
+    : 0;
   const [showNationals, setShowNationals] = useState(true);
 
   return (
@@ -39,12 +50,12 @@ export default function RaceCalendar({ themeColor }: RaceCalendarProps) {
           style={{
             backgroundColor: `${themeColor}11`,
             borderColor: `${themeColor}66`,
-            boxShadow: `0 0 60px ${themeColor}33`
+            boxShadow: `0 0 60px ${themeColor}33`,
           }}
         >
           <AnimatePresence mode="wait">
             <motion.div
-              key={showNationals ? 'nationals' : 'next-race'}
+              key={showNationals ? "nationals" : "next-race"}
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -12 }}
@@ -52,21 +63,27 @@ export default function RaceCalendar({ themeColor }: RaceCalendarProps) {
             >
               <div className="font-mono text-xs tracking-[0.3em] text-white/50 mb-3">
                 {!showNationals && daysUntilNext === 0
-                  ? 'RIGHT NOW'
-                  : showNationals ? 'DAYS UNTIL NATIONALS' : 'DAYS UNTIL NEXT RACE'}
+                  ? "RIGHT NOW"
+                  : showNationals
+                    ? "DAYS UNTIL NATIONALS"
+                    : "DAYS UNTIL NEXT RACE"}
               </div>
               <div
-                className={`font-display tracking-wider mb-2 ${!showNationals && daysUntilNext === 0 ? 'text-5xl md:text-6xl lg:text-7xl' : 'text-7xl md:text-8xl lg:text-9xl'}`}
+                className={`font-display tracking-wider mb-2 ${!showNationals && daysUntilNext === 0 ? "text-5xl md:text-6xl lg:text-7xl" : "text-7xl md:text-8xl lg:text-9xl"}`}
                 style={{ color: themeColor }}
               >
-                {!showNationals && daysUntilNext === 0 ? 'RACE DAY!' : showNationals ? daysUntilNationals : daysUntilNext}
+                {!showNationals && daysUntilNext === 0
+                  ? "RACE DAY!"
+                  : showNationals
+                    ? daysUntilNationals
+                    : daysUntilNext}
               </div>
               <div className="font-mono text-sm tracking-[0.2em] text-white/60">
                 {showNationals
                   ? nationals.name.toUpperCase()
                   : nextRace
                     ? nextRace.name.toUpperCase()
-                    : 'NO UPCOMING RACES'}
+                    : "NO UPCOMING RACES"}
               </div>
             </motion.div>
           </AnimatePresence>
@@ -78,21 +95,27 @@ export default function RaceCalendar({ themeColor }: RaceCalendarProps) {
             style={{
               borderColor: `${themeColor}44`,
               color: `${themeColor}aa`,
-              backgroundColor: 'transparent',
+              backgroundColor: "transparent",
             }}
           >
-            {showNationals ? 'SHOW NEXT RACE →' : '← SHOW NATIONALS'}
+            {showNationals ? "SHOW NEXT RACE →" : "← SHOW NATIONALS"}
           </button>
         </motion.div>
       )}
 
       <div className="space-y-8">
         <div className="flex items-center gap-4">
-          <div className="h-[2px] flex-1" style={{ backgroundColor: `${themeColor}33` }} />
+          <div
+            className="h-[2px] flex-1"
+            style={{ backgroundColor: `${themeColor}33` }}
+          />
           <h4 className="font-display text-3xl md:text-4xl tracking-[0.15em] text-white">
             TRIATHLON
           </h4>
-          <div className="h-[2px] flex-1" style={{ backgroundColor: `${themeColor}33` }} />
+          <div
+            className="h-[2px] flex-1"
+            style={{ backgroundColor: `${themeColor}33` }}
+          />
         </div>
 
         <div className="grid gap-6">
@@ -109,11 +132,17 @@ export default function RaceCalendar({ themeColor }: RaceCalendarProps) {
 
       <div className="space-y-8">
         <div className="flex items-center gap-4">
-          <div className="h-[2px] flex-1" style={{ backgroundColor: `${themeColor}33` }} />
+          <div
+            className="h-[2px] flex-1"
+            style={{ backgroundColor: `${themeColor}33` }}
+          />
           <h4 className="font-display text-3xl md:text-4xl tracking-[0.15em] text-white">
             RUNNING
           </h4>
-          <div className="h-[2px] flex-1" style={{ backgroundColor: `${themeColor}33` }} />
+          <div
+            className="h-[2px] flex-1"
+            style={{ backgroundColor: `${themeColor}33` }}
+          />
         </div>
 
         <div className="grid gap-6">
@@ -139,18 +168,45 @@ interface RaceCardProps {
 
 function RaceCard({ race, isNext, themeColor }: RaceCardProps) {
   const [expanded, setExpanded] = useState(false);
+  const [hasStamped, setHasStamped] = useState(false);
+
   const raceDate = parseLocalDate(race.date);
   const now = new Date();
-  const isSameDay = raceDate.getFullYear() === now.getFullYear() && raceDate.getMonth() === now.getMonth() && raceDate.getDate() === now.getDate();
+  const isSameDay =
+    raceDate.getFullYear() === now.getFullYear() &&
+    raceDate.getMonth() === now.getMonth() &&
+    raceDate.getDate() === now.getDate();
   const isToday = isSameDay && !race.result;
   const isPast = (raceDate < now && !isSameDay) || (isSameDay && !!race.result);
   const daysUntil = getDaysUntil(raceDate);
-  const hasDetails = race.distance || race.course || race.description || race.championship || race.website || race.splits;
+  const hasDetails =
+    race.distance ||
+    race.course ||
+    race.description ||
+    race.championship ||
+    race.website ||
+    race.splits;
 
-  const formattedDate = new Intl.DateTimeFormat('en-US', {
-    month: 'short',
-    day: 'numeric',
-    timeZone: 'UTC',
+  const handleClick = useCallback(() => {
+    if (!hasDetails) return;
+
+    if (expanded) {
+      setExpanded(false);
+      return;
+    }
+
+    if (race.result && !hasStamped) {
+      setHasStamped(true);
+      setTimeout(() => setExpanded(true), 500);
+    } else {
+      setExpanded(true);
+    }
+  }, [expanded, race.result, hasStamped, hasDetails]);
+
+  const formattedDate = new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    timeZone: "UTC",
   }).format(raceDate);
 
   const expandedContent = hasDetails ? (
@@ -158,9 +214,9 @@ function RaceCard({ race, isNext, themeColor }: RaceCardProps) {
       {expanded && (
         <motion.div
           initial={{ height: 0, opacity: 0 }}
-          animate={{ height: 'auto', opacity: 1 }}
+          animate={{ height: "auto", opacity: 1 }}
           exit={{ height: 0, opacity: 0 }}
-          transition={{ duration: 0.3, ease: 'easeInOut' }}
+          transition={{ duration: 0.3, ease: "easeInOut" }}
           className="overflow-hidden"
         >
           <div className="pt-6 mt-6 border-t border-white/10">
@@ -169,20 +225,35 @@ function RaceCard({ race, isNext, themeColor }: RaceCardProps) {
               <div className="flex-1 space-y-3">
                 {race.distance && (
                   <div className="flex items-center gap-3">
-                    <span className="font-mono text-[10px] tracking-[0.2em] text-white/30 uppercase w-20 shrink-0">Distance</span>
-                    <span className="font-mono text-sm text-white/70">{race.distance}</span>
+                    <span className="font-mono text-[10px] tracking-[0.2em] text-white/30 uppercase w-20 shrink-0">
+                      Distance
+                    </span>
+                    <span className="font-mono text-sm text-white/70">
+                      {race.distance}
+                    </span>
                   </div>
                 )}
                 {race.course && (
                   <div className="flex items-center gap-3">
-                    <span className="font-mono text-[10px] tracking-[0.2em] text-white/30 uppercase w-20 shrink-0">Course</span>
-                    <span className="font-mono text-sm text-white/70">{race.course}</span>
+                    <span className="font-mono text-[10px] tracking-[0.2em] text-white/30 uppercase w-20 shrink-0">
+                      Course
+                    </span>
+                    <span className="font-mono text-sm text-white/70">
+                      {race.course}
+                    </span>
                   </div>
                 )}
                 {race.championship && (
                   <div className="flex items-center gap-3">
-                    <span className="font-mono text-[10px] tracking-[0.2em] text-white/30 uppercase w-20 shrink-0">Stakes</span>
-                    <span className="font-mono text-sm tracking-[0.1em]" style={{ color: themeColor }}>{race.championship}</span>
+                    <span className="font-mono text-[10px] tracking-[0.2em] text-white/30 uppercase w-20 shrink-0">
+                      Stakes
+                    </span>
+                    <span
+                      className="font-mono text-sm tracking-[0.1em]"
+                      style={{ color: themeColor }}
+                    >
+                      {race.championship}
+                    </span>
                   </div>
                 )}
                 {race.description && (
@@ -192,20 +263,38 @@ function RaceCard({ race, isNext, themeColor }: RaceCardProps) {
                 )}
                 {race.splits && (
                   <div className="pt-3 space-y-1.5">
-                    <div className="font-mono text-[10px] tracking-[0.2em] text-white/30 uppercase mb-2">Splits</div>
+                    <div className="font-mono text-[10px] tracking-[0.2em] text-white/30 uppercase mb-2">
+                      Splits
+                    </div>
                     {race.splits.map((split) => (
                       <div key={split.leg} className="flex items-center gap-3">
-                        <span className="font-mono text-[10px] tracking-[0.2em] text-white/30 uppercase w-12 shrink-0">{split.leg}</span>
-                        <span className="font-mono text-sm font-medium" style={{ color: themeColor }}>{split.time}</span>
+                        <span className="font-mono text-[10px] tracking-[0.2em] text-white/30 uppercase w-12 shrink-0">
+                          {split.leg}
+                        </span>
+                        <span
+                          className="font-mono text-sm font-medium"
+                          style={{ color: themeColor }}
+                        >
+                          {split.time}
+                        </span>
                         {split.pace && (
-                          <span className="font-mono text-xs text-white/40">{split.pace}</span>
+                          <span className="font-mono text-xs text-white/40">
+                            {split.pace}
+                          </span>
                         )}
                       </div>
                     ))}
                     {race.result && (
                       <div className="flex items-center gap-3 pt-1.5 mt-1.5 border-t border-white/10">
-                        <span className="font-mono text-[10px] tracking-[0.2em] text-white/30 uppercase w-12 shrink-0">Total</span>
-                        <span className="font-mono text-sm font-bold" style={{ color: themeColor }}>{race.result}</span>
+                        <span className="font-mono text-[10px] tracking-[0.2em] text-white/30 uppercase w-12 shrink-0">
+                          Total
+                        </span>
+                        <span
+                          className="font-mono text-sm font-bold"
+                          style={{ color: themeColor }}
+                        >
+                          {race.result}
+                        </span>
                       </div>
                     )}
                   </div>
@@ -220,11 +309,17 @@ function RaceCard({ race, isNext, themeColor }: RaceCardProps) {
                     style={{ color: themeColor }}
                   >
                     RACE WEBSITE
-                    <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <svg
+                      className="w-3 h-3"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    >
                       <path d="M7 17L17 7M17 7H7M17 7V17" />
                     </svg>
                   </a>
-            )}
+                )}
               </div>
 
               {/* Mini map (right on desktop, below on mobile) */}
@@ -266,64 +361,105 @@ function RaceCard({ race, isNext, themeColor }: RaceCardProps) {
         whileInView={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.6 }}
         viewport={{ once: true }}
-        role={hasDetails ? 'button' : undefined}
+        role={hasDetails ? "button" : undefined}
         tabIndex={hasDetails ? 0 : undefined}
         aria-expanded={hasDetails ? expanded : undefined}
-        onClick={() => hasDetails && setExpanded(!expanded)}
+        onClick={handleClick}
         onKeyDown={(e) => {
-          if (hasDetails && (e.key === 'Enter' || e.key === ' ')) {
+          if (hasDetails && (e.key === "Enter" || e.key === " ")) {
             e.preventDefault();
-            setExpanded(!expanded);
+            handleClick();
           }
         }}
-        className={`p-8 md:p-10 rounded-2xl border-2 backdrop-blur-sm ${hasDetails ? 'cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500/50 focus-visible:ring-offset-2 focus-visible:ring-offset-black' : ''}`}
+        className={`relative p-8 md:p-10 rounded-2xl border-2 backdrop-blur-sm ${hasDetails ? "cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500/50 focus-visible:ring-offset-2 focus-visible:ring-offset-black" : ""}`}
         style={{
           backgroundColor: `${themeColor}18`,
           borderColor: themeColor,
-          boxShadow: `0 0 40px ${themeColor}44`
+          boxShadow: `0 0 40px ${themeColor}44`,
         }}
       >
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-          <div className="space-y-4 flex-1">
-            <div className="flex items-center gap-3">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border text-xs font-mono tracking-[0.2em]"
-                style={{
-                  backgroundColor: `${themeColor}22`,
-                  borderColor: `${themeColor}88`,
-                  color: themeColor
-                }}>
-                <span className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: themeColor }} />
-                THE TARGET
+        <div className="relative">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+            <div className="space-y-4 flex-1">
+              <div className="flex items-center gap-3">
+                <div
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full border text-xs font-mono tracking-[0.2em]"
+                  style={{
+                    backgroundColor: `${themeColor}22`,
+                    borderColor: `${themeColor}88`,
+                    color: themeColor,
+                  }}
+                >
+                  <span
+                    className="w-2 h-2 rounded-full animate-pulse"
+                    style={{ backgroundColor: themeColor }}
+                  />
+                  THE TARGET
+                </div>
+                {chevron}
               </div>
-              {chevron}
+
+              <div>
+                <h5 className="font-display text-3xl md:text-4xl lg:text-5xl tracking-wide text-white mb-2 leading-tight">
+                  {race.name}
+                </h5>
+                <p className="font-mono text-sm tracking-[0.15em] text-white/60">
+                  {formattedDate.toUpperCase()} · {race.location.toUpperCase()}
+                </p>
+              </div>
             </div>
 
-            <div>
-              <h5 className="font-display text-3xl md:text-4xl lg:text-5xl tracking-wide text-white mb-2 leading-tight">
-                {race.name}
-              </h5>
-              <p className="font-mono text-sm tracking-[0.15em] text-white/60">
-                {formattedDate.toUpperCase()} · {race.location.toUpperCase()}
-              </p>
-            </div>
+            {!isPast && (
+              <div className="text-center md:text-right">
+                <div
+                  className="font-display text-5xl md:text-6xl tracking-wider mb-1"
+                  style={{ color: themeColor }}
+                >
+                  {daysUntil}
+                </div>
+                <div className="font-mono text-xs tracking-[0.2em] text-white/50">
+                  DAYS
+                </div>
+              </div>
+            )}
+
+            {isPast && race.result && (
+              <div className="text-center md:text-right">
+                <div
+                  className="font-display text-3xl md:text-4xl tracking-wider"
+                  style={{ color: themeColor }}
+                >
+                  {race.result}
+                </div>
+              </div>
+            )}
           </div>
 
-          {!isPast && (
-            <div className="text-center md:text-right">
-              <div className="font-display text-5xl md:text-6xl tracking-wider mb-1" style={{ color: themeColor }}>
-                {daysUntil}
-              </div>
-              <div className="font-mono text-xs tracking-[0.2em] text-white/50">DAYS</div>
-            </div>
-          )}
-
-          {isPast && race.result && (
-            <div className="text-center md:text-right">
-              <div className="font-display text-3xl md:text-4xl tracking-wider" style={{ color: themeColor }}>
-                {race.result}
-              </div>
-            </div>
-          )}
+          {/* Stamp overlay — stays on header area */}
+          <AnimatePresence>
+            {hasStamped && race.result && (
+              <motion.div
+                initial={{ scale: 2.5, opacity: 0, rotate: -12 }}
+                animate={{ scale: 1, opacity: 0.8, rotate: -12 }}
+                transition={{
+                  scale: { type: "spring", stiffness: 600, damping: 20 },
+                  opacity: { duration: 0.1 },
+                }}
+                className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none"
+              >
+                <Image
+                  src="/icons/Mission_Accomplished_Volt.webp"
+                  alt="Mission Accomplished"
+                  width={320}
+                  height={140}
+                  className="select-none"
+                  style={{
+                    filter: "drop-shadow(0 4px 12px rgba(249, 115, 22, 0.3))",
+                  }}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
         {expandedContent}
       </motion.div>
@@ -336,83 +472,130 @@ function RaceCard({ race, isNext, themeColor }: RaceCardProps) {
       whileInView={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.5 }}
       viewport={{ once: true }}
-      role={hasDetails ? 'button' : undefined}
+      role={hasDetails ? "button" : undefined}
       tabIndex={hasDetails ? 0 : undefined}
       aria-expanded={hasDetails ? expanded : undefined}
-      onClick={() => hasDetails && setExpanded(!expanded)}
+      onClick={handleClick}
       onKeyDown={(e) => {
-        if (hasDetails && (e.key === 'Enter' || e.key === ' ')) {
+        if (hasDetails && (e.key === "Enter" || e.key === " ")) {
           e.preventDefault();
-          setExpanded(!expanded);
+          handleClick();
         }
       }}
-      className={`p-6 md:p-8 rounded-xl border backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] ${hasDetails ? 'cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500/50 focus-visible:ring-offset-2 focus-visible:ring-offset-black' : ''}`}
+      className={`relative p-6 md:p-8 rounded-xl border backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] ${hasDetails ? "cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500/50 focus-visible:ring-offset-2 focus-visible:ring-offset-black" : ""}`}
       style={{
-        backgroundColor: isNext ? `${themeColor}11` : 'rgba(255,255,255,0.03)',
-        borderColor: isNext ? `${themeColor}66` : 'rgba(255,255,255,0.1)',
-        boxShadow: isNext ? `0 0 30px ${themeColor}33` : 'none'
+        backgroundColor: isNext ? `${themeColor}11` : "rgba(255,255,255,0.03)",
+        borderColor: isNext ? `${themeColor}66` : "rgba(255,255,255,0.1)",
+        boxShadow: isNext ? `0 0 30px ${themeColor}33` : "none",
       }}
     >
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div className="flex-1 space-y-3">
-          <div className="flex flex-wrap items-center gap-3">
-            <div className="font-mono text-sm tracking-[0.15em] text-white/80">
-              {formattedDate.toUpperCase()}
+      <div className="relative">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="flex-1 space-y-3">
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="font-mono text-sm tracking-[0.15em] text-white/80">
+                {formattedDate.toUpperCase()}
+              </div>
+
+              {isNext && !isPast && !isToday && (
+                <div
+                  className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono tracking-[0.15em]"
+                  style={{
+                    backgroundColor: `${themeColor}22`,
+                    color: themeColor,
+                  }}
+                >
+                  <span
+                    className="w-1.5 h-1.5 rounded-full animate-pulse"
+                    style={{ backgroundColor: themeColor }}
+                  />
+                  NEXT // {daysUntil} DAYS
+                </div>
+              )}
+
+              {isToday && (
+                <div
+                  className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono tracking-[0.15em]"
+                  style={{
+                    backgroundColor: `${themeColor}22`,
+                    color: themeColor,
+                  }}
+                >
+                  <span
+                    className="w-1.5 h-1.5 rounded-full animate-pulse"
+                    style={{ backgroundColor: themeColor }}
+                  />
+                  RACE DAY!
+                </div>
+              )}
+
+              {isPast && !race.result && (
+                <div className="px-3 py-1 rounded-full text-xs font-mono tracking-[0.15em] bg-white/5 text-white/30">
+                  COMPLETED
+                </div>
+              )}
             </div>
 
-            {isNext && !isPast && !isToday && (
-              <div
-                className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono tracking-[0.15em]"
-                style={{ backgroundColor: `${themeColor}22`, color: themeColor }}
-              >
-                <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: themeColor }} />
-                NEXT // {daysUntil} DAYS
-              </div>
-            )}
-
-            {isToday && (
-              <div
-                className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono tracking-[0.15em]"
-                style={{ backgroundColor: `${themeColor}22`, color: themeColor }}
-              >
-                <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: themeColor }} />
-                RACE DAY!
-              </div>
-            )}
-
-            {isPast && !race.result && (
-              <div className="px-3 py-1 rounded-full text-xs font-mono tracking-[0.15em] bg-white/5 text-white/30">
-                COMPLETED
-              </div>
-            )}
+            <div>
+              <h5 className="font-display text-xl md:text-2xl tracking-wide text-white mb-1">
+                {race.name}
+              </h5>
+              <p className="font-mono text-xs tracking-[0.15em] text-white/50">
+                {race.location.toUpperCase()}
+              </p>
+            </div>
           </div>
 
-          <div>
-            <h5 className="font-display text-xl md:text-2xl tracking-wide text-white mb-1">
-              {race.name}
-            </h5>
-            <p className="font-mono text-xs tracking-[0.15em] text-white/50">
-              {race.location.toUpperCase()}
-            </p>
+          <div className="flex items-center gap-4">
+            {isPast && race.result && (
+              <div
+                className="font-display text-2xl md:text-3xl tracking-wide"
+                style={{ color: themeColor }}
+              >
+                {race.result}
+              </div>
+            )}
+
+            {!isPast && !isNext && (
+              <div className="text-right">
+                <div className="font-display text-3xl md:text-4xl tracking-wide text-white/40">
+                  {daysUntil}
+                </div>
+                <div className="font-mono text-xs tracking-[0.2em] text-white/30">
+                  DAYS
+                </div>
+              </div>
+            )}
+
+            {chevron}
           </div>
         </div>
 
-        <div className="flex items-center gap-4">
-          {isPast && race.result && (
-            <div className="font-display text-2xl md:text-3xl tracking-wide" style={{ color: themeColor }}>
-              {race.result}
-            </div>
+        {/* Stamp overlay — stays on header area */}
+        <AnimatePresence>
+          {hasStamped && race.result && (
+            <motion.div
+              initial={{ scale: 2.5, opacity: 0, rotate: -12 }}
+              animate={{ scale: 1, opacity: 0.8, rotate: -12 }}
+              transition={{
+                scale: { type: "spring", stiffness: 600, damping: 20 },
+                opacity: { duration: 0.1 },
+              }}
+              className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none"
+            >
+              <Image
+                src="/icons/Mission_Accomplished_Volt.webp"
+                alt="Mission Accomplished"
+                width={280}
+                height={120}
+                className="select-none"
+                style={{
+                  filter: "drop-shadow(0 4px 12px rgba(249, 115, 22, 0.3))",
+                }}
+              />
+            </motion.div>
           )}
-
-          {!isPast && !isNext && (
-            <div className="text-right">
-              <div className="font-display text-3xl md:text-4xl tracking-wide text-white/40">{daysUntil}</div>
-              <div className="font-mono text-xs tracking-[0.2em] text-white/30">DAYS</div>
-            </div>
-          )}
-
-          {chevron}
-        </div>
+        </AnimatePresence>
       </div>
       {expandedContent}
     </motion.div>

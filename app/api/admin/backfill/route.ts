@@ -27,8 +27,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { days = 90 } = await request.json().catch(() => ({}));
-    const cappedDays = Math.min(days, 365);
+    const { days: rawDays = 90 } = await request.json().catch(() => ({}));
+    const parsed = Math.floor(Number(rawDays));
+    const cappedDays = Math.min(Math.max(parsed > 0 ? parsed : 90, 1), 365);
 
     const [snapshotResult, workoutResult] = await Promise.all([
       backfillHistory(accessToken, Math.min(cappedDays, 90)),

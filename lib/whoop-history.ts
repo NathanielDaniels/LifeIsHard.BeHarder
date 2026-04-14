@@ -76,7 +76,13 @@ function toDateString(isoString: string): string {
 
 function findBestWorkout(workouts: WhoopWorkout[], date: string): WhoopWorkout | null {
   const dayWorkouts = workouts
-    .filter((w) => toDateString(w.start) === date || toDateString(w.end) === date)
+    .filter((w) => {
+      if (!w.start) return false;
+      // Use start date as the canonical date — a workout belongs to the day it started.
+      // Apply timezone offset if available, otherwise use UTC date.
+      const startDate = toDateString(w.start);
+      return startDate === date;
+    })
     .filter((w) => {
       if (!w.start || !w.end) return false;
       const dur = (new Date(w.end).getTime() - new Date(w.start).getTime()) / 60000;
@@ -163,6 +169,7 @@ export async function backfillHistory(
   }
 
   // Batch upsert
+  let inserted = 0;
   if (snapshots.length > 0) {
     const { error } = await supabase
       .from(TABLE)
@@ -170,10 +177,12 @@ export async function backfillHistory(
 
     if (error) {
       errors.push(`Supabase upsert error: ${error.message}`);
+    } else {
+      inserted = snapshots.length;
     }
   }
 
-  return { inserted: snapshots.length, errors };
+  return { inserted, errors };
 }
 
 // ============================================

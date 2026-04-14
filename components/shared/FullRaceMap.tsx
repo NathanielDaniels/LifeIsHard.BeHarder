@@ -74,6 +74,16 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
   const zoomRef = useRef(DEFAULT_ZOOM);
 
   useEffect(() => {
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (prefersReduced) {
+      centerRef.current = [targetLng, targetLat];
+      zoomRef.current = targetZoom;
+      setMapCenter([targetLng, targetLat]);
+      setMapZoom(targetZoom);
+      return;
+    }
+
     const DURATION = 0.6;
     const EASE = [0.4, 0, 0.2, 1] as const;
 
@@ -806,6 +816,7 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
             <div className="flex items-stretch">
               <button
                 onClick={() => setMobileIndex((prev) => prev <= 0 ? RACES_2026.length - 1 : prev - 1)}
+                aria-label="Previous race"
                 className="w-16 flex items-center justify-center border-r border-white/10 text-white/60 active:bg-white/10 transition-colors"
               >
                 <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -877,6 +888,7 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
 
               <button
                 onClick={() => setMobileIndex((prev) => prev >= RACES_2026.length - 1 ? 0 : prev + 1)}
+                aria-label="Next race"
                 className="w-16 flex items-center justify-center border-l border-white/10 text-white/60 active:bg-white/10 transition-colors"
               >
                 <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -884,13 +896,12 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
                 </svg>
               </button>
             </div>
-
-            {/* Dot indicators */}
             <div className="flex justify-center gap-2 py-2 border-t border-white/5">
               {RACES_2026.map((race, i) => (
                 <button
                   key={race.cityCode}
                   onClick={() => setMobileIndex(i)}
+                  aria-label={`Go to ${race.name}`}
                   className="w-2 h-2 rounded-full transition-all duration-200"
                   style={{
                     backgroundColor: i === mobileIndex ? themeColor : 'rgba(255,255,255,0.15)',
