@@ -11,7 +11,6 @@ import SeasonUpdateEmail from "./season-update-email-hybrid";
  *
  * Options:
  *   --dry-run     Preview what would be sent without actually sending
- *   --schedule    Schedule for optimal send time (e.g. --schedule "2026-03-25T10:00:00Z")
  */
 
 /**
