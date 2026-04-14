@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import {
@@ -169,6 +169,13 @@ interface RaceCardProps {
 function RaceCard({ race, isNext, themeColor }: RaceCardProps) {
   const [expanded, setExpanded] = useState(false);
   const [hasStamped, setHasStamped] = useState(false);
+  const stampTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (stampTimerRef.current) clearTimeout(stampTimerRef.current);
+    };
+  }, []);
 
   const raceDate = parseLocalDate(race.date);
   const now = new Date();
@@ -197,7 +204,7 @@ function RaceCard({ race, isNext, themeColor }: RaceCardProps) {
 
     if (race.result && !hasStamped) {
       setHasStamped(true);
-      setTimeout(() => setExpanded(true), 500);
+      stampTimerRef.current = setTimeout(() => setExpanded(true), 500);
     } else {
       setExpanded(true);
     }

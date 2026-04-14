@@ -47,10 +47,8 @@ async function main() {
 
   const SUBJECT = "First Race of the 2026 Season. First Place.";
 
-  // Fetch all audience contacts (paginated)
+  // Fetch audience contacts
   console.log("Fetching audience contacts...");
-  const allContacts: { email: string; unsubscribed: boolean }[] = [];
-
   const { data: contacts, error: contactsError } =
     await resend.contacts.list({ audienceId });
 
@@ -59,9 +57,8 @@ async function main() {
     process.exit(1);
   }
 
-  allContacts.push(...(contacts?.data || []));
-
-  const activeContacts = allContacts.filter((c) => !c.unsubscribed);
+  const allContacts = contacts?.data || [];
+  const activeContacts = allContacts.filter((c: { unsubscribed: boolean }) => !c.unsubscribed);
   console.log(
     `Found ${activeContacts.length} active subscribers (${allContacts.length} total)`,
   );
