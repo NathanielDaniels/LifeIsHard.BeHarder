@@ -42,6 +42,9 @@ export interface BriefingEmailProps {
   recoveryChartUrl: string;
   hrvChartUrl: string;
   strainChartUrl: string;
+  disciplineChartUrl?: string;
+  responseButtons?: { label: string; url: string }[];
+  checkinUrl?: string;
 }
 
 // ============================================
@@ -120,6 +123,9 @@ export default function DailyBriefingEmail({
   recoveryChartUrl = '',
   hrvChartUrl = '',
   strainChartUrl = '',
+  disciplineChartUrl = '',
+  responseButtons = [],
+  checkinUrl = '',
 }: BriefingEmailProps) {
   const accent = recoveryAccent(recoveryColor);
   const recoveryBg = recoveryBgColor(recoveryColor);
@@ -163,6 +169,7 @@ export default function DailyBriefingEmail({
           </Section>
 
           {/* ══════ RECOVERY SCORE ══════ */}
+          <Section style={sectionPadding}>
           <Section style={{ ...recoveryCard, backgroundColor: recoveryBg, borderColor: `${accent}33` }}>
             <Text style={recoveryLabel}>RECOVERY</Text>
 
@@ -185,6 +192,23 @@ export default function DailyBriefingEmail({
               <Section style={progressBarBg}>
                 <Section style={{ ...progressBarFill, width: `${recoveryPct}%`, backgroundColor: accent }} />
               </Section>
+            </Section>
+          </Section>
+          </Section>
+
+          {/* ══════ TRAINING CALL ══════ */}
+          <Section style={sectionPadding}>
+            <Text style={sectionHeader}>TODAY&apos;S TRAINING CALL</Text>
+            <Section style={trainingCard}>
+              <Text style={trainingText}>{trainingCall}</Text>
+            </Section>
+          </Section>
+
+          {/* ══════ COACH'S NOTE ══════ */}
+          <Section style={sectionPadding}>
+            <Text style={sectionHeader}>COACH&apos;S NOTE</Text>
+            <Section style={coachNoteCard}>
+              <Text style={coachNoteText}>{coachNote}</Text>
             </Section>
           </Section>
 
@@ -227,34 +251,6 @@ export default function DailyBriefingEmail({
             )}
           </Section>
 
-          {/* ══════ TREND CHARTS ══════ */}
-          {(recoveryChartUrl || hrvChartUrl || strainChartUrl) && (
-            <Section style={sectionPadding}>
-              <Text style={sectionHeader}>7-DAY TRENDS</Text>
-
-              {recoveryChartUrl && (
-                <Section style={{ marginBottom: '12px' }}>
-                  <Text style={chartLabel}>RECOVERY</Text>
-                  <Img src={recoveryChartUrl} width="480" height="130" alt="Recovery trend" style={chartImg} />
-                </Section>
-              )}
-
-              {hrvChartUrl && (
-                <Section style={{ marginBottom: '12px' }}>
-                  <Text style={chartLabel}>HRV (ms)</Text>
-                  <Img src={hrvChartUrl} width="480" height="130" alt="HRV trend" style={chartImg} />
-                </Section>
-              )}
-
-              {strainChartUrl && (
-                <Section style={{ marginBottom: '0' }}>
-                  <Text style={chartLabel}>STRAIN</Text>
-                  <Img src={strainChartUrl} width="480" height="130" alt="Strain trend" style={chartImg} />
-                </Section>
-              )}
-            </Section>
-          )}
-
           {/* ══════ KEY NUMBERS ══════ */}
           {keyNumbers.length > 0 && (
             <Section style={sectionPadding}>
@@ -275,21 +271,32 @@ export default function DailyBriefingEmail({
             </Section>
           )}
 
-          {/* ══════ TRAINING CALL ══════ */}
-          <Section style={sectionPadding}>
-            <Text style={sectionHeader}>TODAY&apos;S TRAINING CALL</Text>
-            <Section style={trainingCard}>
-              <Text style={trainingText}>{trainingCall}</Text>
+          {/* ══════ DISCIPLINE BALANCE ══════ */}
+          {disciplineChartUrl && (
+            <Section style={sectionPadding}>
+              <Text style={sectionHeader}>14-DAY TRAINING BALANCE</Text>
+              <Img src={disciplineChartUrl} width="480" height="260" alt="Discipline balance" style={chartImg} />
             </Section>
-          </Section>
+          )}
 
-          {/* ══════ COACH'S NOTE ══════ */}
-          <Section style={sectionPadding}>
-            <Text style={sectionHeader}>COACH&apos;S NOTE</Text>
-            <Section style={coachNoteCard}>
-              <Text style={coachNoteText}>{coachNote}</Text>
+          {/* ══════ CHECK IN ══════ */}
+          {responseButtons.length > 0 && (
+            <Section style={sectionPadding}>
+              <Text style={sectionHeader}>CHECK IN WITH COACH</Text>
+              <Section style={responseCard}>
+                {responseButtons.map((btn, i) => (
+                  <Link key={i} href={btn.url} style={responseBtn}>
+                    {btn.label}
+                  </Link>
+                ))}
+                {checkinUrl && (
+                  <Link href={checkinUrl} style={checkinLink}>
+                    Tell me more &rarr;
+                  </Link>
+                )}
+              </Section>
             </Section>
-          </Section>
+          )}
 
           {/* ══════ FOOTER ══════ */}
           <Section style={footerDivider} />
@@ -333,7 +340,7 @@ const wrapper: React.CSSProperties = {
 };
 
 const headerZone: React.CSSProperties = {
-  padding: '32px 40px 24px',
+  padding: '32px 24px 24px',
   textAlign: 'center' as const,
 };
 
@@ -378,7 +385,7 @@ const headerDate: React.CSSProperties = {
 
 // --- Recovery Card ---
 const recoveryCard: React.CSSProperties = {
-  margin: '0 24px 24px',
+  margin: '0',
   padding: '24px',
   border: '1px solid',
   borderRadius: '8px',
@@ -410,10 +417,12 @@ const recoveryZoneBadge: React.CSSProperties = {
 };
 
 const recoveryHeadline: React.CSSProperties = {
+  fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
   fontSize: '14px',
   lineHeight: '1.5',
   color: 'rgba(255,255,255,0.7)',
   margin: '0',
+  textTransform: 'none' as const,
 };
 
 const progressBarBg: React.CSSProperties = {
@@ -586,10 +595,12 @@ const trainingCard: React.CSSProperties = {
 };
 
 const trainingText: React.CSSProperties = {
-  fontSize: '14px',
+  fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+  fontSize: '15px',
   lineHeight: '1.7',
   color: 'rgba(255,255,255,0.75)',
   margin: '0',
+  textTransform: 'none' as const,
 };
 
 // --- Coach's Note ---
@@ -602,22 +613,57 @@ const coachNoteCard: React.CSSProperties = {
 };
 
 const coachNoteText: React.CSSProperties = {
-  fontSize: '14px',
+  fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+  fontSize: '15px',
   lineHeight: '1.8',
   color: 'rgba(255,255,255,0.7)',
   margin: '0',
   fontStyle: 'italic' as const,
+  textTransform: 'none' as const,
+};
+
+// --- Check In ---
+const responseCard: React.CSSProperties = {
+  backgroundColor: CARD_BG,
+  border: `1px solid ${SUBTLE}`,
+  borderRadius: '8px',
+  padding: '20px',
+  textAlign: 'center' as const,
+};
+
+const responseBtn: React.CSSProperties = {
+  display: 'block',
+  backgroundColor: 'rgba(249,115,22,0.08)',
+  border: `1px solid rgba(249,115,22,0.25)`,
+  borderRadius: '8px',
+  padding: '12px 20px',
+  color: ORANGE,
+  fontSize: '14px',
+  fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+  textDecoration: 'none',
+  textAlign: 'center' as const,
+  marginBottom: '8px',
+};
+
+const checkinLink: React.CSSProperties = {
+  display: 'block',
+  color: 'rgba(255,255,255,0.4)',
+  fontSize: '13px',
+  fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+  textDecoration: 'none',
+  textAlign: 'center' as const,
+  marginTop: '12px',
 };
 
 // --- Footer ---
 const footerDivider: React.CSSProperties = {
   height: '1px',
   backgroundColor: SUBTLE,
-  margin: '8px 40px 0',
+  margin: '8px 24px 0',
 };
 
 const footerSection: React.CSSProperties = {
-  padding: '24px 40px',
+  padding: '24px 24px',
   textAlign: 'center' as const,
 };
 

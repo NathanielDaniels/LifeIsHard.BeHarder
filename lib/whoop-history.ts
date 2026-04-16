@@ -15,8 +15,9 @@ import {
   getRecoveryHistory,
   getCycleHistory,
   getWorkoutHistory,
+  getSleepHistory,
 } from './whoop-client';
-import type { DailySnapshot, WorkoutRecord, WhoopRecovery, WhoopCycle, WhoopWorkout } from '@/types/whoop';
+import type { DailySnapshot, WorkoutRecord, WhoopRecovery, WhoopCycle, WhoopWorkout, WhoopSleep } from '@/types/whoop';
 
 const TABLE = 'whoop_daily_snapshots';
 const WORKOUTS_TABLE = 'whoop_workouts';
@@ -33,6 +34,7 @@ function buildSnapshot(
   recovery: WhoopRecovery | null,
   cycle: WhoopCycle | null,
   workout: WhoopWorkout | null,
+  sleep: WhoopSleep | null = null,
 ): DailySnapshot {
   const workoutDuration = workout?.start && workout?.end
     ? Math.round((new Date(workout.end).getTime() - new Date(workout.start).getTime()) / 60000)
@@ -44,6 +46,14 @@ function buildSnapshot(
 
   const cycleCals = cycle?.score?.kilojoule
     ? Math.round(cycle.score.kilojoule * 0.239)
+    : null;
+
+  const stages = sleep?.score?.stage_summary;
+  const sleepDuration = stages
+    ? Math.round((stages.total_in_bed_time_milli - stages.total_awake_time_milli) / 60000)
+    : null;
+  const sleepDebt = sleep?.score?.sleep_needed?.need_from_sleep_debt_milli
+    ? Math.round(sleep.score.sleep_needed.need_from_sleep_debt_milli / 60000)
     : null;
 
   return {
@@ -63,6 +73,15 @@ function buildSnapshot(
     workout_avg_hr: workout?.score?.average_heart_rate ?? null,
     workout_max_hr: workout?.score?.max_heart_rate ?? null,
     workout_calories: workoutCals,
+    sleep_performance: sleep?.score?.sleep_performance_percentage ?? null,
+    sleep_efficiency: sleep?.score?.sleep_efficiency_percentage ?? null,
+    sleep_duration_minutes: sleepDuration,
+    sleep_disturbances: stages?.disturbance_count ?? null,
+    sleep_light_minutes: stages ? Math.round(stages.total_light_sleep_time_milli / 60000) : null,
+    sleep_deep_minutes: stages ? Math.round(stages.total_slow_wave_sleep_time_milli / 60000) : null,
+    sleep_rem_minutes: stages ? Math.round(stages.total_rem_sleep_time_milli / 60000) : null,
+    sleep_debt_minutes: sleepDebt,
+    sleep_respiratory_rate: sleep?.score?.respiratory_rate ?? null,
   };
 }
 
@@ -102,17 +121,22 @@ export async function snapshotToday(accessToken: string): Promise<DailySnapshot>
   const start = `${today}T00:00:00.000Z`;
   const end = `${today}T23:59:59.999Z`;
 
-  const [recoveries, cycles, workouts] = await Promise.all([
+  const [recoveries, cycles, workouts, sleeps] = await Promise.all([
     getRecoveryHistory(accessToken, start, end),
     getCycleHistory(accessToken, start, end),
     getWorkoutHistory(accessToken, start, end),
+    getSleepHistory(accessToken, 1).catch(() => []),
   ]);
+
+  // Find the most recent non-nap sleep
+  const latestSleep = sleeps.find((s) => !s.nap && s.score_state === 'SCORED') ?? null;
 
   const snapshot = buildSnapshot(
     today,
     recoveries[0] ?? null,
     cycles[0] ?? null,
     findBestWorkout(workouts, today),
+    latestSleep,
   );
 
   await upsertSnapshot(snapshot);
@@ -135,10 +159,11 @@ export async function backfillHistory(
   const endISO = end.toISOString();
 
   // Fetch all history in parallel
-  const [recoveries, cycles, workouts] = await Promise.all([
+  const [recoveries, cycles, workouts, sleeps] = await Promise.all([
     getRecoveryHistory(accessToken, startISO, endISO),
     getCycleHistory(accessToken, startISO, endISO),
     getWorkoutHistory(accessToken, startISO, endISO),
+    getSleepHistory(accessToken, days).catch(() => []),
   ]);
 
   // Group by date
@@ -148,6 +173,14 @@ export async function backfillHistory(
   const cycleByDate = new Map(
     cycles.map((c) => [toDateString(c.start), c]),
   );
+  // Group sleep by date (non-nap, scored only)
+  const sleepByDate = new Map<string, typeof sleeps[0]>();
+  for (const s of sleeps) {
+    if (!s.nap && s.score_state === 'SCORED') {
+      const d = toDateString(s.created_at);
+      if (!sleepByDate.has(d)) sleepByDate.set(d, s);
+    }
+  }
 
   // Build snapshots for each day
   const snapshots: DailySnapshot[] = [];
@@ -161,6 +194,7 @@ export async function backfillHistory(
         recoveryByDate.get(dateStr) ?? null,
         cycleByDate.get(dateStr) ?? null,
         findBestWorkout(workouts, dateStr),
+        sleepByDate.get(dateStr) ?? null,
       );
       snapshots.push(snapshot);
     } catch (err) {

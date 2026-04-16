@@ -64,27 +64,27 @@ The site runs in demo mode when WHOOP credentials are unavailable.
 
 ### Positioning
 
-Patrick occupies the raw, confrontational end of the adaptive athlete spectrum. Most adaptive athlete brands sit in soft inspiration. Patrick's is cinematic, data-driven, unapologetic. Think sports documentary, not charity campaign.
+Patrick occupies the raw, confrontational end of the adaptive athlete spectrum. Most adaptive athlete brands focus on soft inspiration. Patrick's is cinematic, data-driven, unapologetic. Think sports documentary, not charity campaign.
 
 ### Colors
 
-| Name | Hex | Role |
-|------|-----|------|
-| Void Black | `#050505` | Primary background. 80%+ of visual real estate. |
+| Name         | Hex       | Role                                                |
+| ------------ | --------- | --------------------------------------------------- |
+| Void Black   | `#050505` | Primary background. 80%+ of visual real estate.     |
 | Pulse Orange | `#F97316` | The heartbeat. Primary accent. Earned, not sprayed. |
-| Signal White | `#FFFFFF` | Primary text. Various opacities for hierarchy. |
-| Cyan | `#00FFFC` | Glitch effects only |
-| Magenta | `#FF00FF` | Glitch effects only |
+| Signal White | `#FFFFFF` | Primary text. Various opacities for hierarchy.      |
+| Cyan         | `#00FFFC` | Glitch effects only                                 |
+| Magenta      | `#FF00FF` | Glitch effects only                                 |
 
 **Orange is earned.** Use for the moment that needs to hit hardest. One word in a headline, one stat in a grid, one CTA. White/gray hierarchy does the heavy lifting.
 
 ### Typography
 
-| Font | Role | Usage |
-|------|------|-------|
+| Font           | Role    | Usage                                                                                                      |
+| -------------- | ------- | ---------------------------------------------------------------------------------------------------------- |
 | **Bebas Neue** | Display | Headlines, stats, tagline. Always uppercase, tracking >= 0.04em. The serifed "I" is a signature character. |
-| **Inter** | Body | Clean, invisible. Body copy, descriptions, longer text. Weights 300-700. |
-| **Space Mono** | UI/Data | Labels, status messages, tracking text, timestamps. Always uppercase with wide letter-spacing. |
+| **Inter**      | Body    | Clean, invisible. Body copy, descriptions, longer text. Weights 300-700.                                   |
+| **Space Mono** | UI/Data | Labels, status messages, tracking text, timestamps. Always uppercase with wide letter-spacing.             |
 
 ### Voice
 

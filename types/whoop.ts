@@ -218,6 +218,16 @@ export interface DailySnapshot {
   workout_avg_hr: number | null;
   workout_max_hr: number | null;
   workout_calories: number | null;
+  // Sleep (not displayed on public site — used by coach email only)
+  sleep_performance: number | null;     // percentage
+  sleep_efficiency: number | null;      // percentage
+  sleep_duration_minutes: number | null;
+  sleep_disturbances: number | null;
+  sleep_light_minutes: number | null;
+  sleep_deep_minutes: number | null;
+  sleep_rem_minutes: number | null;
+  sleep_debt_minutes: number | null;
+  sleep_respiratory_rate: number | null;
   created_at?: string;
 }
 
