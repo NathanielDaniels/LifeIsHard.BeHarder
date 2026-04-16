@@ -29,7 +29,7 @@ async function verifyToken(date: string, token: string): Promise<boolean> {
 }
 
 // Generate token for a given date (used by email pipeline)
-export async function generateToken(date: string): Promise<string> {
+async function generateToken(date: string): Promise<string> {
   const secret = process.env.ADMIN_SECRET;
   if (!secret) {
     if (process.env.NODE_ENV === 'production') throw new Error('ADMIN_SECRET is required in production');
