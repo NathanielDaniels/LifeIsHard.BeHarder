@@ -17,8 +17,26 @@ const BG = '#0a0a0a';
 const GRID = 'rgba(255,255,255,0.06)';
 const LABEL_COLOR = 'rgba(255,255,255,0.4)';
 
+// Sport-specific colors for discipline chart
+const SPORT_COLORS: Record<string, string> = {
+  'running': '#ef4444',      // red
+  'cycling': '#3b82f6',      // blue
+  'spin': '#3b82f6',         // blue (same as cycling)
+  'swimming': '#06b6d4',     // cyan
+  'triathlon': ORANGE,       // orange
+  'strength-training': '#a855f7', // purple
+  'steam-room': '#6b7280',   // gray
+  'percussive-massage': '#6b7280', // gray
+  'yoga': '#10b981',         // emerald
+  'hiking': '#84cc16',       // lime
+};
+
 function encode(config: object): string {
   return `${BASE}?c=${encodeURIComponent(JSON.stringify(config))}&w=480&h=130&bkg=${encodeURIComponent(BG)}&f=png`;
+}
+
+function encodeLarge(config: object, w = 480, h = 300): string {
+  return `${BASE}?c=${encodeURIComponent(JSON.stringify(config))}&w=${w}&h=${h}&bkg=${encodeURIComponent(BG)}&f=png`;
 }
 
 function recentDays(snapshots: DailySnapshot[], days: number): DailySnapshot[] {
@@ -203,4 +221,67 @@ export function strainSparkline(snapshots: DailySnapshot[], days = 7): string {
   };
 
   return encode(config);
+}
+
+// ============================================
+// Discipline Balance — doughnut chart
+// ============================================
+
+export interface DisciplineData {
+  [sport: string]: { minutes: number; pct: number };
+}
+
+function formatSportName(sport: string): string {
+  return sport
+    .split('-')
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(' ');
+}
+
+export function disciplineBalanceChart(disciplines: DisciplineData): string {
+  const entries = Object.entries(disciplines).sort((a, b) => b[1].minutes - a[1].minutes);
+  if (entries.length === 0) return '';
+
+  const labels = entries.map(([sport]) => formatSportName(sport));
+  const data = entries.map(([, d]) => d.minutes);
+  const colors = entries.map(([sport]) => SPORT_COLORS[sport] || '#6b7280');
+
+  const config = {
+    type: 'doughnut',
+    data: {
+      labels,
+      datasets: [{
+        data,
+        backgroundColor: colors,
+        borderColor: BG,
+        borderWidth: 2,
+      }],
+    },
+    options: {
+      legend: {
+        position: 'right',
+        labels: {
+          fontColor: LABEL_COLOR,
+          fontSize: 11,
+          padding: 12,
+          usePointStyle: true,
+        },
+      },
+      plugins: {
+        datalabels: {
+          color: '#ffffff',
+          font: { size: 11, weight: 'bold' },
+          formatter: (value: number, ctx: any) => {
+            const total = ctx.dataset.data.reduce((a: number, b: number) => a + b, 0);
+            if (total === 0) return '';
+            const pct = Math.round((value / total) * 100);
+            return pct >= 5 ? `${pct}%` : '';
+          },
+        },
+      },
+      cutoutPercentage: 55,
+    },
+  };
+
+  return encodeLarge(config, 480, 260);
 }
