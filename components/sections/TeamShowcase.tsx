@@ -196,7 +196,7 @@ export default function TeamShowcase() {
           transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
           className="mb-8 lg:mb-24"
         >
-          <span className="font-mono text-xs tracking-[0.3em] text-white/40 uppercase block mb-4">
+          <span className="font-mono text-xs tracking-[0.3em] text-white/60 uppercase block mb-4">
             Built by those who believe
           </span>
           <h1 className="font-display text-[clamp(3rem,8vw,5rem)] leading-[0.9] uppercase tracking-tight text-white">
@@ -281,7 +281,7 @@ export default function TeamShowcase() {
                             target="_blank"
                             rel="noopener noreferrer"
                             onClick={(e) => e.stopPropagation()}
-                            className="p-1 rounded text-white/40 hover:text-orange-500 transition-colors duration-200"
+                            className="p-1 rounded text-white/60 hover:text-orange-500 transition-colors duration-200"
                           >
                             <SocialIcon platform={link.platform} />
                           </a>
@@ -290,7 +290,7 @@ export default function TeamShowcase() {
                     )}
                   </div>
 
-                  <p className="mt-1 pl-[14px] font-mono text-[10px] uppercase tracking-[0.25em] text-white/30">
+                  <p className="mt-1 pl-[14px] font-mono text-[10px] uppercase tracking-[0.25em] text-white/50">
                     {member.role}
                   </p>
 
@@ -306,7 +306,7 @@ export default function TeamShowcase() {
                         }}
                         className="overflow-hidden"
                       >
-                        <p className="pt-3 pl-[14px] border-l-2 border-orange-500 ml-[2px] text-sm text-white/40 leading-relaxed">
+                        <p className="pt-3 pl-[14px] border-l-2 border-orange-500 ml-[2px] text-sm text-white/60 leading-relaxed">
                           {member.bio}
                         </p>
                       </motion.div>
@@ -395,7 +395,7 @@ export default function TeamShowcase() {
           >
             <Link
               href="/"
-              className="inline-flex items-center gap-3 font-display text-lg tracking-wide text-white/60 hover:text-white transition-colors duration-300 uppercase group"
+              className="inline-flex items-center gap-3 font-display text-lg tracking-wide text-white/80 hover:text-white transition-colors duration-300 uppercase group"
             >
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" className="transition-transform duration-300 group-hover:-translate-x-1">
                 <path d="M19 12H5M5 12L12 19M5 12L12 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -480,7 +480,7 @@ export default function TeamShowcase() {
                             target="_blank"
                             rel="noopener noreferrer"
                             onClick={(e) => e.stopPropagation()}
-                            className="p-1 rounded text-white/40 hover:text-orange-500 transition-colors duration-200"
+                            className="p-1 rounded text-white/60 hover:text-orange-500 transition-colors duration-200"
                           >
                             <SocialIcon platform={link.platform} />
                           </a>
@@ -489,7 +489,7 @@ export default function TeamShowcase() {
                     )}
                   </div>
 
-                  <p className="mt-1.5 pl-[30px] lg:pl-[38px] font-mono text-[10px] lg:text-[11px] uppercase tracking-[0.25em] text-white/30">
+                  <p className="mt-1.5 pl-[30px] lg:pl-[38px] font-mono text-[10px] lg:text-[11px] uppercase tracking-[0.25em] text-white/50">
                     {member.role}
                   </p>
 
@@ -500,7 +500,7 @@ export default function TeamShowcase() {
                         animate={{ height: "auto", opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
                         transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-                        className="pl-[30px] lg:pl-[38px] text-sm text-white/40 leading-relaxed overflow-hidden"
+                        className="pl-[30px] lg:pl-[38px] text-sm text-white/60 leading-relaxed overflow-hidden"
                       >
                         <span className="block pt-2">{member.bio}</span>
                       </motion.p>
@@ -521,7 +521,7 @@ export default function TeamShowcase() {
         >
           <Link
             href="/"
-            className="inline-flex items-center gap-3 font-display text-lg tracking-wide text-white/60 hover:text-white transition-colors duration-300 uppercase group"
+            className="inline-flex items-center gap-3 font-display text-lg tracking-wide text-white/80 hover:text-white transition-colors duration-300 uppercase group"
           >
             <svg
               width="24"

@@ -88,13 +88,13 @@ export default function TheRebuild() {
             >
               NOT A REPLACEMENT. AN UPGRADE.
             </h3>
-            <p className="font-mono text-base md:text-lg tracking-[0.15em] text-white/60 leading-relaxed mb-4">
+            <p className="font-mono text-base md:text-lg tracking-[0.15em] text-white/80 leading-relaxed mb-4">
               Carbon fiber. Titanium. Engineering that doesn't just restore function. It amplifies it.
             </p>
-            <p className="font-mono text-base md:text-lg tracking-[0.15em] text-white/60 leading-relaxed mb-4">
+            <p className="font-mono text-base md:text-lg tracking-[0.15em] text-white/80 leading-relaxed mb-4">
               This isn't about getting back to who he was. It's about becoming someone better.
             </p>
-            <p className="font-mono text-xs tracking-[0.2em] text-white/40 mt-8">
+            <p className="font-mono text-xs tracking-[0.2em] text-white/60 mt-8">
               PROSTHETIST: DAVID ROTTER
             </p>
           </motion.div>
@@ -134,7 +134,7 @@ export default function TheRebuild() {
                 opacity: techOverlayOpacity,
               }}
             >
-              <p className="font-mono text-xs tracking-[0.2em] text-white/60 mb-2">
+              <p className="font-mono text-xs tracking-[0.2em] text-white/80 mb-2">
                 MATERIAL SPEC
               </p>
               <p className="font-mono text-xs tracking-[0.15em] text-white/80">
@@ -166,13 +166,13 @@ export default function TheRebuild() {
             >
               SOMEONE SAID 'TRY THIS.'
             </h3>
-            <p className="font-mono text-base md:text-lg tracking-[0.15em] text-white/60 leading-relaxed mb-4">
+            <p className="font-mono text-base md:text-lg tracking-[0.15em] text-white/80 leading-relaxed mb-4">
               Keri introduced him to adaptive sports. First session at Dare2Tri.
             </p>
-            <p className="font-mono text-base md:text-lg tracking-[0.15em] text-white/60 leading-relaxed mb-4">
+            <p className="font-mono text-base md:text-lg tracking-[0.15em] text-white/80 leading-relaxed mb-4">
               The catalyst. The spark. The moment everything changed direction.
             </p>
-            <p className="font-mono text-base md:text-lg tracking-[0.15em] text-white/60 leading-relaxed">
+            <p className="font-mono text-base md:text-lg tracking-[0.15em] text-white/80 leading-relaxed">
               Patient became athlete.
             </p>
           </motion.div>
@@ -216,10 +216,10 @@ export default function TheRebuild() {
             >
               {countersTriggered && <AnimatedCounter value={daysSinceAccident} duration={2000} />}
             </div>
-            <p className="font-mono text-xs tracking-[0.3em] text-white/60">
+            <p className="font-mono text-xs tracking-[0.3em] text-white/80">
               DAYS SINCE ACCIDENT
             </p>
-            <p className="font-mono text-xs tracking-[0.15em] text-white/40 mt-2">
+            <p className="font-mono text-xs tracking-[0.15em] text-white/60 mt-2">
               November 1, 2020
             </p>
           </div>
@@ -231,10 +231,10 @@ export default function TheRebuild() {
             >
               {countersTriggered && <AnimatedCounter value={daysSober} duration={2000} />}
             </div>
-            <p className="font-mono text-xs tracking-[0.3em] text-white/60">
+            <p className="font-mono text-xs tracking-[0.3em] text-white/80">
               DAYS SOBER
             </p>
-            <p className="font-mono text-xs tracking-[0.15em] text-white/40 mt-2">
+            <p className="font-mono text-xs tracking-[0.15em] text-white/60 mt-2">
               January 20, 2020
             </p>
           </div>
@@ -246,11 +246,11 @@ export default function TheRebuild() {
             >
               {countersTriggered && <AnimatedCounter value={daysUntilNextRace} duration={2000} />}
             </div>
-            <p className="font-mono text-xs tracking-[0.3em] text-white/60">
+            <p className="font-mono text-xs tracking-[0.3em] text-white/80">
               DAYS UNTIL NEXT RACE
             </p>
             {nextRace && (
-              <p className="font-mono text-xs tracking-[0.15em] text-white/40 mt-2">
+              <p className="font-mono text-xs tracking-[0.15em] text-white/60 mt-2">
                 {nextRace.name}
               </p>
             )}

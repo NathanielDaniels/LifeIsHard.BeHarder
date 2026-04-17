@@ -59,13 +59,13 @@ export default function LiveStats() {
         >
           <div className="inline-flex items-center gap-2 mb-4 px-4 py-2 rounded-full border border-white/10 bg-white/5">
             <div className={`w-2 h-2 rounded-full bg-green-500 animate-pulse`} />
-            <span className="text-xs font-mono text-white/60">SYSTEM STATUS: {energyState} ENERGY</span>
+            <span className="text-xs font-mono text-white/80">SYSTEM STATUS: {energyState} ENERGY</span>
           </div>
           
           <h2 className="text-5xl md:text-7xl font-black text-white mb-4">
             LIVE <span style={{ color: theme.primaryColor, transition: 'color 1s' }}>RIGHT NOW</span>
           </h2>
-          <p className="text-white/60 text-lg">
+          <p className="text-white/80 text-lg">
             Site physics synced to Patrick's recovery.
           </p>
         </motion.div>
@@ -113,7 +113,7 @@ export default function LiveStats() {
             transition={{ delay: 1, duration: 1 }}
             className="mt-20 p-8 rounded-2xl bg-white/5 border border-white/10 max-w-2xl mx-auto text-center"
           >
-            <p className="text-white/60 text-sm mb-6 uppercase tracking-widest">
+            <p className="text-white/80 text-sm mb-6 uppercase tracking-widest">
               Simulation Control (Dev Only)
             </p>
             <div className="flex flex-wrap justify-center gap-4">
@@ -136,7 +136,7 @@ export default function LiveStats() {
                 Simulate: PEAK (95%)
               </button>
             </div>
-            <p className="mt-4 text-xs text-white/40">
+            <p className="mt-4 text-xs text-white/60">
               Click to see how the entire site's atmosphere shifts based on data.
             </p>
           </motion.div>
@@ -184,7 +184,7 @@ function StatCard({ label, value, unit, max, color, description, delay, isPrimar
       />
 
       <div className="relative z-10">
-        <div className="text-white/60 text-sm uppercase tracking-widest mb-4">
+        <div className="text-white/80 text-sm uppercase tracking-widest mb-4">
           {label}
         </div>
 
@@ -211,7 +211,7 @@ function StatCard({ label, value, unit, max, color, description, delay, isPrimar
           />
         </div>
 
-        <div className="text-white/40 text-xs">
+        <div className="text-white/60 text-xs">
           {description}
         </div>
       </div>

@@ -53,7 +53,7 @@ export default function TheMachine() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="font-mono text-xs tracking-[0.5em] text-white/50 uppercase"
+            className="font-mono text-xs tracking-[0.5em] text-white/70 uppercase"
           >
             {isConnected ? "Today's Readout" : 'Biometric Data'} // {dateString}
           </motion.h2>
@@ -73,7 +73,7 @@ export default function TheMachine() {
           transition={{ duration: 0.8 }}
           className="flex flex-col items-center justify-center mb-16 py-12"
         >
-          <span className="font-mono text-xs tracking-[0.5em] text-white/40 uppercase mb-4">
+          <span className="font-mono text-xs tracking-[0.5em] text-white/60 uppercase mb-4">
             Today&apos;s Recovery
           </span>
           <div className="relative flex items-center justify-center">
@@ -212,14 +212,14 @@ export default function TheMachine() {
             <div className="flex items-center gap-3 mb-4">
               <div className="w-1 h-8 rounded-full" style={{ backgroundColor: themeColor }} />
               <div>
-                <span className="font-mono text-[0.75rem] tracking-[0.3em] text-white/60 block">
+                <span className="font-mono text-[0.75rem] tracking-[0.3em] text-white/80 block">
                   LAST WORKOUT
                 </span>
                 <span className="font-display text-2xl font-bold uppercase" style={{ color: themeColor }}>
                   {stats.lastWorkout.sport}
                 </span>
               </div>
-              <span className="ml-auto font-mono text-[0.75rem] text-white/40">
+              <span className="ml-auto font-mono text-[0.75rem] text-white/60">
                 {new Date(stats.lastWorkout.completedAt).toLocaleDateString('en-US', {
                   timeZone: 'America/Chicago',
                   month: 'short',
@@ -230,37 +230,37 @@ export default function TheMachine() {
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div>
-                <span className="font-mono text-[0.7rem] tracking-[0.2em] text-white/50 block">STRAIN</span>
+                <span className="font-mono text-[0.7rem] tracking-[0.2em] text-white/70 block">STRAIN</span>
                 <span className="font-display text-3xl font-bold" style={{ color: themeColor }}>
                   {stats.lastWorkout.strain.toFixed(1)}
                 </span>
               </div>
               <div>
-                <span className="font-mono text-[0.7rem] tracking-[0.2em] text-white/50 block">AVG HR</span>
+                <span className="font-mono text-[0.7rem] tracking-[0.2em] text-white/70 block">AVG HR</span>
                 <span className="font-display text-3xl font-bold" style={{ color: themeColor }}>
                   {stats.lastWorkout.averageHeartRate}{' '}
-                  <span className="text-base font-mono text-white/40">BPM</span>
+                  <span className="text-base font-mono text-white/60">BPM</span>
                 </span>
               </div>
               <div>
-                <span className="font-mono text-[0.7rem] tracking-[0.2em] text-white/50 block">MAX HR</span>
+                <span className="font-mono text-[0.7rem] tracking-[0.2em] text-white/70 block">MAX HR</span>
                 <span className="font-display text-3xl font-bold" style={{ color: themeColor }}>
                   {stats.lastWorkout.maxHeartRate}{' '}
-                  <span className="text-base font-mono text-white/40">BPM</span>
+                  <span className="text-base font-mono text-white/60">BPM</span>
                 </span>
               </div>
               <div>
-                <span className="font-mono text-[0.7rem] tracking-[0.2em] text-white/50 block">CALORIES</span>
+                <span className="font-mono text-[0.7rem] tracking-[0.2em] text-white/70 block">CALORIES</span>
                 <span className="font-display text-3xl font-bold" style={{ color: themeColor }}>
                   {stats.lastWorkout.calories}{' '}
-                  <span className="text-base font-mono text-white/40">kcal</span>
+                  <span className="text-base font-mono text-white/60">kcal</span>
                 </span>
               </div>
             </div>
           </motion.div>
         )}
 
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3 mt-8 font-mono text-[0.65rem] md:text-[0.75rem] tracking-[0.2em] text-white/50">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3 mt-8 font-mono text-[0.65rem] md:text-[0.75rem] tracking-[0.2em] text-white/70">
           <span className="whitespace-nowrap">POWERED BY WHOOP</span>
           <span className="hidden sm:inline opacity-50">•</span>
           <span className="whitespace-nowrap">{isConnected ? 'LIVE DATA' : 'DEMO DATA'}</span>

@@ -23,10 +23,10 @@ export default function TheFall() {
         <h2 className="font-display text-[clamp(3rem,8vw,6rem)] font-bold text-white/90 leading-none mb-6">
           JANUARY 20, 2020
         </h2>
-        <p className="font-mono text-base md:text-lg tracking-[0.15em] text-white/50 leading-relaxed max-w-lg">
+        <p className="font-mono text-base md:text-lg tracking-[0.15em] text-white/70 leading-relaxed max-w-lg">
           THE DAY HE GOT SOBER.
         </p>
-        <p className="font-mono text-base md:text-lg tracking-[0.15em] text-white/40 leading-relaxed max-w-lg mt-3">
+        <p className="font-mono text-base md:text-lg tracking-[0.15em] text-white/70 leading-relaxed max-w-lg mt-3">
           Nine months before the accident. The first thing he lost wasn't his leg.
         </p>
       </motion.div>
@@ -43,13 +43,13 @@ export default function TheFall() {
         <h2 className="font-display text-[clamp(3rem,10vw,8rem)] font-bold text-white/90 leading-none mb-6">
           2020
         </h2>
-        <p className="font-mono text-base md:text-lg tracking-[0.15em] text-white/50 leading-relaxed max-w-lg">
+        <p className="font-mono text-base md:text-lg tracking-[0.15em] text-white/70 leading-relaxed max-w-lg">
           THE YEAR EVERYTHING COLLAPSED.
         </p>
-        <p className="font-mono text-base md:text-lg tracking-[0.15em] text-white/35 leading-relaxed max-w-lg mt-3">
+        <p className="font-mono text-base md:text-lg tracking-[0.15em] text-white/70 leading-relaxed max-w-lg mt-3">
           Marriage ended. The restaurant group he'd spent years building fell apart during COVID.
         </p>
-        <p className="font-mono text-base md:text-lg tracking-[0.15em] text-white/40 leading-relaxed max-w-lg mt-3">
+        <p className="font-mono text-base md:text-lg tracking-[0.15em] text-white/70 leading-relaxed max-w-lg mt-3">
           Rock bottom has a basement.
         </p>
       </motion.div>
@@ -66,13 +66,13 @@ export default function TheFall() {
         <h2 className="font-display text-[clamp(3rem,8vw,6rem)] font-bold text-white/90 leading-none mb-2">
           NOVEMBER 1, 2020
         </h2>
-        <p className="font-mono text-sm tracking-[0.3em] text-white/40 mb-8">
+        <p className="font-mono text-sm tracking-[0.3em] text-white/60 mb-8">
           CHICAGO, ILLINOIS
         </p>
-        <p className="font-mono text-base md:text-lg tracking-[0.15em] text-white/50 leading-relaxed max-w-lg">
+        <p className="font-mono text-base md:text-lg tracking-[0.15em] text-white/70 leading-relaxed max-w-lg">
           A car hit his motorcycle.
         </p>
-        <p className="font-mono text-base md:text-lg tracking-[0.15em] text-white/40 leading-relaxed max-w-lg mt-4">
+        <p className="font-mono text-base md:text-lg tracking-[0.15em] text-white/70 leading-relaxed max-w-lg mt-4">
           He lost his right leg below the knee.
         </p>
       </motion.div>
@@ -89,7 +89,7 @@ export default function TheFall() {
           whileInView={{ opacity: 0.6 }}
           viewport={{ once: true, margin: "-10%" }}
           transition={{ duration: 2 }}
-          className="font-mono text-sm md:text-base tracking-[0.5em] text-white/40 mb-8"
+          className="font-mono text-sm md:text-base tracking-[0.5em] text-white/60 mb-8"
         >
           SIGNAL RECOVERED
         </motion.p>

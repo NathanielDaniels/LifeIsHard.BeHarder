@@ -200,7 +200,7 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
             2026 RACE MAP
           </h3>
           {!selectedData && (
-            <p className="font-mono text-[10px] tracking-[0.2em] text-white/40 mt-1">
+            <p className="font-mono text-[10px] tracking-[0.2em] text-white/60 mt-1">
               <span className="hidden md:inline">{RACES_2026.length} RACES · CLICK A RACE FOR DETAILS</span>
               <span className="md:hidden">{RACES_2026.length} RACES · EXPLORE RACES BELOW</span>
             </p>
@@ -249,7 +249,7 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
                   {race.course && (
                     <>
                       <span className="mx-2 text-white/20">·</span>
-                      <span className="text-white/40">{race.course}</span>
+                      <span className="text-white/60">{race.course}</span>
                     </>
                   )}
                   {race.championship && (
@@ -603,7 +603,7 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
         <nav className="hidden md:flex flex-col w-80 lg:w-96 border-l border-white/10 bg-black/50" aria-label="Race list">
           {/* Sidebar header */}
           <div className="px-5 py-4 border-b border-white/10">
-            <div className="font-mono text-[10px] tracking-[0.3em] text-white/40">
+            <div className="font-mono text-[10px] tracking-[0.3em] text-white/60">
               ALL RACES
             </div>
           </div>
@@ -698,7 +698,7 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
                         {race.name}
                       </div>
                       {/* Location + distance */}
-                      <div className="font-mono text-[11px] tracking-[0.1em] text-white/50 mt-0.5">
+                      <div className="font-mono text-[11px] tracking-[0.1em] text-white/70 mt-0.5">
                         {race.location}
                         {race.distance ? ` · ${race.distance}` : ''}
                       </div>
@@ -728,10 +728,10 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
                         <div className="mt-2 pt-2 border-t border-white/10 space-y-1">
                           {race.splits.map((split) => (
                             <div key={split.leg} className="flex items-center gap-2">
-                              <span className="font-mono text-[9px] tracking-[0.15em] text-white/30 w-8 shrink-0">{split.leg}</span>
+                              <span className="font-mono text-[9px] tracking-[0.15em] text-white/50 w-8 shrink-0">{split.leg}</span>
                               <span className="font-mono text-[11px] font-medium" style={{ color: themeColor }}>{split.time}</span>
                               {split.pace && (
-                                <span className="font-mono text-[10px] text-white/30">{split.pace}</span>
+                                <span className="font-mono text-[10px] text-white/50">{split.pace}</span>
                               )}
                             </div>
                           ))}
@@ -752,7 +752,7 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
                           <div className="font-display text-3xl leading-none" style={{ color: themeColor }}>
                             {daysUntil}
                           </div>
-                          <div className="font-mono text-[9px] tracking-[0.2em] text-white/50 mt-0.5">
+                          <div className="font-mono text-[9px] tracking-[0.2em] text-white/70 mt-0.5">
                             DAYS
                           </div>
                         </div>
@@ -763,7 +763,7 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
                             {race.result}
                           </div>
                         ) : (
-                          <div className="font-mono text-[10px] tracking-[0.15em] text-white/30">
+                          <div className="font-mono text-[10px] tracking-[0.15em] text-white/50">
                             DONE
                           </div>
                         )
@@ -776,7 +776,7 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
           </div>
 
           {/* Legend at bottom of sidebar */}
-          <div className="px-5 py-3 border-t border-white/10 flex flex-wrap gap-x-4 gap-y-1 font-mono text-[9px] tracking-[0.15em] text-white/30">
+          <div className="px-5 py-3 border-t border-white/10 flex flex-wrap gap-x-4 gap-y-1 font-mono text-[9px] tracking-[0.15em] text-white/50">
             <span className="flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: themeColor }} />
               Upcoming
@@ -860,13 +860,13 @@ function FullRaceMap({ themeColor, onClose }: FullRaceMapProps) {
                         {race.name}
                       </div>
                       {/* Date, location, distance */}
-                      <div className="font-mono text-[11px] tracking-[0.1em] text-white/50 mt-1">
+                      <div className="font-mono text-[11px] tracking-[0.1em] text-white/70 mt-1">
                         {raceDate.toUpperCase()} · {race.location}
                         {race.distance ? ` · ${race.distance}` : ''}
                       </div>
                       {/* Course */}
                       {race.course && (
-                        <div className="font-mono text-[10px] tracking-[0.1em] text-white/40 mt-1.5 text-center">
+                        <div className="font-mono text-[10px] tracking-[0.1em] text-white/60 mt-1.5 text-center">
                           {race.course}
                         </div>
                       )}
