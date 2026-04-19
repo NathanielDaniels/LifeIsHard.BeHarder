@@ -85,7 +85,7 @@ function MinimalStats({
           <span className="font-display text-2xl font-bold" style={{ color: themeColor }}>
             {currentHeartRate}
           </span>
-          <span className="text-sm text-white/40 ml-1">BPM</span>
+          <span className="text-sm text-white/60 ml-1">BPM</span>
         </div>
       </div>
       
@@ -95,7 +95,7 @@ function MinimalStats({
           <span className="font-display text-2xl font-bold" style={{ color: themeColor }}>
             {stats.recovery}%
           </span>
-          <span className="text-sm text-white/40 ml-1">Recovery</span>
+          <span className="text-sm text-white/60 ml-1">Recovery</span>
         </div>
       )}
     </div>
@@ -128,12 +128,12 @@ function CompactStats({
           size={40}
         />
         <div className="flex flex-col">
-          <span className="text-[0.55rem] font-mono tracking-[0.3em] text-white/40">
+          <span className="text-[0.55rem] font-mono tracking-[0.3em] text-white/60">
             {stats.heartRateSource === 'workout' ? 'POST-WORKOUT HR' : 
              stats.heartRateSource === 'decay' ? 'RECOVERING' : 'RESTING HR'}
           </span>
           <span className="font-display text-2xl font-bold" style={{ color: themeColor }}>
-            {currentHeartRate} <span className="text-sm font-mono text-white/40">BPM</span>
+            {currentHeartRate} <span className="text-sm font-mono text-white/60">BPM</span>
           </span>
         </div>
       </div>
@@ -165,7 +165,7 @@ function CompactStats({
       
       {/* Connection Status */}
       {showStatus && (
-        <div className="flex items-center gap-2 font-mono text-[0.6rem] tracking-[0.2em] text-white/40">
+        <div className="flex items-center gap-2 font-mono text-[0.6rem] tracking-[0.2em] text-white/60">
           <span 
             className="w-2 h-2 rounded-full"
             style={{ 
@@ -212,7 +212,7 @@ function FullStats({
           />
           <div>
             <h3 className="font-display text-lg font-bold">Live Biometrics</h3>
-            <p className="text-xs text-white/40 font-mono tracking-wider">
+            <p className="text-xs text-white/60 font-mono tracking-wider">
               POWERED BY WHOOP
             </p>
           </div>
@@ -227,7 +227,7 @@ function FullStats({
                 boxShadow: `0 0 8px ${isConnected ? '#00ff00' : '#ffaa00'}`,
               }}
             />
-            <span className="text-xs font-mono text-white/50">
+            <span className="text-xs font-mono text-white/70">
               {isConnected ? 'LIVE' : 'DEMO'}
             </span>
           </div>
@@ -278,7 +278,7 @@ function FullStats({
       {/* Last Workout */}
       {stats.lastWorkout && (
         <div className="pt-4 border-t border-white/10">
-          <p className="text-xs font-mono text-white/40 tracking-wider mb-2">
+          <p className="text-xs font-mono text-white/60 tracking-wider mb-2">
             LAST WORKOUT
           </p>
           <div className="flex justify-between items-center">
@@ -286,15 +286,15 @@ function FullStats({
               <p className="font-display font-bold" style={{ color: themeColor }}>
                 {stats.lastWorkout.sport}
               </p>
-              <p className="text-sm text-white/60">
+              <p className="text-sm text-white/80">
                 {formatDuration(stats.lastWorkout.duration)} · Strain {stats.lastWorkout.strain.toFixed(1)}
               </p>
             </div>
             <div className="text-right">
-              <p className="text-sm text-white/40">
+              <p className="text-sm text-white/60">
                 Avg HR: {stats.lastWorkout.averageHeartRate ?? '--'}
               </p>
-              <p className="text-sm text-white/40">
+              <p className="text-sm text-white/60">
                 Max HR: {stats.lastWorkout.maxHeartRate ?? '--'}
               </p>
             </div>
@@ -349,7 +349,7 @@ function StatPill({
 }) {
   return (
     <div className="hidden md:flex flex-col items-center">
-      <span className="text-[0.5rem] font-mono tracking-[0.2em] text-white/40 mb-1">
+      <span className="text-[0.5rem] font-mono tracking-[0.2em] text-white/60 mb-1">
         {label}
       </span>
       <span className="font-display font-bold" style={{ color: themeColor }}>
@@ -386,15 +386,15 @@ function StatCard({
   
   return (
     <div className={`p-3 rounded-xl ${highlight ? 'bg-white/5' : ''}`}>
-      <p className="text-[0.6rem] font-mono tracking-wider text-white/40 mb-1">
+      <p className="text-[0.6rem] font-mono tracking-wider text-white/60 mb-1">
         {label}
       </p>
       <p className="font-display text-2xl font-bold" style={{ color: displayColor }}>
         {value ?? '--'}
-        {unit && <span className="text-sm text-white/40 ml-1">{unit}</span>}
+        {unit && <span className="text-sm text-white/60 ml-1">{unit}</span>}
       </p>
       {sublabel && (
-        <p className="text-[0.55rem] font-mono text-white/30 mt-1">{sublabel}</p>
+        <p className="text-[0.55rem] font-mono text-white/70 mt-1">{sublabel}</p>
       )}
     </div>
   );
@@ -411,7 +411,7 @@ function MiniStat({
 }) {
   return (
     <div className="text-center">
-      <p className="text-[0.55rem] font-mono tracking-wider text-white/40">
+      <p className="text-[0.55rem] font-mono tracking-wider text-white/60">
         {label}
       </p>
       <p className="font-display font-bold text-white/80">

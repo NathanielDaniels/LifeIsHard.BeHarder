@@ -41,7 +41,7 @@ export default function RaceGlobe({ themeColor }: RaceGlobeProps) {
 
   return (
     <div className="flex flex-col items-center text-center">
-      <p className="font-mono text-xs tracking-[0.3em] text-white/40 mb-2 uppercase">
+      <p className="font-mono text-xs tracking-[0.3em] text-white/60 mb-2 uppercase">
         Race Map
       </p>
       <h3 className="font-display text-3xl md:text-4xl tracking-[0.15em] text-white mb-8">
@@ -71,7 +71,7 @@ export default function RaceGlobe({ themeColor }: RaceGlobeProps) {
         />
       </div>
 
-      <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 mt-8 font-mono text-[10px] tracking-[0.2em] text-white/40 uppercase">
+      <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 mt-8 font-mono text-[10px] tracking-[0.2em] text-white/60 uppercase">
         <span>10 Races</span>
         <span className="hidden sm:inline">·</span>
         <span>4 States</span>

@@ -420,7 +420,7 @@ export default function ComingSoonClient() {
                       {isConnected ? 'Link Established' : whoopMode === 'demo' ? 'Demo Mode' : 'Offline Mode'}
                     </motion.span>
                   ) : (
-                    <span className="uppercase text-white/40">
+                    <span className="uppercase text-white/60">
                       {connectionStatus === 'connecting' ? 'Connecting...' : 
                        connectionStatus === 'syncing' ? 'Syncing Data...' : 
                        'Initializing...'}
@@ -512,7 +512,7 @@ export default function ComingSoonClient() {
             transition={{ duration: 0.8, ease: "easeOut" }}
             className="mb-6"
           >
-            <h2 className="text-lg md:text-xl font-light tracking-[0.4em] text-white/60 font-display uppercase">
+            <h2 className="text-lg md:text-xl font-light tracking-[0.4em] text-white/80 font-display uppercase">
               Patrick Wingert
             </h2>
             <motion.div 
@@ -547,7 +547,7 @@ export default function ComingSoonClient() {
             initial={{ opacity: 0, y: 20 }}
             animate={phase >= 2 ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 1, delay: 0.3 }}
-            className="mt-8 font-mono text-[clamp(0.7rem,1.5vw,1rem)] tracking-[0.4em] text-white/40"
+            className="mt-8 font-mono text-[clamp(0.7rem,1.5vw,1rem)] tracking-[0.4em] text-white/60"
           >
             ADAPTIVE ATHLETE
           </motion.p>
@@ -954,26 +954,26 @@ export default function ComingSoonClient() {
                     {whoopStats.lastWorkout.sport}
                   </span>
                 </div>
-                <span className="ml-auto font-mono text-[0.75rem] text-white/40">
+                <span className="ml-auto font-mono text-[0.75rem] text-white/60">
                   {new Date(whoopStats.lastWorkout.completedAt).toLocaleDateString('en-US', { timeZone: 'America/Chicago', month: 'short', day: 'numeric' })} • {whoopStats.lastWorkout.duration} min
                 </span>
               </div>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div>
-                  <span className="font-mono text-[0.7rem] tracking-[0.2em] text-white/50 block">STRAIN</span>
+                  <span className="font-mono text-[0.7rem] tracking-[0.2em] text-white/70 block">STRAIN</span>
                   <span className="font-display text-3xl font-bold" style={{ color: themeColor }}>{whoopStats.lastWorkout.strain.toFixed(1)}</span>
                 </div>
                 <div>
-                  <span className="font-mono text-[0.7rem] tracking-[0.2em] text-white/50 block">AVG HR</span>
-                  <span className="font-display text-3xl font-bold" style={{ color: themeColor }}>{whoopStats.lastWorkout.averageHeartRate} <span className="text-base font-mono text-white/40">BPM</span></span>
+                  <span className="font-mono text-[0.7rem] tracking-[0.2em] text-white/70 block">AVG HR</span>
+                  <span className="font-display text-3xl font-bold" style={{ color: themeColor }}>{whoopStats.lastWorkout.averageHeartRate} <span className="text-base font-mono text-white/60">BPM</span></span>
                 </div>
                 <div>
-                  <span className="font-mono text-[0.7rem] tracking-[0.2em] text-white/50 block">MAX HR</span>
-                  <span className="font-display text-3xl font-bold" style={{ color: themeColor }}>{whoopStats.lastWorkout.maxHeartRate} <span className="text-base font-mono text-white/40">BPM</span></span>
+                  <span className="font-mono text-[0.7rem] tracking-[0.2em] text-white/70 block">MAX HR</span>
+                  <span className="font-display text-3xl font-bold" style={{ color: themeColor }}>{whoopStats.lastWorkout.maxHeartRate} <span className="text-base font-mono text-white/60">BPM</span></span>
                 </div>
                 <div>
-                  <span className="font-mono text-[0.7rem] tracking-[0.2em] text-white/50 block">CALORIES</span>
-                  <span className="font-display text-3xl font-bold" style={{ color: themeColor }}>{whoopStats.lastWorkout.calories} <span className="text-base font-mono text-white/40">kcal</span></span>
+                  <span className="font-mono text-[0.7rem] tracking-[0.2em] text-white/70 block">CALORIES</span>
+                  <span className="font-display text-3xl font-bold" style={{ color: themeColor }}>{whoopStats.lastWorkout.calories} <span className="text-base font-mono text-white/60">kcal</span></span>
                 </div>
               </div>
             </motion.div>

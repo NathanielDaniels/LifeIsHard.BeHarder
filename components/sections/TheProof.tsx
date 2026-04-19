@@ -193,18 +193,18 @@ export default function TheProof() {
                       >
                         {panel.days}
                       </div>
-                      <div className="font-mono text-sm text-white/50 tracking-widest">
+                      <div className="font-mono text-sm text-white/70 tracking-widest">
                         {panel.location}
                       </div>
                     </div>
 
                     <div className="flex gap-8">
                       <div>
-                        <div className="font-mono text-xs text-white/40 mb-1">ALTITUDE</div>
+                        <div className="font-mono text-xs text-white/60 mb-1">ALTITUDE</div>
                         <div className="font-display text-2xl text-white">{panel.altitude}ft</div>
                       </div>
                       <div>
-                        <div className="font-mono text-xs text-white/40 mb-1">TEMP</div>
+                        <div className="font-mono text-xs text-white/60 mb-1">TEMP</div>
                         <div className="font-display text-2xl text-white">{panel.temp}°F</div>
                       </div>
                     </div>
@@ -250,18 +250,18 @@ export default function TheProof() {
                 <div className="font-display text-4xl mb-1" style={{ color: themeColor }}>
                   {panel.days}
                 </div>
-                <div className="font-mono text-xs text-white/50 tracking-widest">
+                <div className="font-mono text-xs text-white/70 tracking-widest">
                   {panel.location}
                 </div>
               </div>
 
               <div className="flex gap-6">
                 <div>
-                  <div className="font-mono text-xs text-white/40 mb-1">ALTITUDE</div>
+                  <div className="font-mono text-xs text-white/60 mb-1">ALTITUDE</div>
                   <div className="font-display text-xl text-white">{panel.altitude}ft</div>
                 </div>
                 <div>
-                  <div className="font-mono text-xs text-white/40 mb-1">TEMP</div>
+                  <div className="font-mono text-xs text-white/60 mb-1">TEMP</div>
                   <div className="font-display text-xl text-white">{panel.temp}°F</div>
                 </div>
               </div>
@@ -290,7 +290,7 @@ export default function TheProof() {
             <span style={{ color: themeColor }}>TRAIL COMPLETE.</span>
           </div>
 
-          <div className="font-display text-2xl md:text-4xl text-white/60 space-y-2">
+          <div className="font-display text-2xl md:text-4xl text-white/80 space-y-2">
             <div>FIRST AMERICAN.</div>
             <div>FIRST BELOW-KNEE AMPUTEE.</div>
             <div style={{ color: themeColor }}>250 MILES.</div>
@@ -343,17 +343,17 @@ function TelemetryOverlay({
     <div className="absolute top-8 left-8 z-30 font-mono text-xs md:text-sm text-white/70 space-y-3 bg-black/60 backdrop-blur-sm px-4 py-3 rounded-lg border border-white/10">
       <div className="flex items-center gap-4">
         <div>
-          <div className="text-white/40 text-xs">DAY</div>
+          <div className="text-white/60 text-xs">DAY</div>
           <div className="text-white text-lg font-bold">{dayDisplay}</div>
         </div>
         <div className="h-8 w-px bg-white/20" />
         <div>
-          <div className="text-white/40 text-xs">ALTITUDE</div>
+          <div className="text-white/60 text-xs">ALTITUDE</div>
           <div className="text-white text-lg font-bold">{altDisplay.toLocaleString()}ft</div>
         </div>
         <div className="h-8 w-px bg-white/20" />
         <div>
-          <div className="text-white/40 text-xs">TEMP</div>
+          <div className="text-white/60 text-xs">TEMP</div>
           <div className="text-white text-lg font-bold">{tempDisplay}°F</div>
         </div>
       </div>
@@ -369,7 +369,7 @@ function TelemetryOverlay({
         />
       </div>
 
-      <div className="text-white/40 text-xs">TRANS BHUTAN TRAIL • 250 MILES</div>
+      <div className="text-white/60 text-xs">TRANS BHUTAN TRAIL • 250 MILES</div>
     </div>
   );
 }
@@ -411,7 +411,7 @@ function MountainProfile({ dotX, themeColor }: { dotX: any; themeColor: string }
         </circle>
       </svg>
 
-      <div className="flex justify-between text-white/30 font-mono text-xs mt-2">
+      <div className="flex justify-between text-white/50 font-mono text-xs mt-2">
         <div>8,200ft</div>
         <div>9,800ft</div>
         <div>12,500ft</div>

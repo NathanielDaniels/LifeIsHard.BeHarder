@@ -141,7 +141,7 @@ export default function ProstheticScene({ scrollProgress, themeColor }: Prosthet
   if (hasError) {
     return (
       <div className="w-full h-full flex items-center justify-center">
-        <p className="font-mono text-xs tracking-[0.2em] text-white/30">
+        <p className="font-mono text-xs tracking-[0.2em] text-white/50">
           PROSTHETIC SYSTEM // OFFLINE
         </p>
       </div>

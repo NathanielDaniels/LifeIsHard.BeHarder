@@ -93,13 +93,29 @@ function toDateString(isoString: string): string {
   return isoString.split('T')[0];
 }
 
+/**
+ * Convert a UTC ISO timestamp to a local date string using a WHOOP timezone offset.
+ * WHOOP offsets are like "-05:00" or "+05:30".
+ * A workout at 2026-04-17T01:30:00Z with offset "-05:00" → 2026-04-16 (8:30pm CDT).
+ */
+function toLocalDateString(isoString: string, timezoneOffset?: string): string {
+  if (!timezoneOffset) return toDateString(isoString);
+  const dt = new Date(isoString);
+  const match = timezoneOffset.match(/^([+-])(\d{2}):(\d{2})$/);
+  if (!match) return toDateString(isoString);
+  const sign = match[1] === '+' ? 1 : -1;
+  const offsetMinutes = sign * (parseInt(match[2]) * 60 + parseInt(match[3]));
+  const local = new Date(dt.getTime() + offsetMinutes * 60000);
+  return local.toISOString().split('T')[0];
+}
+
 function findBestWorkout(workouts: WhoopWorkout[], date: string): WhoopWorkout | null {
   const dayWorkouts = workouts
     .filter((w) => {
       if (!w.start) return false;
-      // Use start date as the canonical date — a workout belongs to the day it started.
-      // Apply timezone offset if available, otherwise use UTC date.
-      const startDate = toDateString(w.start);
+      // Use start date in the athlete's LOCAL timezone as the canonical date.
+      // A workout at 8pm CDT (1am UTC next day) belongs to the day it was performed.
+      const startDate = toLocalDateString(w.start, w.timezone_offset);
       return startDate === date;
     })
     .filter((w) => {
@@ -118,7 +134,11 @@ function findBestWorkout(workouts: WhoopWorkout[], date: string): WhoopWorkout |
 
 export async function snapshotToday(accessToken: string): Promise<DailySnapshot> {
   const today = new Date().toISOString().split('T')[0];
-  const start = `${today}T00:00:00.000Z`;
+  // Extend workout fetch range by 1 day in each direction to catch workouts
+  // that cross UTC midnight (e.g., 8pm CDT = 1am UTC next day).
+  // findBestWorkout filters by local date, so extra results are harmless.
+  const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+  const start = `${yesterday}T00:00:00.000Z`;
   const end = `${today}T23:59:59.999Z`;
 
   const [recoveries, cycles, workouts, sleeps] = await Promise.all([
@@ -279,7 +299,7 @@ function buildWorkoutRecord(workout: WhoopWorkout): WorkoutRecord {
 
   return {
     whoop_workout_id: workout.id,
-    date: toDateString(workout.start),
+    date: toLocalDateString(workout.start, workout.timezone_offset),
     sport_name: workout.sport_name ?? null,
     strain: workout.score?.strain ?? null,
     avg_hr: workout.score?.average_heart_rate ?? null,
@@ -300,8 +320,11 @@ function buildWorkoutRecord(workout: WhoopWorkout): WorkoutRecord {
 export async function saveAllWorkouts(
   accessToken: string,
 ): Promise<{ saved: number; errors: string[] }> {
+  // Extend range by 1 day to catch workouts that cross UTC midnight
+  // (e.g., 8pm PST = 3am UTC next day). Upsert by whoop_workout_id prevents dupes.
   const today = new Date().toISOString().split('T')[0];
-  const start = `${today}T00:00:00.000Z`;
+  const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+  const start = `${yesterday}T00:00:00.000Z`;
   const end = `${today}T23:59:59.999Z`;
   const errors: string[] = [];
 

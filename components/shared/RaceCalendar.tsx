@@ -35,7 +35,7 @@ export default function RaceCalendar({ themeColor }: RaceCalendarProps) {
         <h3 className="font-display text-5xl md:text-6xl lg:text-7xl tracking-[0.1em] text-white">
           2026 RACE CALENDAR
         </h3>
-        <p className="font-mono text-sm tracking-[0.2em] text-white/40">
+        <p className="font-mono text-sm tracking-[0.2em] text-white/60">
           THE ROAD TO NATIONALS
         </p>
       </div>
@@ -61,7 +61,7 @@ export default function RaceCalendar({ themeColor }: RaceCalendarProps) {
               exit={{ opacity: 0, y: -12 }}
               transition={{ duration: 0.25 }}
             >
-              <div className="font-mono text-xs tracking-[0.3em] text-white/50 mb-3">
+              <div className="font-mono text-xs tracking-[0.3em] text-white/70 mb-3">
                 {!showNationals && daysUntilNext === 0
                   ? "RIGHT NOW"
                   : showNationals
@@ -232,7 +232,7 @@ function RaceCard({ race, isNext, themeColor }: RaceCardProps) {
               <div className="flex-1 space-y-3">
                 {race.distance && (
                   <div className="flex items-center gap-3">
-                    <span className="font-mono text-[10px] tracking-[0.2em] text-white/30 uppercase w-20 shrink-0">
+                    <span className="font-mono text-[10px] tracking-[0.2em] text-white/50 uppercase w-20 shrink-0">
                       Distance
                     </span>
                     <span className="font-mono text-sm text-white/70">
@@ -242,7 +242,7 @@ function RaceCard({ race, isNext, themeColor }: RaceCardProps) {
                 )}
                 {race.course && (
                   <div className="flex items-center gap-3">
-                    <span className="font-mono text-[10px] tracking-[0.2em] text-white/30 uppercase w-20 shrink-0">
+                    <span className="font-mono text-[10px] tracking-[0.2em] text-white/50 uppercase w-20 shrink-0">
                       Course
                     </span>
                     <span className="font-mono text-sm text-white/70">
@@ -252,7 +252,7 @@ function RaceCard({ race, isNext, themeColor }: RaceCardProps) {
                 )}
                 {race.championship && (
                   <div className="flex items-center gap-3">
-                    <span className="font-mono text-[10px] tracking-[0.2em] text-white/30 uppercase w-20 shrink-0">
+                    <span className="font-mono text-[10px] tracking-[0.2em] text-white/50 uppercase w-20 shrink-0">
                       Stakes
                     </span>
                     <span
@@ -264,18 +264,18 @@ function RaceCard({ race, isNext, themeColor }: RaceCardProps) {
                   </div>
                 )}
                 {race.description && (
-                  <p className="font-mono text-sm text-white/50 italic pt-2">
+                  <p className="font-mono text-sm text-white/70 italic pt-2">
                     &ldquo;{race.description}&rdquo;
                   </p>
                 )}
                 {race.splits && (
                   <div className="pt-3 space-y-1.5">
-                    <div className="font-mono text-[10px] tracking-[0.2em] text-white/30 uppercase mb-2">
+                    <div className="font-mono text-[10px] tracking-[0.2em] text-white/50 uppercase mb-2">
                       Splits
                     </div>
                     {race.splits.map((split) => (
                       <div key={split.leg} className="flex items-center gap-3">
-                        <span className="font-mono text-[10px] tracking-[0.2em] text-white/30 uppercase w-12 shrink-0">
+                        <span className="font-mono text-[10px] tracking-[0.2em] text-white/50 uppercase w-12 shrink-0">
                           {split.leg}
                         </span>
                         <span
@@ -285,7 +285,7 @@ function RaceCard({ race, isNext, themeColor }: RaceCardProps) {
                           {split.time}
                         </span>
                         {split.pace && (
-                          <span className="font-mono text-xs text-white/40">
+                          <span className="font-mono text-xs text-white/60">
                             {split.pace}
                           </span>
                         )}
@@ -293,7 +293,7 @@ function RaceCard({ race, isNext, themeColor }: RaceCardProps) {
                     ))}
                     {race.result && (
                       <div className="flex items-center gap-3 pt-1.5 mt-1.5 border-t border-white/10">
-                        <span className="font-mono text-[10px] tracking-[0.2em] text-white/30 uppercase w-12 shrink-0">
+                        <span className="font-mono text-[10px] tracking-[0.2em] text-white/50 uppercase w-12 shrink-0">
                           Total
                         </span>
                         <span
@@ -568,10 +568,10 @@ function RaceCard({ race, isNext, themeColor }: RaceCardProps) {
 
             {!isPast && !isNext && (
               <div className="text-right">
-                <div className="font-display text-3xl md:text-4xl tracking-wide text-white/40">
+                <div className="font-display text-3xl md:text-4xl tracking-wide text-white/60">
                   {daysUntil}
                 </div>
-                <div className="font-mono text-xs tracking-[0.2em] text-white/30">
+                <div className="font-mono text-xs tracking-[0.2em] text-white/50">
                   DAYS
                 </div>
               </div>

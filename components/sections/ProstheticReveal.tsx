@@ -39,7 +39,7 @@ export default function ProstheticReveal() {
             <h2 className="text-4xl md:text-6xl font-black text-white mb-4">
               MY <span className="text-orange-500">REALITY</span>
             </h2>
-            <p className="text-xl text-white/60 font-light">
+            <p className="text-xl text-white/80 font-light">
               This is what I carry. This is what carries me.
             </p>
           </motion.div>
@@ -155,7 +155,7 @@ export default function ProstheticReveal() {
             viewport={{ once: true }}
             className="absolute bottom-8 left-0 right-0 text-center px-6"
           >
-            <p className="text-xl md:text-2xl text-white/60 font-light max-w-3xl mx-auto">
+            <p className="text-xl md:text-2xl text-white/80 font-light max-w-3xl mx-auto">
               Some see a limitation. I see <span className="text-orange-500 font-bold">liberation</span>.
             </p>
           </motion.div>

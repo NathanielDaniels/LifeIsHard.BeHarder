@@ -88,7 +88,7 @@ export default function SupportCTA() {
           viewport={{ once: true }}
           className="text-center"
         >
-          <p className="text-white/50 text-sm">
+          <p className="text-white/70 text-sm">
             All contributions made through Dare2tri are tax-deductible. Dare2tri is a 501(c)(3) nonprofit organization.
           </p>
         </motion.div>
@@ -122,13 +122,13 @@ function FundingMountain({ current, goal, supporters }: { current: number, goal:
 
       <div className="flex justify-between items-end mb-8 relative z-10">
         <div>
-          <div className="text-sm text-white/50 uppercase tracking-widest mb-1">Elevation Reached</div>
+          <div className="text-sm text-white/70 uppercase tracking-widest mb-1">Elevation Reached</div>
           <div className="text-5xl md:text-7xl font-black text-white">
             ${current.toLocaleString()}
           </div>
         </div>
         <div className="text-right">
-          <div className="text-sm text-white/50 uppercase tracking-widest mb-1">Summit Goal</div>
+          <div className="text-sm text-white/70 uppercase tracking-widest mb-1">Summit Goal</div>
           <div className="text-3xl font-bold text-white/70">
             ${goal.toLocaleString()}
           </div>
@@ -198,7 +198,7 @@ function FundingMountain({ current, goal, supporters }: { current: number, goal:
             className="absolute w-px h-full border-l border-dashed border-white/10 flex flex-col justify-end pb-2"
             style={{ left: `${ms}%` }}
           >
-            <div className={`text-[10px] uppercase tracking-widest -rotate-90 origin-bottom-left translate-x-3 mb-4 ${percentage >= ms ? 'text-white' : 'text-white/30'}`}>
+            <div className={`text-[10px] uppercase tracking-widest -rotate-90 origin-bottom-left translate-x-3 mb-4 ${percentage >= ms ? 'text-white' : 'text-white/50'}`}>
               Camp {ms/25}
             </div>
           </div>
@@ -209,11 +209,11 @@ function FundingMountain({ current, goal, supporters }: { current: number, goal:
         <div className="flex gap-12">
           <div>
             <span className="block text-2xl font-bold text-white">{supporters}</span>
-            <span className="text-xs text-white/50 uppercase">Backers</span>
+            <span className="text-xs text-white/70 uppercase">Backers</span>
           </div>
           <div>
             <span className="block text-2xl font-bold text-white">{(percentage).toFixed(1)}%</span>
-            <span className="text-xs text-white/50 uppercase">Complete</span>
+            <span className="text-xs text-white/70 uppercase">Complete</span>
           </div>
         </div>
 

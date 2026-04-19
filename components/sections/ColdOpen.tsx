@@ -101,7 +101,7 @@ export default function ColdOpen() {
             animate={{ opacity: bootPhase >= 3 ? 0.1 : 0.6 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.5 }}
-            className="absolute top-8 left-8 font-mono text-xs md:text-sm text-white/60 tracking-widest flex flex-col gap-2 z-20 hidden md:flex"
+            className="absolute top-8 left-8 font-mono text-xs md:text-sm text-white/80 tracking-widest flex flex-col gap-2 z-20 hidden md:flex"
           >
             {[
               { text: '> INIT VITALITY ENGINE v2.1', delay: 0 },
@@ -176,7 +176,7 @@ export default function ColdOpen() {
             transition={{ duration: 0.8 }}
             className="absolute bottom-8 left-1/2 -translate-x-1/2 hidden md:flex flex-col items-center gap-2 z-50"
           >
-            <span className="font-mono text-[0.7rem] tracking-[0.3em] text-white/50">SCROLL</span>
+            <span className="font-mono text-[0.7rem] tracking-[0.3em] text-white/70">SCROLL</span>
             <div
               className="w-[1.5px] h-8 bg-gradient-to-b to-transparent"
               style={{
@@ -211,7 +211,7 @@ export default function ColdOpen() {
             </motion.svg>
           </div>
           <div className="flex flex-col">
-            <span className="text-[0.65rem] md:text-[0.7rem] font-mono tracking-[0.3em] text-white/60">
+            <span className="text-[0.65rem] md:text-[0.7rem] font-mono tracking-[0.3em] text-white/80">
               LIVE HEART RATE
             </span>
             <span
@@ -219,7 +219,7 @@ export default function ColdOpen() {
               style={{ color: themeColor }}
             >
               {currentHeartRate}{' '}
-              <span className="text-sm font-mono text-white/50">BPM</span>
+              <span className="text-sm font-mono text-white/70">BPM</span>
             </span>
           </div>
         </div>
@@ -231,7 +231,7 @@ export default function ColdOpen() {
             transition={{ duration: 0.6, delay: 0.1 }}
             className="flex flex-col items-center"
           >
-            <span className="text-[0.6rem] md:text-[0.65rem] font-mono tracking-[0.25em] text-white/50">
+            <span className="text-[0.6rem] md:text-[0.65rem] font-mono tracking-[0.25em] text-white/70">
               RECOVERY
             </span>
             <span
@@ -248,7 +248,7 @@ export default function ColdOpen() {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="flex flex-col items-center"
           >
-            <span className="text-[0.6rem] md:text-[0.65rem] font-mono tracking-[0.25em] text-white/50">
+            <span className="text-[0.6rem] md:text-[0.65rem] font-mono tracking-[0.25em] text-white/70">
               STRAIN
             </span>
             <span
@@ -268,7 +268,7 @@ export default function ColdOpen() {
               transition={{ duration: 0.6, delay: 0.3 }}
               className="hidden md:flex flex-col items-center"
             >
-              <span className="text-[0.6rem] md:text-[0.65rem] font-mono tracking-[0.25em] text-white/50">
+              <span className="text-[0.6rem] md:text-[0.65rem] font-mono tracking-[0.25em] text-white/70">
                 HRV
               </span>
               <span
@@ -276,7 +276,7 @@ export default function ColdOpen() {
                 style={{ color: themeColor }}
               >
                 {Math.round(whoopStats.hrv)}
-                <span className="text-sm font-mono text-white/40">ms</span>
+                <span className="text-sm font-mono text-white/60">ms</span>
               </span>
             </motion.div>
           )}
@@ -288,7 +288,7 @@ export default function ColdOpen() {
               transition={{ duration: 0.6, delay: 0.4 }}
               className="hidden md:flex flex-col items-center"
             >
-              <span className="text-[0.6rem] md:text-[0.65rem] font-mono tracking-[0.25em] text-white/50">
+              <span className="text-[0.6rem] md:text-[0.65rem] font-mono tracking-[0.25em] text-white/70">
                 RESTING HR
               </span>
               <span
@@ -296,7 +296,7 @@ export default function ColdOpen() {
                 style={{ color: themeColor }}
               >
                 {whoopStats.restingHeartRate}
-                <span className="text-sm font-mono text-white/40">BPM</span>
+                <span className="text-sm font-mono text-white/60">BPM</span>
               </span>
             </motion.div>
           )}
