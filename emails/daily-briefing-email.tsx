@@ -43,6 +43,10 @@ export interface BriefingEmailProps {
   hrvChartUrl: string;
   strainChartUrl: string;
   disciplineChartUrl?: string;
+  trainingLoadChartUrl?: string;
+  recoveryLoadChartUrl?: string;
+  raceReadinessChartUrl?: string;
+  consistencyChartUrl?: string;
   responseButtons?: { label: string; url: string }[];
   checkinUrl?: string;
 }
@@ -124,6 +128,10 @@ export default function DailyBriefingEmail({
   hrvChartUrl = '',
   strainChartUrl = '',
   disciplineChartUrl = '',
+  trainingLoadChartUrl = '',
+  recoveryLoadChartUrl = '',
+  raceReadinessChartUrl = '',
+  consistencyChartUrl = '',
   responseButtons = [],
   checkinUrl = '',
 }: BriefingEmailProps) {
@@ -276,6 +284,40 @@ export default function DailyBriefingEmail({
             <Section style={sectionPadding}>
               <Text style={sectionHeader}>14-DAY TRAINING BALANCE</Text>
               <Img src={disciplineChartUrl} width="480" height="260" alt="Discipline balance" style={chartImg} />
+            </Section>
+          )}
+
+          {/* ══════ RACE READINESS ══════ */}
+          {raceReadinessChartUrl && (
+            <Section style={sectionPadding}>
+              <Text style={sectionHeader}>RACE READINESS</Text>
+              <Section style={{ textAlign: 'center' as const }}>
+                <Img src={raceReadinessChartUrl} width="200" height="200" alt="Race readiness score" style={{ ...chartImg, maxWidth: '200px', margin: '0 auto' }} />
+              </Section>
+            </Section>
+          )}
+
+          {/* ══════ TRAINING LOAD ══════ */}
+          {trainingLoadChartUrl && (
+            <Section style={sectionPadding}>
+              <Text style={sectionHeader}>4-WEEK TRAINING LOAD</Text>
+              <Img src={trainingLoadChartUrl} width="480" height="200" alt="Weekly training load progression" style={chartImg} />
+            </Section>
+          )}
+
+          {/* ══════ RECOVERY-TO-LOAD RATIO ══════ */}
+          {recoveryLoadChartUrl && (
+            <Section style={sectionPadding}>
+              <Text style={sectionHeader}>RECOVERY ÷ LOAD RATIO</Text>
+              <Img src={recoveryLoadChartUrl} width="480" height="200" alt="Recovery to load ratio trend" style={chartImg} />
+            </Section>
+          )}
+
+          {/* ══════ CONSISTENCY CALENDAR ══════ */}
+          {consistencyChartUrl && (
+            <Section style={sectionPadding}>
+              <Text style={sectionHeader}>28-DAY ACTIVITY</Text>
+              <Img src={consistencyChartUrl} width="480" height="100" alt="Workout consistency calendar" style={chartImg} />
             </Section>
           )}
 
