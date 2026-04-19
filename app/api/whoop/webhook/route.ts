@@ -6,6 +6,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { WhoopWebhookPayload } from '@/types/whoop';
 import { invalidateCache } from '@/lib/whoop-cache';
+import { getValidAccessToken } from '@/lib/whoop-token-storage';
+import { saveAllWorkouts } from '@/lib/whoop-history';
 import { rateLimit, getClientIP, rateLimitResponse } from '@/lib/rate-limit';
 import crypto from 'crypto';
 
@@ -81,9 +83,19 @@ export async function POST(request: NextRequest) {
 
 async function handleWebhookEvent(payload: WhoopWebhookPayload): Promise<void> {
   switch (payload.type) {
-    case 'workout.updated':
+    case 'workout.updated': {
       console.log(`[webhook] Workout updated: ${payload.id}`);
+      // Save all recent workouts to Supabase so the coach briefing sees every activity.
+      // Uses upsert on whoop_workout_id so duplicates are harmless.
+      const token = await getValidAccessToken();
+      if (token) {
+        const result = await saveAllWorkouts(token);
+        console.log(`[webhook] Saved ${result.saved} workout(s)`, result.errors.length ? result.errors : '');
+      } else {
+        console.error('[webhook] No valid access token — cannot save workouts');
+      }
       break;
+    }
     // case 'sleep.updated':
     //   console.log(`[webhook] Sleep updated: ${payload.id}`);
     //   break;
