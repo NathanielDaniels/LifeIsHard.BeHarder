@@ -299,7 +299,7 @@ function buildWorkoutRecord(workout: WhoopWorkout): WorkoutRecord {
 
   return {
     whoop_workout_id: workout.id,
-    date: toDateString(workout.start),
+    date: toLocalDateString(workout.start, workout.timezone_offset),
     sport_name: workout.sport_name ?? null,
     strain: workout.score?.strain ?? null,
     avg_hr: workout.score?.average_heart_rate ?? null,
@@ -320,8 +320,11 @@ function buildWorkoutRecord(workout: WhoopWorkout): WorkoutRecord {
 export async function saveAllWorkouts(
   accessToken: string,
 ): Promise<{ saved: number; errors: string[] }> {
+  // Extend range by 1 day to catch workouts that cross UTC midnight
+  // (e.g., 8pm PST = 3am UTC next day). Upsert by whoop_workout_id prevents dupes.
   const today = new Date().toISOString().split('T')[0];
-  const start = `${today}T00:00:00.000Z`;
+  const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+  const start = `${yesterday}T00:00:00.000Z`;
   const end = `${today}T23:59:59.999Z`;
   const errors: string[] = [];
 
