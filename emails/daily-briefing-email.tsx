@@ -632,27 +632,30 @@ const responseCard: React.CSSProperties = {
 };
 
 const responseBtn: React.CSSProperties = {
-  display: 'block',
+  display: 'inline-block',
   backgroundColor: 'rgba(249,115,22,0.08)',
   border: `1px solid rgba(249,115,22,0.25)`,
   borderRadius: '8px',
-  padding: '12px 20px',
+  padding: '10px 16px',
   color: ORANGE,
-  fontSize: '14px',
-  fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-  textDecoration: 'none',
-  textAlign: 'center' as const,
-  marginBottom: '8px',
-};
-
-const checkinLink: React.CSSProperties = {
-  display: 'block',
-  color: 'rgba(255,255,255,0.4)',
   fontSize: '13px',
   fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
   textDecoration: 'none',
   textAlign: 'center' as const,
-  marginTop: '12px',
+  margin: '4px',
+};
+
+const checkinLink: React.CSSProperties = {
+  display: 'block',
+  color: ORANGE,
+  fontSize: '14px',
+  fontWeight: 600,
+  fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+  textDecoration: 'none',
+  textAlign: 'center' as const,
+  marginTop: '16px',
+  padding: '10px 0',
+  borderTop: '1px solid rgba(255,255,255,0.1)',
 };
 
 // --- Footer ---
