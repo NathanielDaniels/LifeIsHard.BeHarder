@@ -89,15 +89,15 @@ function CheckinForm() {
           </div>
         )}
 
-        {/* Training today */}
+        {/* Training plan */}
         <div style={section}>
-          <label style={label}>TRAINING TODAY</label>
+          <label style={label}>TODAY&apos;S PLAN</label>
           <div style={buttonRow}>
             {[
-              { value: 'completed', label: 'Did the workout' },
-              { value: 'modified', label: 'Modified it' },
-              { value: 'skipped', label: 'Skipped' },
-              { value: 'rest-day', label: 'Rest day' },
+              { value: 'following-plan', label: 'Following coach plan' },
+              { value: 'different-plan', label: 'Doing something else' },
+              { value: 'rest-day', label: 'Taking a rest day' },
+              { value: 'unsure', label: 'Not sure yet' },
             ].map((opt) => (
               <button
                 key={opt.value}
@@ -112,7 +112,7 @@ function CheckinForm() {
 
         {/* Body check */}
         <div style={section}>
-          <label style={label}>HOW DOES YOUR BODY FEEL?</label>
+          <label style={label}>HOW ARE YOU FEELING THIS MORNING?</label>
           <div style={buttonRow}>
             {[
               { value: 'strong', label: '\u{1F4AA} Strong' },
