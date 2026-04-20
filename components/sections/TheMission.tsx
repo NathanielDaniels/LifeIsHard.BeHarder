@@ -81,7 +81,7 @@ export default function TheMission() {
                 </h2>
               </div>
 
-              <div className="space-y-6 text-lg md:text-xl text-white/70 leading-relaxed">
+              <div className="space-y-6 text-lg md:text-xl text-white/80 leading-relaxed">
                 <p>
                   Acceptance to the <strong style={{ color: theme.primaryColor }}>Dare2Tri Elite Development Team</strong> isn't given. It's earned through relentless training, podium finishes, and a refusal to accept limitations.
                 </p>

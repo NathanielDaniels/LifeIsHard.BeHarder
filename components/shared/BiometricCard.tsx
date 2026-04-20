@@ -131,10 +131,10 @@ export default function BiometricCard({ label, value, unit, color, delay, subtex
         >
           {value !== null ? value : '--'}
         </ValueTag>
-        <span className="font-mono text-sm text-white/50 mb-1">{unit}</span>
+        <span className="font-mono text-sm text-white/70 mb-1">{unit}</span>
       </div>
       {subtext && (
-        <span className="font-mono text-[0.65rem] text-white/40 mt-2 block">
+        <span className="font-mono text-[0.65rem] text-white/60 mt-2 block">
           {subtext}
         </span>
       )}

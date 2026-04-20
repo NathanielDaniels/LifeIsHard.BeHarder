@@ -31,7 +31,7 @@ export default function TheShift() {
           <h2 className="text-5xl md:text-7xl font-black text-white mb-6">
             THE <span className="text-orange-500">SHIFT</span>
           </h2>
-          <p className="text-xl md:text-2xl text-white/60 max-w-3xl mx-auto font-light">
+          <p className="text-xl md:text-2xl text-white/80 max-w-3xl mx-auto font-light">
             One moment changed everything. What came next defined everything.
           </p>
         </motion.div>
@@ -151,7 +151,7 @@ export default function TheShift() {
           viewport={{ once: true }}
           className="mt-20 text-center px-6"
         >
-          <p className="text-2xl md:text-4xl font-light text-white/70 max-w-4xl mx-auto leading-relaxed">
+          <p className="text-2xl md:text-4xl font-light text-white/80 max-w-4xl mx-auto leading-relaxed">
             The injury took my leg.
             <br />
             It couldn't take my <span className="text-orange-500 font-bold">fire</span>.

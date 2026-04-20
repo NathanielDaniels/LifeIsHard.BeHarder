@@ -25,7 +25,7 @@ export default function SiteFooter() {
       </div>
 
       <div className="max-w-6xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
-        <span className="font-display text-base tracking-[0.2em] text-white/60">
+        <span className="font-display text-base tracking-[0.2em] text-white/80">
           PATRICK WINGERT
         </span>
         <span className="font-mono text-[9px] tracking-[0.2em] text-white/20">

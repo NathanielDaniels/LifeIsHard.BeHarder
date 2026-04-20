@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { rateLimit, getClientIP, rateLimitResponse } from '@/lib/rate-limit';
 import WelcomeEmail from '@/emails/welcome-email';
+import { supabase } from '@/lib/supabase';
 
 // Lazy-init so build doesn't crash when env vars are missing
 let _resend: Resend | null = null;
@@ -98,6 +99,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Persist to Supabase
+    try {
+      await supabase
+        .from('subscribers')
+        .upsert({ email, source: 'coming-soon' }, { onConflict: 'email' });
+    } catch (dbErr) {
+      console.error('Supabase subscriber insert failed:', dbErr);
+    }
+
     // Send welcome email
     const { error: emailError } = await getResend().emails.send({
       from: `Patrick Wingert <${process.env.RESEND_FROM_EMAIL || 'patrick@patrickwingert.com'}>`,
@@ -109,6 +119,22 @@ export async function POST(request: NextRequest) {
     if (emailError) {
       console.error('Welcome email failed:', emailError);
       // Contact was still added - don't fail the whole request
+    }
+
+    // Notify Patrick of new subscriber
+    const notifyEmail = process.env.SUBSCRIBE_NOTIFY_EMAIL;
+    if (notifyEmail) {
+      getResend().contacts.list({ audienceId: getAudienceId() })
+        .then(({ data }) => {
+          const count = data?.data?.length ?? '?';
+          return getResend().emails.send({
+            from: `Patrick Wingert <${process.env.RESEND_FROM_EMAIL || 'patrick@patrickwingert.com'}>`,
+            to: notifyEmail.split(',').map((e) => e.trim()),
+            subject: `Subscriber #${count}: ${email}`,
+            text: `New email signup on patrickwingert.com\n\n${email}\n\nTotal subscribers: ${count}\n\nView all subscribers: https://resend.com/audiences`,
+          });
+        })
+        .catch((err) => console.error('Notify email failed:', err));
     }
 
     return NextResponse.json(

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface CustomCursorProps {
   themeColor: string;
@@ -13,8 +13,28 @@ export default function CustomCursor({ themeColor, isDimmed = false }: CustomCur
   const innerRef = useRef<HTMLDivElement>(null);
   const mouseRef = useRef({ x: 0, y: 0 });
   const posRef = useRef({ x: 0, y: 0 });
+  const [isTouch, setIsTouch] = useState(false);
 
   useEffect(() => {
+    // Check media query first
+    const mq = window.matchMedia('(hover: none)');
+    setIsTouch(mq.matches);
+    const mqHandler = (e: MediaQueryListEvent) => setIsTouch(e.matches);
+    mq.addEventListener('change', mqHandler);
+
+    // Also detect actual touch events (catches S-Pen devices that report hover: hover)
+    const onTouch = () => setIsTouch(true);
+    window.addEventListener('touchstart', onTouch, { once: true, passive: true });
+
+    return () => {
+      mq.removeEventListener('change', mqHandler);
+      window.removeEventListener('touchstart', onTouch);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (isTouch) return;
+
     const onMouseMove = (e: MouseEvent) => {
       mouseRef.current = { x: e.clientX, y: e.clientY };
     };
@@ -43,7 +63,9 @@ export default function CustomCursor({ themeColor, isDimmed = false }: CustomCur
       window.removeEventListener('mousemove', onMouseMove);
       cancelAnimationFrame(animationId);
     };
-  }, []);
+  }, [isTouch]);
+
+  if (isTouch) return null;
 
   return (
     <>

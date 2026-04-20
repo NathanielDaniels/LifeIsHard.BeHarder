@@ -23,7 +23,7 @@ export default function TheAsk() {
       className: 'h-28 md:h-36 lg:h-44 invert brightness-200'
     },
     {
-      src: '/sponsors/CAF_logo.png',
+      src: '/sponsors/CAF_logo.webp',
       link: 'https://www.challengedathletes.org/',
       alt: 'Challenged Athletes Foundation',
       className: 'h-28 md:h-36 mix-blend-screen invert grayscale hover:grayscale-0 hover:invert-0 opacity-100'
@@ -35,7 +35,7 @@ export default function TheAsk() {
       className: 'h-16 md:h-20 grayscale hover:grayscale-0 brightness-200 hover:brightness-100'
     },
     {
-      src: '/sponsors/SEBCM_color.png',
+      src: '/sponsors/SEBCM_color.webp',
       link: 'https://soeverybodycanmove.org',
       alt: 'SEBCM',
       className: 'h-16 md:h-20 grayscale hover:grayscale-0 brightness-200 hover:brightness-100'
@@ -62,7 +62,7 @@ export default function TheAsk() {
           viewport={{ once: true }}
           className="text-center space-y-6 mb-16 md:mb-20"
         >
-          <div className="font-mono text-sm tracking-[0.3em] text-white/40">
+          <div className="font-mono text-sm tracking-[0.3em] text-white/60">
             YOU'VE SEEN THE STORY
           </div>
           <h2 className="font-display text-6xl md:text-7xl lg:text-8xl tracking-[0.05em] text-white leading-none">
@@ -70,7 +70,7 @@ export default function TheAsk() {
             <br />
             <span style={{ color: theme.primaryColor }}>MISSION.</span>
           </h2>
-          <p className="text-lg md:text-xl text-white/70 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-lg md:text-xl text-white/80 max-w-2xl mx-auto leading-relaxed">
             Patrick trains full-time toward Nationals. Equipment, travel, coaching, race fees. Every contribution powers the next mile.
           </p>
         </motion.div>
@@ -102,7 +102,7 @@ export default function TheAsk() {
                   TAX-DEDUCTIBLE
                 </div>
               </div>
-              <p className="text-white/70 leading-relaxed">
+              <p className="text-white/80 leading-relaxed">
                 Support the organization that makes adaptive athletics possible. Every dollar goes toward equipment, coaching, and opportunities for para-athletes.
               </p>
             </div>
@@ -127,7 +127,7 @@ export default function TheAsk() {
               <h3 className="font-display text-2xl md:text-3xl tracking-wide text-white">
                 Sponsor Patrick
               </h3>
-              <p className="text-white/70 leading-relaxed">
+              <p className="text-white/80 leading-relaxed">
                 Put your brand behind the mission. Equipment, travel, race sponsorship. Direct athlete support that makes podium finishes possible.
               </p>
             </div>
@@ -199,7 +199,7 @@ export default function TheAsk() {
             <div className="font-display text-3xl md:text-4xl tracking-[0.1em] text-white mb-3">
               FOLLOW THE JOURNEY
             </div>
-            <p className="font-mono text-sm tracking-[0.2em] text-white/40">
+            <p className="font-mono text-sm tracking-[0.2em] text-white/60">
               RACE RESULTS · TRAINING UPDATES · THE ROAD TO NATIONALS
             </p>
           </div>
@@ -208,7 +208,7 @@ export default function TheAsk() {
 
           <div className="flex items-center gap-4 pt-2">
             <div className="flex-1 h-px bg-white/10" />
-            <span className="font-mono text-sm tracking-[0.2em] text-white/40">OR FOLLOW ALONG</span>
+            <span className="font-mono text-sm tracking-[0.2em] text-white/60">OR FOLLOW ALONG</span>
             <div className="flex-1 h-px bg-white/10" />
           </div>
 

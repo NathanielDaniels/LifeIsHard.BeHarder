@@ -45,7 +45,7 @@ const socialLinks = [
     size: 38,
   },
   {
-    href: "https://www.instagram.com/patwingzzz",
+    href: "https://www.instagram.com/patwingit",
     label: "INSTAGRAM",
     iconSrc: `${SITE}/icons/instagram.png`,
     size: 32,
@@ -171,8 +171,8 @@ export default function SeasonUpdateEmail({ email }: SeasonUpdateEmailProps) {
             {[
               ["APR 11", "Napa Valley Tri", "CA State Championship"],
               ["JUN 7", "Leon's Triathlon", "Hammond, IN"],
-              ["JUN 19", "SuperTri Long Beach Legacy", "CA"],
               ["JUN 28", "Pleasant Prairie Tri", "WI"],
+              ["JUL 19", "SuperTri Long Beach Legacy", "CA"],
               ["AUG 9", "USA Para Tri Nationals", "Milwaukee"],
               ["AUG 23", "SuperTri Chicago", "IL State Championship"],
             ].map(([date, race, note], i) => (

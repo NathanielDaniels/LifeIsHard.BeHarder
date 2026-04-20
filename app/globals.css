@@ -43,6 +43,7 @@ body {
   background: linear-gradient(180deg, #fb923c 0%, #f97316 100%);
 }
 
+
 /* Selection color */
 ::selection {
   background: rgba(249, 115, 22, 0.3);
@@ -106,6 +107,18 @@ img {
     backdrop-filter: blur(24px);
     -webkit-backdrop-filter: blur(24px);
     border: 1px solid rgba(249, 115, 22, 0.15);
+  }
+}
+
+/* Reduce expensive blur on mobile GPUs */
+@media (max-width: 768px) {
+  .glass {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+  .glass-card {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
   }
 }
 

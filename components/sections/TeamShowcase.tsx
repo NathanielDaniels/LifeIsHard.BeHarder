@@ -63,7 +63,7 @@ const TEAM: TeamMember[] = [
     name: "David Rotter",
     role: "Prosthetist / Jedi Master",
     bio: "The engineer behind the leg. David designs and builds the prosthetics that let Patrick live life his way, trek, and push beyond what anyone thought possible. Every stride starts with Dave's work.",
-    image: "/team/Dave.jpg",
+    image: "/team/Dave.webp",
     social: [{ platform: "website", url: "https://www.rotterprosthetics.com/" }, { platform: "instagram", url: "https://www.instagram.com/davidrotterprosthetics/?hl=en" }],
   },
   {
@@ -125,26 +125,13 @@ function SocialIcon({ platform }: { platform: SocialLink["platform"] }) {
   }
 }
 
-const photoVariants = {
-  hidden: { opacity: 0, y: 30, scale: 0.97 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    scale: 1,
-    transition: { delay: i * 0.12, duration: 0.7, ease: [0.22, 1, 0.36, 1] },
-  }),
-};
 
 const rowVariants = {
-  hidden: { opacity: 0, x: 40 },
+  hidden: { opacity: 0, x: -30 },
   visible: (i: number) => ({
     opacity: 1,
     x: 0,
-    transition: {
-      delay: 0.3 + i * 0.08,
-      duration: 0.5,
-      ease: [0.22, 1, 0.36, 1],
-    },
+    transition: { duration: 0.5, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] },
   }),
 };
 
@@ -172,7 +159,7 @@ export default function TeamShowcase() {
     hoverTimeout.current = setTimeout(() => {
       setHoveredId(null);
       hoverTimeout.current = null;
-    }, 80);
+    }, 200);
   }, []);
 
   useEffect(() => {
@@ -209,7 +196,7 @@ export default function TeamShowcase() {
           transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
           className="mb-8 lg:mb-24"
         >
-          <span className="font-mono text-xs tracking-[0.3em] text-white/40 uppercase block mb-4">
+          <span className="font-mono text-xs tracking-[0.3em] text-white/60 uppercase block mb-4">
             Built by those who believe
           </span>
           <h1 className="font-display text-[clamp(3rem,8vw,5rem)] leading-[0.9] uppercase tracking-tight text-white">
@@ -225,7 +212,7 @@ export default function TeamShowcase() {
             const isActive = activeId === member.id;
 
             return (
-              <motion.div
+              <div
                 key={member.id}
                 data-member={member.id}
                 role="button"
@@ -238,10 +225,6 @@ export default function TeamShowcase() {
                     handleTap(member.id);
                   }
                 }}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-50px" }}
-                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
                 className="relative aspect-[3/4] overflow-hidden cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-orange-500/50 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
               >
                 {member.image ? (
@@ -298,7 +281,7 @@ export default function TeamShowcase() {
                             target="_blank"
                             rel="noopener noreferrer"
                             onClick={(e) => e.stopPropagation()}
-                            className="p-1 rounded text-white/40 hover:text-orange-500 transition-colors duration-200"
+                            className="p-1 rounded text-white/60 hover:text-orange-500 transition-colors duration-200"
                           >
                             <SocialIcon platform={link.platform} />
                           </a>
@@ -307,7 +290,7 @@ export default function TeamShowcase() {
                     )}
                   </div>
 
-                  <p className="mt-1 pl-[14px] font-mono text-[10px] uppercase tracking-[0.25em] text-white/30">
+                  <p className="mt-1 pl-[14px] font-mono text-[10px] uppercase tracking-[0.25em] text-white/50">
                     {member.role}
                   </p>
 
@@ -323,14 +306,14 @@ export default function TeamShowcase() {
                         }}
                         className="overflow-hidden"
                       >
-                        <p className="pt-3 pl-[14px] border-l-2 border-orange-500 ml-[2px] text-sm text-white/40 leading-relaxed">
+                        <p className="pt-3 pl-[14px] border-l-2 border-orange-500 ml-[2px] text-sm text-white/60 leading-relaxed">
                           {member.bio}
                         </p>
                       </motion.div>
                     )}
                   </AnimatePresence>
                 </div>
-              </motion.div>
+              </div>
             );
           })}
         </div>
@@ -350,17 +333,12 @@ export default function TeamShowcase() {
                   const isDimmed = activeId !== null && !isActive;
 
                   return (
-                    <motion.div
+                    <div
                       key={member.id}
-                      custom={globalIdx}
-                      variants={photoVariants}
-                      initial="hidden"
-                      whileInView="visible"
-                      viewport={{ once: true, margin: "-50px" }}
                       tabIndex={0}
                       role="button"
                       aria-label={member.name}
-                      className={`relative ${COLUMN_CONFIG[colIdx].photoClass} overflow-hidden rounded-xl cursor-pointer transition-opacity duration-400 outline-none focus-visible:ring-2 focus-visible:ring-orange-500/50`}
+                      className={`relative ${COLUMN_CONFIG[colIdx].photoClass} overflow-hidden rounded-xl cursor-pointer transition-opacity duration-[400ms] outline-none focus-visible:ring-2 focus-visible:ring-orange-500/50`}
                       style={{ opacity: isDimmed ? 0.6 : 1 }}
                       onMouseEnter={() => handleHoverEnter(member.id)}
                       onMouseLeave={handleHoverLeave}
@@ -402,7 +380,7 @@ export default function TeamShowcase() {
                         className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-orange-500/25 to-transparent transition-opacity duration-500"
                         style={{ opacity: isActive ? 1 : 0 }}
                       />
-                    </motion.div>
+                    </div>
                   );
                 })}
               </div>
@@ -417,7 +395,7 @@ export default function TeamShowcase() {
           >
             <Link
               href="/"
-              className="inline-flex items-center gap-3 font-display text-lg tracking-wide text-white/60 hover:text-white transition-colors duration-300 uppercase group"
+              className="inline-flex items-center gap-3 font-display text-lg tracking-wide text-white/80 hover:text-white transition-colors duration-300 uppercase group"
             >
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" className="transition-transform duration-300 group-hover:-translate-x-1">
                 <path d="M19 12H5M5 12L12 19M5 12L12 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -502,7 +480,7 @@ export default function TeamShowcase() {
                             target="_blank"
                             rel="noopener noreferrer"
                             onClick={(e) => e.stopPropagation()}
-                            className="p-1 rounded text-white/40 hover:text-orange-500 transition-colors duration-200"
+                            className="p-1 rounded text-white/60 hover:text-orange-500 transition-colors duration-200"
                           >
                             <SocialIcon platform={link.platform} />
                           </a>
@@ -511,7 +489,7 @@ export default function TeamShowcase() {
                     )}
                   </div>
 
-                  <p className="mt-1.5 pl-[30px] lg:pl-[38px] font-mono text-[10px] lg:text-[11px] uppercase tracking-[0.25em] text-white/30">
+                  <p className="mt-1.5 pl-[30px] lg:pl-[38px] font-mono text-[10px] lg:text-[11px] uppercase tracking-[0.25em] text-white/50">
                     {member.role}
                   </p>
 
@@ -522,7 +500,7 @@ export default function TeamShowcase() {
                         animate={{ height: "auto", opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
                         transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-                        className="pl-[30px] lg:pl-[38px] text-sm text-white/40 leading-relaxed overflow-hidden"
+                        className="pl-[30px] lg:pl-[38px] text-sm text-white/60 leading-relaxed overflow-hidden"
                       >
                         <span className="block pt-2">{member.bio}</span>
                       </motion.p>
@@ -543,7 +521,7 @@ export default function TeamShowcase() {
         >
           <Link
             href="/"
-            className="inline-flex items-center gap-3 font-display text-lg tracking-wide text-white/60 hover:text-white transition-colors duration-300 uppercase group"
+            className="inline-flex items-center gap-3 font-display text-lg tracking-wide text-white/80 hover:text-white transition-colors duration-300 uppercase group"
           >
             <svg
               width="24"

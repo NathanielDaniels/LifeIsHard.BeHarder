@@ -39,7 +39,7 @@ const SPONSORS: Sponsor[] = [
   {
     name: 'Challenged Athletes Foundation',
     description: 'Providing opportunities and support to people with physical challenges so they can pursue active lifestyles through sport.',
-    logo: '/sponsors/CAF_logo.png',
+    logo: '/sponsors/CAF_logo.webp',
     url: 'https://www.challengedathletes.org/',
     logoClass: 'h-16 md:h-20',
   },
@@ -53,7 +53,7 @@ const SPONSORS: Sponsor[] = [
   {
     name: 'So Every Body Can Move',
     description: 'Removing barriers to movement and fitness for people of all abilities. Inclusive wellness, no exceptions.',
-    logo: '/sponsors/SEBCM_color.png',
+    logo: '/sponsors/SEBCM_color.webp',
     url: 'https://soeverybodycanmove.org',
     logoClass: 'h-12 md:h-16 brightness-200',
   },
@@ -168,7 +168,7 @@ export default function SponsorsShowcase() {
           transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
           className="mb-20 lg:mb-28"
         >
-          <span className="font-mono text-xs tracking-[0.3em] text-white/40 uppercase block mb-4">
+          <span className="font-mono text-xs tracking-[0.3em] text-white/60 uppercase block mb-4">
             Partners in the mission
           </span>
           <h1 className="font-display text-[clamp(3rem,8vw,5rem)] leading-[0.9] uppercase tracking-tight text-white">
@@ -217,7 +217,7 @@ export default function SponsorsShowcase() {
                     {sponsor.name}
                   </h3>
                   <p className={`text-sm md:text-base leading-relaxed transition-colors duration-300 ${
-                    isActive ? 'text-white/60' : 'text-white/40 group-hover:text-white/60'
+                    isActive ? 'text-white/80' : 'text-white/60 group-hover:text-white/80'
                   }`}>
                     {sponsor.description}
                   </p>
@@ -247,13 +247,13 @@ export default function SponsorsShowcase() {
           className="mb-32 lg:mb-40"
         >
           <div className="text-center mb-16">
-            <span className="font-mono text-xs tracking-[0.3em] text-white/40 uppercase block mb-4">
+            <span className="font-mono text-xs tracking-[0.3em] text-white/60 uppercase block mb-4">
               Join the team
             </span>
             <h2 className="font-display text-[clamp(2.5rem,6vw,4rem)] leading-[0.9] uppercase tracking-tight text-white mb-6">
               Become a <span className="text-orange-500">Sponsor.</span>
             </h2>
-            <p className="text-white/50 max-w-2xl mx-auto leading-relaxed text-lg">
+            <p className="text-white/70 max-w-2xl mx-auto leading-relaxed text-lg">
               Put your brand behind an athlete who doesn't quit. Equipment, travel, race sponsorship, gear.
               Every partnership powers the next mile toward Nationals.
             </p>
@@ -269,7 +269,7 @@ export default function SponsorsShowcase() {
                 <div className="font-display text-3xl md:text-4xl text-white mb-3 tracking-wide">
                   MESSAGE SENT.
                 </div>
-                <p className="text-white/50 font-mono text-sm tracking-wide">
+                <p className="text-white/70 font-mono text-sm tracking-wide">
                   Patrick will be in touch.
                 </p>
               </motion.div>
@@ -280,7 +280,7 @@ export default function SponsorsShowcase() {
 
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
-                    <label htmlFor="name" className="block font-mono text-[10px] tracking-[0.25em] text-white/40 uppercase mb-2">
+                    <label htmlFor="name" className="block font-mono text-[10px] tracking-[0.25em] text-white/60 uppercase mb-2">
                       Name
                     </label>
                     <input
@@ -293,7 +293,7 @@ export default function SponsorsShowcase() {
                     />
                   </div>
                   <div>
-                    <label htmlFor="email" className="block font-mono text-[10px] tracking-[0.25em] text-white/40 uppercase mb-2">
+                    <label htmlFor="email" className="block font-mono text-[10px] tracking-[0.25em] text-white/60 uppercase mb-2">
                       Email
                     </label>
                     <input
@@ -308,7 +308,7 @@ export default function SponsorsShowcase() {
                 </div>
 
                 <div>
-                  <label htmlFor="message" className="block font-mono text-[10px] tracking-[0.25em] text-white/40 uppercase mb-2">
+                  <label htmlFor="message" className="block font-mono text-[10px] tracking-[0.25em] text-white/60 uppercase mb-2">
                     Message
                   </label>
                   <textarea
@@ -339,7 +339,7 @@ export default function SponsorsShowcase() {
 
                 <div className="flex items-center gap-4 pt-2">
                   <div className="flex-1 h-px bg-white/10" />
-                  <span className="font-mono text-xs tracking-[0.2em] text-white/30">OR EMAIL DIRECTLY</span>
+                  <span className="font-mono text-xs tracking-[0.2em] text-white/50">OR EMAIL DIRECTLY</span>
                   <div className="flex-1 h-px bg-white/10" />
                 </div>
 
@@ -363,13 +363,13 @@ export default function SponsorsShowcase() {
           className="text-center mb-24 lg:mb-32"
         >
           <div className="max-w-2xl mx-auto p-10 md:p-14 rounded-2xl border border-orange-500/20 bg-orange-500/[0.03]">
-            <span className="font-mono text-xs tracking-[0.3em] text-white/40 uppercase block mb-4">
+            <span className="font-mono text-xs tracking-[0.3em] text-white/60 uppercase block mb-4">
               Support the organization
             </span>
             <h3 className="font-display text-3xl md:text-4xl tracking-wide text-white mb-4">
               DONATE TO <span className="text-orange-500">DARE2TRI</span>
             </h3>
-            <p className="text-white/50 leading-relaxed mb-8">
+            <p className="text-white/70 leading-relaxed mb-8">
               Tax-deductible contributions go directly toward equipment, coaching, and opportunities for para-athletes.
               Every dollar powers the next mile.
             </p>
@@ -399,7 +399,7 @@ export default function SponsorsShowcase() {
         >
           <Link
             href="/"
-            className="inline-flex items-center gap-3 font-display text-lg tracking-wide text-white/60 hover:text-white transition-colors duration-300 uppercase group"
+            className="inline-flex items-center gap-3 font-display text-lg tracking-wide text-white/80 hover:text-white transition-colors duration-300 uppercase group"
           >
             <svg
               width="24"

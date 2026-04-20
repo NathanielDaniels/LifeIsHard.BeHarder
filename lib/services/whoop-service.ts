@@ -125,7 +125,30 @@ export const whoopService: ServiceProvider = {
 
     // Token is valid — verify endpoints actually respond
     try {
-      return await pingEndpoints(accessToken, currentExpiry);
+      const result = await pingEndpoints(accessToken, currentExpiry);
+
+      // All endpoints returned 401 — token is dead server-side despite local expiry
+      // Attempt a force refresh to self-heal before alerting
+      if (result.status === 'expired') {
+        console.log('[whoop-service] All endpoints 401. Attempting force refresh to self-heal...');
+        const { forceRefreshToken } = await import('@/lib/whoop-token-storage');
+        try {
+          const newToken = await forceRefreshToken();
+          if (newToken) {
+            const refreshedTokens = await getStoredTokens();
+            const newExpiry = refreshedTokens?.expires_at ?? currentExpiry;
+            const retryResult = await pingEndpoints(newToken, newExpiry);
+            if (retryResult.status === 'connected') {
+              console.log('[whoop-service] Self-heal succeeded. Token refreshed and endpoints healthy.');
+            }
+            return retryResult;
+          }
+        } catch (healErr) {
+          console.error('[whoop-service] Self-heal failed:', healErr instanceof Error ? healErr.message : healErr);
+        }
+      }
+
+      return result;
     } catch (err) {
       return {
         status: 'error',

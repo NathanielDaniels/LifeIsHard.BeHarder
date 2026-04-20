@@ -34,7 +34,7 @@ export default function ByTheNumbers() {
           <h2 className="text-5xl md:text-7xl font-black text-white mb-6">
             BY THE <span className="text-orange-500">NUMBERS</span>
           </h2>
-          <p className="text-xl md:text-2xl text-white/60 font-light">
+          <p className="text-xl md:text-2xl text-white/80 font-light">
             Every number tells a story of resilience
           </p>
         </motion.div>
@@ -143,7 +143,7 @@ function StatCounter({ label, value, unit, color, delay, isInView }: StatCounter
           whileInView={{ opacity: 1, x: 0 }}
           transition={{ delay: delay + 0.2, duration: 0.8 }}
           viewport={{ once: true }}
-          className="text-white/50 text-sm md:text-base uppercase tracking-widest mb-6 font-mono"
+          className="text-white/70 text-sm md:text-base uppercase tracking-widest mb-6 font-mono"
         >
           {label}
         </motion.div>

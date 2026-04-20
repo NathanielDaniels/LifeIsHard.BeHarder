@@ -197,6 +197,73 @@ export interface WhoopStats {
 }
 
 // ============================================
+// Historical Data (90-day storage)
+// ============================================
+
+export interface DailySnapshot {
+  id?: number;
+  date: string;                    // YYYY-MM-DD
+  recovery_score: number | null;
+  resting_heart_rate: number | null;
+  hrv: number | null;              // ms (RMSSD)
+  spo2: number | null;
+  skin_temp: number | null;        // celsius
+  strain: number | null;           // 0-21
+  calories: number | null;
+  average_heart_rate: number | null;
+  max_heart_rate: number | null;
+  workout_sport: string | null;
+  workout_strain: number | null;
+  workout_duration_minutes: number | null;
+  workout_avg_hr: number | null;
+  workout_max_hr: number | null;
+  workout_calories: number | null;
+  // Sleep (not displayed on public site — used by coach email only)
+  sleep_performance: number | null;     // percentage
+  sleep_efficiency: number | null;      // percentage
+  sleep_duration_minutes: number | null;
+  sleep_disturbances: number | null;
+  sleep_light_minutes: number | null;
+  sleep_deep_minutes: number | null;
+  sleep_rem_minutes: number | null;
+  sleep_debt_minutes: number | null;
+  sleep_respiratory_rate: number | null;
+  created_at?: string;
+}
+
+// ============================================
+// AI Daily Briefing
+// ============================================
+
+export interface DailyBriefing {
+  id?: number;
+  date: string;                    // YYYY-MM-DD
+  briefing_markdown: string;       // AI-generated analysis
+  model_used: string;              // e.g. "claude-haiku-4-5-20251001"
+  snapshot_count: number;          // how many days of data were used
+  generated_at: string;
+}
+
+export interface WorkoutRecord {
+  whoop_workout_id: string;        // WHOOP UUID — upsert key
+  date: string;                    // YYYY-MM-DD derived from workout start
+  sport_name: string | null;
+  strain: number | null;
+  avg_hr: number | null;
+  max_hr: number | null;
+  duration_minutes: number | null;
+  calories: number | null;
+  distance_meters: number | null;
+  zone_zero_ms: number | null;
+  zone_one_ms: number | null;
+  zone_two_ms: number | null;
+  zone_three_ms: number | null;
+  zone_four_ms: number | null;
+  zone_five_ms: number | null;
+  score_state: string | null;      // SCORED | PENDING_SCORE | UNSCORABLE
+}
+
+// ============================================
 // Demo/Fallback Data
 // ============================================
 

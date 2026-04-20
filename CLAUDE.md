@@ -21,12 +21,14 @@ Today, he competes in triathlon and marathon events, training toward podium fini
 **Motto:** "Life is Hard. Be Harder."
 
 ### Key People
+
 - **Wife** and **parents** - core support system
 - **David Rotter** - prosthetist
 - **Keri** - friend at Dare2Tri who got him into adaptive sports
 - **Melissa Stockwell** - mentor/connection through Dare2Tri
 
 ### Key Dates
+
 ```
 Sobriety:       January 20, 2020
 Accident:       November 1, 2020
@@ -35,20 +37,24 @@ Next Race:      April 11, 2026 (AlphaWin Napa Valley Triathlon - California Stat
 ```
 
 ### 2026 Race Calendar
+
 **Triathlon:**
+
 - Apr 11: AlphaWin Napa Valley Triathlon (CA State Championship)
 - Jun 7: Leon's Triathlon, Hammond, IN
-- Jun 19: SuperTri Long Beach Legacy Triathlon
+- Jul 19: SuperTri Long Beach Legacy Triathlon
 - Jun 28: Pleasant Prairie Triathlon, WI
 - Aug 9: USA Para Triathlon National Championships, Milwaukee
 - Aug 23: SuperTri Chicago Triathlon (IL State Championship)
 
 **Running:**
+
 - Jul 26: San Francisco Marathon
 - Nov 15: Berkeley Half Marathon
 - Dec 6: California International Marathon
 
 ### Credentials
+
 - Dare2Tri Elite Development Team Athlete (2026)
 - First American & first below-knee amputee to thru-hike the Trans Bhutan Trail
 - Record-setting trekker
@@ -59,27 +65,32 @@ Next Race:      April 11, 2026 (AlphaWin Napa Valley Triathlon - California Stat
 ## Design Philosophy
 
 ### Quality Standard
+
 **This is not template-level work.** Every output should make people stop scrolling and say "what the hell is this?" - in the best way possible. Safe, generic designs will be rejected. Push boundaries on every deliverable. This standard applies to all future work on this project.
 
 ### Aesthetic
+
 - **Cinematic / sports documentary** - think Netflix sports doc opening credits
 - **Premium and editorial** - more Monocle than ESPN
 - **High-energy but controlled** - aggressive typography balanced with breathing room
 - **Dark, moody, dramatic** - the site should feel like walking into a film
 
 ### Brand Colors
+
 - **Primary background:** Near-black (#050505)
 - **Accent color:** Vibrant orange (dynamic via VitalityContext theme, defaults ~#f97316)
 - **Text:** White with various opacity levels for hierarchy
 - **Supporting:** Cyan (#0ff) and magenta (#f0f) for glitch effects only
 
 ### Typography
+
 - **Display font:** Bebas Neue (font-display) - used for all major headings, "LIFE IS HARD. BE HARDER.", stats, section titles
 - **Body/mono font:** Inter - general body text
 - **Mono/UI font:** System mono or Space Mono - used for labels, tracking text, status messages, technical UI elements
 - The distinctive serifed "I" in Bebas Neue is a key character of the typography - preserve this
 
 ### Visual Effects (Current Implementation)
+
 - **ECG heartbeat line** - SVG animation behind hero, speed synced to actual heart rate
 - **Glitch typography** - chromatic aberration (cyan/magenta ghosts) on "BE HARDER."
 - **Film grain / noise overlay** - subtle texture across entire page
@@ -91,67 +102,142 @@ Next Race:      April 11, 2026 (AlphaWin Napa Valley Triathlon - California Stat
 - **Vignette** - edge darkening
 - **Floating background text** - huge ghosted text scrolling in background
 - **Animated counters** - numbers count up with eased animation
+- **Interactive 3D globe** - cobe WebGL globe with race markers and route arcs
+- **Interactive 2D race map** - fly-to zoom, state highlighting, keyboard nav, Nationals treatment
 
 ---
 
 ## Technical Stack
 
 ### Framework & Dependencies
+
 - **Next.js 14.2.18** (App Router)
 - **React 18**
 - **Framer Motion 11.x** - all animations and scroll-driven interactions
 - **Lenis** - smooth scrolling (via SmoothScroll component)
 - **Tailwind CSS 3.4** - styling
 - **TypeScript** - strict mode
+- **Cobe** - 3D WebGL globe (dynamically imported)
+- **react-simple-maps** - 2D SVG race map (dynamically imported)
+- **React Three Fiber / Drei** - 3D prosthetic scene (dynamically imported)
+- **Resend** - transactional email
+- **Supabase** - WHOOP token persistence
+- **Lucide React** - icons (optimized via optimizePackageImports)
 
 ### Project Structure
+
 ```
 patrick-wingert-site/
 ├── app/
 │   ├── page.tsx                    # Currently renders ComingSoonClient
 │   ├── coming-soon-client.tsx      # ACTIVE - the deployed coming soon page
-│   ├── page_full-site.tsx          # IN DEVELOPMENT - the full multi-section site
+│   ├── page.full-site.tsx          # IN DEVELOPMENT - the full multi-section site
 │   ├── layout.tsx                  # Root layout (Inter + Bebas Neue fonts, Providers)
 │   ├── globals.css                 # Global styles, animations, utilities
+│   ├── schedule/page.tsx           # /schedule route
+│   ├── sponsors/page.tsx           # /sponsors route
+│   ├── team/page.tsx               # /team route
+│   ├── admin/                      # Admin dashboard (WHOOP management)
+│   │   ├── page.tsx
+│   │   ├── admin-client.tsx
+│   │   └── whoop/page.tsx
 │   └── api/
-│       ├── subscribe/              # Email capture endpoint
+│       ├── subscribe/route.ts      # Email capture
+│       ├── contact/route.ts        # Contact form
+│       ├── admin/                   # Admin auth + WHOOP reconnect
+│       │   ├── login/route.ts
+│       │   ├── logout/route.ts
+│       │   ├── reconnect/route.ts
+│       │   └── status/route.ts
+│       ├── cron/health-check/route.ts  # WHOOP token health check
 │       └── whoop/                  # WHOOP OAuth + data endpoints
 │           ├── auth/route.ts
 │           ├── callback/route.ts
 │           ├── stats/route.ts
 │           ├── webhook/route.ts
-│           └── disconnect/route.ts
+│           ├── disconnect/route.ts
+│           └── debug/route.ts
 ├── components/
 │   ├── Providers.tsx               # Context wrappers
 │   ├── SmoothScroll.tsx            # Lenis smooth scroll
-│   ├── SoundController.tsx         # Audio management
-│   └── sections/                   # Full site sections
-│       ├── HeroSection.tsx
-│       ├── TheShift.tsx
-│       ├── ProstheticReveal.tsx
-│       ├── ByTheNumbers.tsx
-│       ├── BhutanJourney.tsx
-│       ├── LiveStats.tsx
-│       ├── TheMission.tsx
-│       ├── SupportCTA.tsx
-│       └── InstagramFeed.tsx
+│   ├── SiteControls.tsx            # Site-wide controls
+│   ├── WhoopStats.tsx              # WHOOP stats display
+│   ├── persistent/                 # Always-visible overlay elements
+│   │   ├── AtmosphericOverlays.tsx # Background text, vignette, particles
+│   │   ├── JourneyLine.tsx         # Orange journey progress line
+│   │   └── PersistentECG.tsx       # Heartbeat line overlay
+│   ├── sections/                   # Full site sections
+│   │   ├── HeroSection.tsx
+│   │   ├── ColdOpen.tsx
+│   │   ├── TheFall.tsx
+│   │   ├── TheRebuild.tsx
+│   │   ├── TheShift.tsx
+│   │   ├── TheMachine.tsx
+│   │   ├── TheProof.tsx
+│   │   ├── TheAsk.tsx
+│   │   ├── ProstheticReveal.tsx
+│   │   ├── ByTheNumbers.tsx
+│   │   ├── BhutanJourney.tsx
+│   │   ├── LiveStats.tsx
+│   │   ├── TheMission.tsx
+│   │   ├── SupportCTA.tsx
+│   │   ├── SponsorsShowcase.tsx
+│   │   ├── TeamShowcase.tsx
+│   │   ├── SchedulePage.tsx
+│   │   ├── SiteFooter.tsx
+│   │   └── InstagramFeed.tsx
+│   └── shared/                     # Reusable UI components
+│       ├── AnimatedCounter.tsx
+│       ├── BiometricCard.tsx
+│       ├── CobeGlobe.tsx           # 3D interactive globe (cobe)
+│       ├── CustomCursor.tsx        # Crosshair cursor with follow
+│       ├── EmailCapture.tsx
+│       ├── FloatingParticles.tsx
+│       ├── FullRaceMap.tsx         # 2D interactive race map (react-simple-maps)
+│       ├── GlitchText.tsx          # Chromatic aberration text
+│       ├── MiniRouteMap.tsx        # Small route preview in calendar
+│       ├── PixelRunner.tsx         # Pixel art runner sprite
+│       ├── ProstheticScene.tsx     # 3D prosthetic (React Three Fiber)
+│       ├── RaceCalendar.tsx        # Race schedule with countdown
+│       ├── RaceGlobe.tsx           # Globe + map overlay wrapper
+│       ├── RaceRouteMap.tsx        # Individual race route map
+│       └── SocialLinks.tsx
 ├── contexts/
 │   ├── VitalityContext.tsx          # Theme + energy state management
 │   └── WhoopContext.tsx             # WHOOP data + connection state
 ├── lib/
+│   ├── race-data.ts                # Race definitions, coordinates, helpers
+│   ├── geo-utils.ts                # Haversine distance, formatting
 │   ├── whoop-client.ts             # WHOOP API client
-│   ├── whoop-storage.ts            # Token persistence
-│   └── whoop-cache.ts              # Response caching
+│   ├── whoop-token-storage.ts      # Token persistence (Supabase)
+│   ├── whoop-cache.ts              # Response caching
+│   ├── whoop.ts                    # WHOOP utilities
+│   ├── supabase.ts                 # Supabase client
+│   ├── admin-auth.ts               # Admin HMAC auth
+│   ├── api-connections.ts          # API connection helpers
+│   ├── instagram.ts                # Instagram API client
+│   ├── rate-limit.ts               # Rate limiting
+│   └── services/
+│       ├── index.ts
+│       └── whoop-service.ts        # WHOOP service layer
+├── emails/                          # React Email templates
+│   ├── welcome-email.tsx
+│   ├── site-launch-email.tsx
+│   ├── season-update-email.tsx
+│   └── send-test-hybrid.ts
 ├── types/
-│   └── whoop.ts                    # WHOOP TypeScript types
+│   ├── whoop.ts                    # WHOOP TypeScript types
+│   └── api-tokens.ts              # Token types
 ├── tailwind.config.js
+├── next.config.mjs
 ├── tsconfig.json
 └── package.json
 ```
 
 ### Two-Version System
+
 - **`coming-soon-client.tsx`** - Currently deployed and live. This is the page visitors see.
-- **`page_full-site.tsx`** - The full multi-section storytelling site, in active development. Once complete, it replaces the coming soon page.
+- **`page.full-site.tsx`** - The full multi-section storytelling site, in active development. Once complete, it replaces the coming soon page.
 
 When editing, be clear about which version you're modifying.
 
@@ -160,6 +246,7 @@ When editing, be clear about which version you're modifying.
 ## WHOOP Integration
 
 ### Architecture
+
 The site connects to Patrick's WHOOP device via OAuth 2.0 to display real biometric data.
 
 ```
@@ -169,14 +256,16 @@ Browser → WhoopProvider (React Context) → /api/whoop/stats → WHOOP API
 ```
 
 ### Dual-Mode System
+
 The site operates in two modes with graceful fallback:
 
-| Mode | Trigger | Data Source |
-|------|---------|-------------|
-| **Live** | Valid WHOOP credentials + connected | Real WHOOP API data |
-| **Demo** | No credentials or connection error | Realistic placeholder data via VitalityContext |
+| Mode     | Trigger                             | Data Source                                    |
+| -------- | ----------------------------------- | ---------------------------------------------- |
+| **Live** | Valid WHOOP credentials + connected | Real WHOOP API data                            |
+| **Demo** | No credentials or connection error  | Realistic placeholder data via VitalityContext |
 
 ### Data Points Displayed
+
 - Recovery Score (0-100%, color-coded: green ≥67, yellow ≥34, red <34)
 - Daily Strain (0-21 scale)
 - Heart Rate (current/resting/max/average)
@@ -187,18 +276,22 @@ The site operates in two modes with graceful fallback:
 - Last Workout details (sport, duration, strain, HR stats)
 
 ### Heart Rate Behavior
+
 WHOOP doesn't provide real-time HR streaming via API. Instead:
+
 - After a workout completes (via webhook), show the **workout average HR**
 - Over ~2 hours, the displayed HR **decays back to resting HR**
 - This creates an "echo of training" effect - visitors see the aftermath of real effort
-- The heartbeat ECG animation speed syncs to the current displayed HR
+- The heartbeat animation speed syncs to the current displayed HR
 
 ### Rate Limits
+
 - 100 requests/minute, 10,000 requests/day
 - Server-side caching (5-min intervals) keeps usage at ~288 calls/day (~3% of limit)
 - Webhooks handle real-time updates without polling
 
 ### Environment Variables
+
 ```env
 WHOOP_ENABLED=true
 WHOOP_CLIENT_ID=<from WHOOP developer dashboard>
@@ -213,6 +306,7 @@ WHOOP_REDIRECT_URI=https://patrickwingert.com/api/whoop/callback
 The boot sequence is a cinematic loading experience tied to the WHOOP connection:
 
 ### Phase Progression
+
 ```
 Phase 0: Boot screen (WHOOP connecting, progress bar, status log)
          → Waits for WHOOP data OR 8s fallback timeout
@@ -224,7 +318,9 @@ Phase 4-6: Remaining elements cascade in
 ```
 
 ### Progress Bar Logic
+
 The progress bar is synced to actual WHOOP connection status:
+
 - `idle` → 5%
 - `connecting` → 30%
 - `syncing` → 60%
@@ -236,7 +332,7 @@ Smooth animation eases between milestones. If API hangs, forced completion at 8 
 
 ## Coming Soon Page - Sections
 
-1. **Hero** - "LIFE IS HARD. BE HARDER." with ECG line, parallax, glitch text, live HR display
+1. **Hero** - "LIFE IS HARD. BE HARDER." with heartbeat line, parallax, glitch text, live HR display
 2. **The Story / Stats** - "THEY SAID IT WAS IMPOSSIBLE. THEY WERE WRONG." + three animated counters (Days Since Accident, Days Sober, Days Until Next Race)
 3. **Live Biometrics** - Full WHOOP data dashboard (recovery, strain, HR, HRV, SpO2, temp, calories, last workout)
 4. **Email Capture** - "DON'T MISS THE MOMENT." + email subscription form with glow effects
@@ -246,23 +342,38 @@ Smooth animation eases between milestones. If API hangs, forced completion at 8 
 
 ## Full Site - Sections (In Development)
 
-The full site (`page_full-site.tsx`) uses scroll-driven storytelling with an orange journey line tracking progress:
+The full site (`page.full-site.tsx`) uses scroll-driven storytelling with an orange journey line tracking progress:
 
-1. **HeroSection** - Main entrance
-2. **TheShift** - The turning point in Patrick's life
-3. **ProstheticReveal** - The prosthetic as identity, not limitation
-4. **LiveStats** - WHOOP biometric dashboard
-5. **ByTheNumbers** - Key stats and achievements
-6. **BhutanJourney** - The Trans Bhutan Trail story
-7. **TheMission** - Dare2Tri and advocacy work
-8. **InstagramFeed** - Dynamic social content
-9. **SupportCTA** - Sponsorship and donation (Dare2Tri general fund + direct athlete sponsorship)
+1. **ColdOpen** - Cinematic opening
+2. **HeroSection** - Main entrance
+3. **TheFall** - The accident and what was lost
+4. **TheRebuild** - Recovery and prosthetic (3D scene)
+5. **TheShift** - The turning point
+6. **TheMachine** - Training and biometric data
+7. **TheProof** - Results and achievements
+8. **ByTheNumbers** - Key stats and animated counters
+9. **BhutanJourney** - The Trans Bhutan Trail story
+10. **LiveStats** - WHOOP biometric dashboard
+11. **TheMission** - Dare2Tri and advocacy work
+12. **TheAsk** - Sponsorship pitch
+13. **SponsorsShowcase** - Current supporters
+14. **TeamShowcase** - Team behind Patrick
+15. **SupportCTA** - Donation and sponsorship
+16. **InstagramFeed** - Dynamic social content
+17. **SiteFooter** - Footer with links
+
+### Additional Pages
+
+- **/schedule** - Full race calendar (SchedulePage component)
+- **/sponsors** - Sponsors page
+- **/team** - Team page
 
 ---
 
 ## Content & Copy
 
 ### Voice & Tone
+
 - Direct, punchy, zero fluff
 - Short sentences that hit hard
 - Earned confidence, not arrogance
@@ -270,7 +381,8 @@ The full site (`page_full-site.tsx`) uses scroll-driven storytelling with an ora
 - "He didn't go looking for meaning. He went to finish something he started in his head twenty years ago."
 
 ### Social Links
-- Instagram: https://www.instagram.com/patwings666
+
+- Instagram: https://www.instagram.com/patwingit
 - Strava: https://www.strava.com (needs specific profile link)
 - Dare2Tri: https://www.dare2tri.org
 
@@ -300,16 +412,16 @@ Engineering Preferences:
 - Bias toward fewer dependencies - before adding a package, ask if Framer Motion or native browser APIs already cover it.
 
 1. Architecture Review
-Evaluate:
+   Evaluate:
 
 - WHOOP data flow - is the boundary between WhoopContext, VitalityContext, and components clean? No component should reach past its context.
 - Serverless gotchas - any file system reads/writes outside of /tmp? Any state assumed to persist between function invocations? (Learned the hard way with token storage.)
-- API route structure - are /api/whoop/* routes handling errors and returning consistent shapes? A failed fetch should never crash the UI.
+- API route structure - are /api/whoop/\* routes handling errors and returning consistent shapes? A failed fetch should never crash the UI.
 - Context coupling - VitalityContext and WhoopContext should remain independently functional. Demo mode must work with zero env vars set.
 - Two-version system integrity - changes to shared components (Providers, SmoothScroll, contexts) affect both coming-soon-client.tsx and the full site. Flag blast radius.
 
 2. Code Quality Review
-Evaluate:   
+   Evaluate:
 
 - DRY violations - the biometric stat cards in coming-soon-client.tsx are a known repeat pattern. Should be extracted.
 - Error handling - every fetch() call needs a catch. Every WHOOP API response needs a null/undefined guard before accessing .data.
@@ -318,7 +430,7 @@ Evaluate:
 - Magic numbers - animation durations, phase timing delays, and HR decay constants should be named constants, not inline literals.
 
 3. Animation & Performance Review
-Evaluate:
+   Evaluate:
 
 - Framer Motion overhead - are useTransform and useSpring hooks being created at the top level of components (correct) or inside loops/conditionals (wrong)?
 - will-change and GPU layers - fixed position elements with continuous animation (scan line, particles, ECG) should not cause layout thrash.
@@ -327,7 +439,7 @@ Evaluate:
 - Re-render triggers - mousePosition state updates on every mousemove. Ensure this doesn't cascade re-renders into expensive child components.
 
 4. WHOOP Integration Review
-Evaluate:
+   Evaluate:
 
 - Token persistence - tokens must go through Supabase, never the filesystem. Flag any fs imports in API routes.
 - Dual-mode fallback - if WHOOP_ENABLED=false or credentials are missing, the site must render correctly in demo mode with no console errors.
@@ -336,7 +448,7 @@ Evaluate:
 - HR decay correctness - the post-workout HR decay logic should handle edge cases: no workout today, workout older than 2 hours, resting HR unavailable.
 
 5. Design Quality Review
-Evaluate:
+   Evaluate:
 
 - Does it clear the bar? Would this make someone stop scrolling and say "what the hell is this?" - in a good way. If not, it's not done.
 - Orange discipline - accent color used for emphasis, not decoration. Count orange elements per viewport. If it's more than 3-4, pull back.

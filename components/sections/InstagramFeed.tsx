@@ -101,17 +101,17 @@ export default function InstagramFeed({ themeColor }: InstagramFeedProps) {
           </h2>
 
           <div className="flex items-center gap-6">
-            <p className="font-mono text-sm tracking-[0.1em] text-white/40">
+            <p className="font-mono text-sm tracking-[0.1em] text-white/60">
               Training. Racing. Living.
             </p>
             <a
-              href="https://www.instagram.com/patwingzzz"
+              href="https://www.instagram.com/patwingit"
               target="_blank"
               rel="noopener noreferrer"
               className="font-mono text-sm tracking-[0.1em] transition-colors duration-200 hover:opacity-80"
               style={{ color: themeColor }}
             >
-              @patwingzzz
+              @patwingit
             </a>
           </div>
         </motion.div>
@@ -131,7 +131,7 @@ export default function InstagramFeed({ themeColor }: InstagramFeedProps) {
             return (
               <a
                 key={post.id}
-                href="https://www.instagram.com/patwingzzz"
+                href="https://www.instagram.com/patwingit"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="relative h-[45vh] md:h-[55vh] lg:h-[65vh] overflow-visible group transition-[flex] duration-500 ease-out"
@@ -206,21 +206,21 @@ export default function InstagramFeed({ themeColor }: InstagramFeedProps) {
           className="mt-12 md:mt-16 flex justify-center px-6"
         >
           <a
-            href="https://www.instagram.com/patwingzzz"
+            href="https://www.instagram.com/patwingit"
             target="_blank"
             rel="noopener noreferrer"
             className="group flex items-center gap-3 px-8 py-4 border transition-all duration-300 hover:bg-white/5"
             style={{ borderColor: `${themeColor}44` }}
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-white/50 group-hover:text-white/80 transition-colors duration-300">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-white/70 group-hover:text-white/80 transition-colors duration-300">
               <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
               <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
               <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
             </svg>
-            <span className="font-mono text-xs tracking-[0.2em] text-white/50 group-hover:text-white/80 transition-colors duration-300">
+            <span className="font-mono text-xs tracking-[0.2em] text-white/70 group-hover:text-white/80 transition-colors duration-300">
               FOLLOW ON INSTAGRAM
             </span>
-            <svg className="w-4 h-4 text-white/30 group-hover:text-white/60 group-hover:translate-x-1 transition-all duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg className="w-4 h-4 text-white/50 group-hover:text-white/80 group-hover:translate-x-1 transition-all duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M5 12h14M12 5l7 7-7 7" />
             </svg>
           </a>

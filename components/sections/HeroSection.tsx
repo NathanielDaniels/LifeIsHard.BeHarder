@@ -228,7 +228,7 @@ export default function HeroSection() {
               boxShadow: '0 0 25px rgba(249, 115, 22, 0.9)'
             }}
           />
-          <span className="text-sm text-white/60 font-mono tracking-wider">
+          <span className="text-sm text-white/80 font-mono tracking-wider">
             LIVE • {heartbeat} BPM
           </span>
         </motion.div>
@@ -245,7 +245,7 @@ export default function HeroSection() {
           transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
           className="flex flex-col items-center gap-2"
         >
-          <span className="text-xs text-white/40 uppercase tracking-widest">Scroll</span>
+          <span className="text-xs text-white/60 uppercase tracking-widest">Scroll</span>
           <div className="w-px h-12 bg-gradient-to-b from-orange-500/60 to-transparent" />
         </motion.div>
       </motion.div>

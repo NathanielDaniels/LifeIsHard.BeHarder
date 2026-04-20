@@ -19,7 +19,7 @@ export default function SchedulePage() {
           transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
           className="mb-20 lg:mb-28"
         >
-          <span className="font-mono text-xs tracking-[0.3em] text-white/40 uppercase block mb-4">
+          <span className="font-mono text-xs tracking-[0.3em] text-white/60 uppercase block mb-4">
             Dare2Tri Elite Development Team
           </span>
           <h1 className="font-display text-[clamp(3rem,8vw,5rem)] leading-[0.9] uppercase tracking-tight text-white">

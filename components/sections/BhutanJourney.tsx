@@ -111,7 +111,7 @@ export default function BhutanJourney() {
             }}
           >
             <div className="flex items-center gap-3">
-              <span className="text-sm text-white/60 uppercase tracking-wider">Altitude</span>
+              <span className="text-sm text-white/80 uppercase tracking-wider">Altitude</span>
               <motion.span className="text-2xl font-black text-orange-500 font-mono">
                 {altitude}'
               </motion.span>
@@ -122,7 +122,7 @@ export default function BhutanJourney() {
             className="px-6 py-3 rounded-full bg-black/80 backdrop-blur-md border border-white/10"
           >
             <div className="flex items-center gap-3">
-              <span className="text-sm text-white/60 uppercase tracking-wider">Temp</span>
+              <span className="text-sm text-white/80 uppercase tracking-wider">Temp</span>
               <motion.span className="text-2xl font-black text-white font-mono">
                 {temperature}°F
               </motion.span>
@@ -140,7 +140,7 @@ export default function BhutanJourney() {
           <h2 className="text-4xl md:text-6xl font-black text-white mb-2">
             THE <span className="text-orange-500">BHUTAN</span> TREK
           </h2>
-          <p className="text-white/60 text-lg">7 Days. 14,000 Feet. One Record.</p>
+          <p className="text-white/80 text-lg">7 Days. 14,000 Feet. One Record.</p>
         </motion.div>
 
         <motion.div
@@ -235,7 +235,7 @@ export default function BhutanJourney() {
                   <span className="text-xl font-black text-white">
                     {point.altitude.toLocaleString()}'
                   </span>
-                  <span className="text-xs text-white/40 uppercase tracking-widest">Altitude</span>
+                  <span className="text-xs text-white/60 uppercase tracking-widest">Altitude</span>
                 </div>
               </div>
             </div>
@@ -253,7 +253,7 @@ export default function BhutanJourney() {
             transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
             className="flex items-center gap-2"
           >
-            <span className="text-xs text-white/40 uppercase tracking-widest">Scroll to journey</span>
+            <span className="text-xs text-white/60 uppercase tracking-widest">Scroll to journey</span>
             <svg className="w-4 h-4 text-white/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>

@@ -11,13 +11,18 @@ import FloatingParticles from '@/components/shared/FloatingParticles';
 import BiometricCard from '@/components/shared/BiometricCard';
 import EmailCapture from '@/components/shared/EmailCapture';
 import SocialLinks from '@/components/shared/SocialLinks';
-import RaceCalendar from '@/components/shared/RaceCalendar';
+import { getDaysUntil, getDaysSince, parseLocalDate, getNextRace } from '@/lib/race-data';
+import dynamic from 'next/dynamic';
+
+const RaceCalendar = dynamic(() => import('@/components/shared/RaceCalendar'), { ssr: false });
+const RaceGlobe = dynamic(() => import('@/components/shared/RaceGlobe'), { ssr: false });
 // import InstagramFeed from '@/components/sections/InstagramFeed';
 import CustomCursor from '@/components/shared/CustomCursor';
+// import PixelRunner from '@/components/shared/PixelRunner';
 
-const ACCIDENT_DATE = new Date('2020-11-01');
-const SOBRIETY_DATE = new Date('2020-01-20');
-const NEXT_RACE_DATE = new Date('2026-04-11');
+const ACCIDENT_DATE = parseLocalDate('2020-11-01');
+const SOBRIETY_DATE = parseLocalDate('2020-01-20');
+const NATIONALS_DATE = parseLocalDate('2026-08-09');
 
 export default function ComingSoonClient() {
   const { energyState, theme } = useVitality();
@@ -52,7 +57,8 @@ export default function ComingSoonClient() {
   const [daysSinceAccident, setDaysSinceAccident] = useState(0);
   const [daysSober, setDaysSober] = useState(0);
   const [daysUntilRace, setDaysUntilRace] = useState(0);
-  
+  const [daysUntilNationals, setDaysUntilNationals] = useState(0);
+  const [showNationals, setShowNationals] = useState(false);
   const [showScrollHint, setShowScrollHint] = useState(false);
   const hasScrolledRef = useRef(false);
 
@@ -122,16 +128,19 @@ export default function ComingSoonClient() {
   const yLayer2 = useTransform(mouseY, [-0.5, 0.5], [-40, 40]);
 
   const { scrollYProgress } = useScroll();
-  const floatX = useTransform(scrollYProgress, [0, 1], [0, -300]);
-  const floatXReverse = useTransform(scrollYProgress, [0, 1], [0, 300]);
+  const floatXRaw = useTransform(scrollYProgress, [0, 1], [0, -300]);
+  const floatXReverseRaw = useTransform(scrollYProgress, [0, 1], [0, 300]);
+  const floatX = useSpring(floatXRaw, { stiffness: 80, damping: 30, mass: 0.5 });
+  const floatXReverse = useSpring(floatXReverseRaw, { stiffness: 80, damping: 30, mass: 0.5 });
 
   const themeColor = theme.primaryColor;
 
   useEffect(() => {
-    const today = new Date();
-    setDaysSinceAccident(Math.floor((today.getTime() - ACCIDENT_DATE.getTime()) / (1000 * 60 * 60 * 24)));
-    setDaysSober(Math.floor((today.getTime() - SOBRIETY_DATE.getTime()) / (1000 * 60 * 60 * 24)));
-    setDaysUntilRace(Math.max(0, Math.floor((NEXT_RACE_DATE.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))));
+    setDaysSinceAccident(getDaysSince(ACCIDENT_DATE));
+    setDaysSober(getDaysSince(SOBRIETY_DATE));
+    const next = getNextRace();
+    setDaysUntilRace(next ? getDaysUntil(parseLocalDate(next.date)) : 0);
+    setDaysUntilNationals(getDaysUntil(NATIONALS_DATE));
   }, []);
 
 
@@ -270,13 +279,13 @@ export default function ComingSoonClient() {
       {!prefersReducedMotion && (
         <>
           <motion.div
-            className="fixed top-[15%] left-[1%] font-display text-[12vw] text-white/[0.02] pointer-events-none z-[1] whitespace-nowrap font-bold tracking-tight will-change-transform"
+            className="fixed top-[15%] left-[1%] font-display text-[12vw] text-white/[0.02] pointer-events-none z-[1] whitespace-nowrap font-bold tracking-tight"
             style={{ x: floatX }}
           >
-            • UNSTOPPABLE • RELENTLESS • UNBROKEN • UNDEFEATED •
+            • RELENTLESS • UNSTOPPABLE • UNBROKEN • UNDEFEATED •
           </motion.div>
           <motion.div
-            className="fixed bottom-[15%] right-[-10%] font-display text-[12vw] text-white/[0.02] pointer-events-none z-[1] whitespace-nowrap font-bold tracking-tight will-change-transform"
+            className="fixed bottom-[15%] right-[-10%] font-display text-[12vw] text-white/[0.02] pointer-events-none z-[1] whitespace-nowrap font-bold tracking-tight"
             style={{ x: floatXReverse }}
           >
             • RECORD BREAKER • DARE2TRI • ADAPTIVE ATHLETE • ELITE •
@@ -327,7 +336,7 @@ export default function ComingSoonClient() {
             key="intro-overlay"
             exit={{ opacity: 0 }}
             transition={{ duration: 0.5 }}
-            className="fixed inset-0 z-50 bg-black flex flex-col items-center justify-center p-6"
+            className="fixed inset-0 z-[60] bg-black flex flex-col items-center justify-center p-6"
           >
             <div className="absolute top-10 left-10 font-mono text-xs md:text-sm text-white/60 tracking-widest flex flex-col gap-2 overflow-hidden">
               {statusMessages.map((line, i) => (
@@ -411,7 +420,7 @@ export default function ComingSoonClient() {
                       {isConnected ? 'Link Established' : whoopMode === 'demo' ? 'Demo Mode' : 'Offline Mode'}
                     </motion.span>
                   ) : (
-                    <span className="uppercase text-white/40">
+                    <span className="uppercase text-white/60">
                       {connectionStatus === 'connecting' ? 'Connecting...' : 
                        connectionStatus === 'syncing' ? 'Syncing Data...' : 
                        'Initializing...'}
@@ -440,6 +449,37 @@ export default function ComingSoonClient() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* === LLLDAM 2026 CORNER BADGE (APRIL ONLY) === */}
+      {new Date().getMonth() === 3 && (
+        <div className="fixed top-3 left-3 md:top-4 md:left-4 z-50 group">
+          <a
+            href="https://40years.amputee-coalition.org"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block"
+          >
+            <Image
+              src="/LLLDAM2026.png"
+              alt="#LLLDAM2026 - Limb Loss and Limb Difference Awareness Month"
+              width={240}
+              height={60}
+              className="h-12 md:h-14 w-auto cursor-pointer opacity-70 hover:opacity-100 transition-opacity duration-200"
+            />
+          </a>
+          <div role="tooltip" className="absolute top-full left-0 mt-2 w-72 p-4 rounded-xl bg-black/90 backdrop-blur-xl border border-white/10 opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto group-focus-within:opacity-100 group-focus-within:translate-y-0 group-focus-within:pointer-events-auto transition-all duration-300">
+            <p className="font-mono text-[10px] tracking-[0.2em] text-orange-500 mb-2">
+              APRIL IS LIMB LOSS & LIMB DIFFERENCE AWARENESS MONTH
+            </p>
+            <p className="text-sm text-white/60 leading-relaxed mb-3">
+              Nearly 2.1 million Americans live with limb loss. This month honors their stories, raises awareness, and celebrates the strength of the limb loss and limb difference community.
+            </p>
+            <span className="font-mono text-[10px] tracking-[0.15em] text-orange-500/70">
+              CLICK TO LEARN MORE →
+            </span>
+          </div>
+        </div>
+      )}
 
       {/* === HERO === */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
@@ -472,7 +512,7 @@ export default function ComingSoonClient() {
             transition={{ duration: 0.8, ease: "easeOut" }}
             className="mb-6"
           >
-            <h2 className="text-lg md:text-xl font-light tracking-[0.4em] text-white/60 font-display uppercase">
+            <h2 className="text-lg md:text-xl font-light tracking-[0.4em] text-white/80 font-display uppercase">
               Patrick Wingert
             </h2>
             <motion.div 
@@ -507,7 +547,7 @@ export default function ComingSoonClient() {
             initial={{ opacity: 0, y: 20 }}
             animate={phase >= 2 ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 1, delay: 0.3 }}
-            className="mt-8 font-mono text-[clamp(0.7rem,1.5vw,1rem)] tracking-[0.4em] text-white/40"
+            className="mt-8 font-mono text-[clamp(0.7rem,1.5vw,1rem)] tracking-[0.4em] text-white/60"
           >
             ADAPTIVE ATHLETE
           </motion.p>
@@ -652,7 +692,6 @@ export default function ComingSoonClient() {
             {[
               { value: daysSinceAccident, label: 'DAYS SINCE ACCIDENT' },
               { value: daysSober, label: 'DAYS SOBER' },
-              { value: daysUntilRace, label: 'DAYS UNTIL NEXT RACE' },
             ].map((stat, i) => (
               <motion.div
                 key={stat.label}
@@ -662,7 +701,7 @@ export default function ComingSoonClient() {
                 transition={{ duration: 0.6, delay: 0.2 + i * 0.15 }}
                 className="text-center"
               >
-                <div 
+                <div
                   className="font-display text-[clamp(3.5rem,10vw,7rem)] font-bold leading-none"
                   style={{ color: themeColor }}
                 >
@@ -673,6 +712,48 @@ export default function ComingSoonClient() {
                 </div>
               </motion.div>
             ))}
+
+            {/* Toggleable race countdown */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.5 }}
+              className="text-center cursor-pointer select-none group"
+              onClick={() => setShowNationals((prev) => !prev)}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setShowNationals((prev) => !prev); }}
+              aria-label={showNationals ? 'Show days until next race' : 'Show days until nationals'}
+            >
+              <div className="relative overflow-hidden">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={showNationals ? 'nationals' : 'next-race'}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <div
+                      className="font-display text-[clamp(3.5rem,10vw,7rem)] font-bold leading-none"
+                      style={{ color: themeColor }}
+                    >
+                      <AnimatedCounter value={showNationals ? daysUntilNationals : daysUntilRace} duration={2600} />
+                    </div>
+                    <div className="font-mono text-[0.7rem] md:text-[0.8rem] tracking-[0.3em] text-white/70 mt-2 font-medium">
+                      {showNationals ? 'DAYS UNTIL NATIONALS' : 'DAYS UNTIL NEXT RACE'}
+                    </div>
+                  </motion.div>
+                </AnimatePresence>
+              </div>
+              <div
+                className="font-mono text-[0.55rem] tracking-[0.2em] mt-3 transition-opacity duration-300 opacity-0 group-hover:opacity-100"
+                style={{ color: `${themeColor}99` }}
+              >
+                TAP TO {showNationals ? 'SEE NEXT RACE' : 'SEE NATIONALS'}
+              </div>
+            </motion.div>
           </div>
         </motion.div>
       </section>
@@ -873,26 +954,26 @@ export default function ComingSoonClient() {
                     {whoopStats.lastWorkout.sport}
                   </span>
                 </div>
-                <span className="ml-auto font-mono text-[0.75rem] text-white/40">
+                <span className="ml-auto font-mono text-[0.75rem] text-white/60">
                   {new Date(whoopStats.lastWorkout.completedAt).toLocaleDateString('en-US', { timeZone: 'America/Chicago', month: 'short', day: 'numeric' })} • {whoopStats.lastWorkout.duration} min
                 </span>
               </div>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div>
-                  <span className="font-mono text-[0.7rem] tracking-[0.2em] text-white/50 block">STRAIN</span>
+                  <span className="font-mono text-[0.7rem] tracking-[0.2em] text-white/70 block">STRAIN</span>
                   <span className="font-display text-3xl font-bold" style={{ color: themeColor }}>{whoopStats.lastWorkout.strain.toFixed(1)}</span>
                 </div>
                 <div>
-                  <span className="font-mono text-[0.7rem] tracking-[0.2em] text-white/50 block">AVG HR</span>
-                  <span className="font-display text-3xl font-bold" style={{ color: themeColor }}>{whoopStats.lastWorkout.averageHeartRate} <span className="text-base font-mono text-white/40">BPM</span></span>
+                  <span className="font-mono text-[0.7rem] tracking-[0.2em] text-white/70 block">AVG HR</span>
+                  <span className="font-display text-3xl font-bold" style={{ color: themeColor }}>{whoopStats.lastWorkout.averageHeartRate} <span className="text-base font-mono text-white/60">BPM</span></span>
                 </div>
                 <div>
-                  <span className="font-mono text-[0.7rem] tracking-[0.2em] text-white/50 block">MAX HR</span>
-                  <span className="font-display text-3xl font-bold" style={{ color: themeColor }}>{whoopStats.lastWorkout.maxHeartRate} <span className="text-base font-mono text-white/40">BPM</span></span>
+                  <span className="font-mono text-[0.7rem] tracking-[0.2em] text-white/70 block">MAX HR</span>
+                  <span className="font-display text-3xl font-bold" style={{ color: themeColor }}>{whoopStats.lastWorkout.maxHeartRate} <span className="text-base font-mono text-white/60">BPM</span></span>
                 </div>
                 <div>
-                  <span className="font-mono text-[0.7rem] tracking-[0.2em] text-white/50 block">CALORIES</span>
-                  <span className="font-display text-3xl font-bold" style={{ color: themeColor }}>{whoopStats.lastWorkout.calories} <span className="text-base font-mono text-white/40">kcal</span></span>
+                  <span className="font-mono text-[0.7rem] tracking-[0.2em] text-white/70 block">CALORIES</span>
+                  <span className="font-display text-3xl font-bold" style={{ color: themeColor }}>{whoopStats.lastWorkout.calories} <span className="text-base font-mono text-white/60">kcal</span></span>
                 </div>
               </div>
             </motion.div>
@@ -969,6 +1050,20 @@ export default function ComingSoonClient() {
         </motion.div>
       </section>
 
+      {/* === RACE MAP GLOBE === */}
+      <section className="relative py-20 md:py-32 px-6">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 1, ease: 'easeOut' }}
+          className="max-w-5xl mx-auto flex justify-center"
+        >
+          <RaceGlobe themeColor={themeColor} />
+        </motion.div>
+
+      </section>
+
       {/* === RACE SCHEDULE === */}
       <section className="relative py-32 md:py-48 px-6">
         <motion.div
@@ -986,7 +1081,7 @@ export default function ComingSoonClient() {
       {/* <InstagramFeed themeColor={themeColor} /> */}
 
       {/* === SPONSORS === */}
-      <section className="relative z-20 py-32 md:py-40 px-6 backdrop-blur-2xl border-t border-white/5">
+      <section className="relative z-20 py-32 md:py-40 px-6 backdrop-blur-md border-t border-white/5">
         <motion.div 
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
@@ -1013,9 +1108,9 @@ export default function ComingSoonClient() {
               { src: '/sponsors/performance-wealth-partners-light.svg', link: 'https://performancewealthpartners.com', alt: 'Performance Wealth Partners', className: 'h-16 md:h-20 grayscale group-hover:grayscale-0' },
               { src: '/sponsors/ATF_logo.png', link: 'https://www.adaptivetrainingfoundation.org/', alt: 'Adaptive Training Foundation', className: 'h-28 md:h-36 lg:h-44 invert brightness-200' },
               // Invert turns the white background black and logo white. Mix-blend-screen then makes the black background invisible
-              { src: '/sponsors/CAF_logo.png', link: 'https://www.challengedathletes.org/', alt: 'Sponsor 3', className: 'h-24 md:h-32 mix-blend-screen invert grayscale group-hover:grayscale-0 group-hover:invert-0 opacity-100 rounded-[50%] object-cover' },
+              { src: '/sponsors/CAF_logo.webp', link: 'https://www.challengedathletes.org/', alt: 'Sponsor 3', className: 'h-24 md:h-32 mix-blend-screen invert grayscale group-hover:grayscale-0 group-hover:invert-0 opacity-100 rounded-[50%] object-cover' },
               { src: '/sponsors/david-rotter-logo_orig.png', link: 'https://www.rotterprosthetics.com/', alt: 'David Rotter Prosthetics', className: 'h-16 md:h-20 grayscale group-hover:grayscale-0 brightness-200 group-hover:brightness-100' },
-              { src: '/sponsors/SEBCM_color.png', link: 'https://soeverybodycanmove.org', alt: 'So Every Body Can Move', className: 'h-10 md:h-12 grayscale group-hover:grayscale-0 brightness-200 group-hover:brightness-100' },
+              { src: '/sponsors/SEBCM_color.webp', link: 'https://soeverybodycanmove.org', alt: 'So Every Body Can Move', className: 'h-10 md:h-12 grayscale group-hover:grayscale-0 brightness-200 group-hover:brightness-100' },
             ].map((sponsor, i) => (
               <motion.div
                 key={sponsor.alt}
@@ -1047,23 +1142,50 @@ export default function ComingSoonClient() {
         </motion.div>
       </section>
 
+      {/* === LIMB LOSS & LIMB DIFFERENCE AWARENESS MONTH (APRIL ONLY) === */}
+      {new Date().getMonth() === 3 && (
+        <motion.section
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 1 }}
+          className="relative z-20 py-12 md:py-16 px-6 border-t border-white/5"
+          style={{ backgroundColor: 'rgba(5,5,5,0.95)' }}
+        >
+          <a
+            href="https://40years.amputee-coalition.org"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block max-w-4xl mx-auto hover:opacity-90 transition-opacity duration-200"
+          >
+            <Image
+              src="/LLLDAM-Header.png"
+              alt="April is Limb Loss and Limb Difference Awareness Month - One Community. Countless Stories."
+              width={1200}
+              height={400}
+              className="w-full h-auto object-contain"
+            />
+          </a>
+        </motion.section>
+      )}
+
       {/* === FOOTER === */}
       <footer className="relative z-20 py-8 px-6 border-t border-white/5 bg-black">
         <div className="max-w-6xl mx-auto flex flex-row justify-between items-center gap-4">
           <span className="font-display text-base tracking-[0.2em] text-white/60">
             PATRICK WINGERT
           </span>
-          <a 
+          <a
             href="https://dare2tri.org/"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center justify-end opacity-60 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-300 cursor-pointer outline-none"
           >
-            <Image 
-              src="/sponsors/D2T_logo_short.webp" 
-              alt="Dare2Tri Elite Team Athlete." 
-              width={120} 
-              height={40} 
+            <Image
+              src="/sponsors/D2T_logo_short.webp"
+              alt="Dare2Tri Elite Team Athlete."
+              width={120}
+              height={40}
               className="object-contain"
             />
           </a>
