@@ -48,7 +48,13 @@ export interface BriefingEmailProps {
   raceReadinessChartUrl?: string;
   raceReadinessBreakdown?: { score: number; recovery: number; consistency: number; balance: number };
   consistencyChartUrl?: string;
+  hrZoneChartUrl?: string;
+  daysSince?: { swim: number | null; bike: number | null; run: number | null };
   responseButtons?: { label: string; url: string }[];
+  q1Label?: string;
+  q1Buttons?: { label: string; url: string }[];
+  q2Label?: string;
+  q2Buttons?: { label: string; url: string }[];
   checkinUrl?: string;
 }
 
@@ -134,7 +140,13 @@ export default function DailyBriefingEmail({
   raceReadinessChartUrl = '',
   raceReadinessBreakdown,
   consistencyChartUrl = '',
+  hrZoneChartUrl = '',
+  daysSince,
   responseButtons = [],
+  q1Label = '',
+  q1Buttons = [],
+  q2Label = '',
+  q2Buttons = [],
   checkinUrl = '',
 }: BriefingEmailProps) {
   const accent = recoveryAccent(recoveryColor);
@@ -299,6 +311,30 @@ export default function DailyBriefingEmail({
             </Section>
           )}
 
+          {/* ══════ DAYS SINCE LAST DISCIPLINE ══════ */}
+          {daysSince && (
+            <Section style={sectionPadding}>
+              <Text style={sectionHeader}>LAST SESSION</Text>
+              <Row style={{ width: '100%' }}>
+                <Column style={daysSinceCell}>
+                  <Text style={daysSinceIcon}>🏊</Text>
+                  <Text style={daysSinceValue}>{daysSince.swim === 0 ? 'TODAY' : daysSince.swim != null ? `${daysSince.swim}d` : '—'}</Text>
+                  <Text style={daysSinceLabel}>SWIM</Text>
+                </Column>
+                <Column style={daysSinceCell}>
+                  <Text style={daysSinceIcon}>🚴</Text>
+                  <Text style={daysSinceValue}>{daysSince.bike === 0 ? 'TODAY' : daysSince.bike != null ? `${daysSince.bike}d` : '—'}</Text>
+                  <Text style={daysSinceLabel}>BIKE</Text>
+                </Column>
+                <Column style={daysSinceCell}>
+                  <Text style={daysSinceIcon}>🏃</Text>
+                  <Text style={daysSinceValue}>{daysSince.run === 0 ? 'TODAY' : daysSince.run != null ? `${daysSince.run}d` : '—'}</Text>
+                  <Text style={daysSinceLabel}>RUN</Text>
+                </Column>
+              </Row>
+            </Section>
+          )}
+
           {/* ══════ DISCIPLINE BALANCE ══════ */}
           {disciplineChartUrl && (
             <Section style={sectionPadding}>
@@ -347,12 +383,21 @@ export default function DailyBriefingEmail({
             </Section>
           )}
 
+          {/* ══════ HR ZONE DISTRIBUTION ══════ */}
+          {hrZoneChartUrl && (
+            <Section style={sectionPadding}>
+              <Text style={sectionHeader}>HEART RATE ZONES (14-DAY)</Text>
+              <Img src={hrZoneChartUrl} width="480" height="200" alt="HR zone distribution" style={chartImg} />
+              <Text style={chartCaption}>Total training minutes per HR zone. Z1-2 = aerobic base. Z3 = tempo. Z4-5 = threshold/max effort. More Z2 time = better endurance foundation.</Text>
+            </Section>
+          )}
+
           {/* ══════ RECOVERY-TO-LOAD RATIO ══════ */}
           {recoveryLoadChartUrl && (
             <Section style={sectionPadding}>
               <Text style={sectionHeader}>RECOVERY ÷ LOAD RATIO</Text>
               <Img src={recoveryLoadChartUrl} width="480" height="220" alt="Recovery to load ratio trend" style={chartImg} />
-              <Text style={chartCaption}>Green dashed line = adapting (body keeping up with training). Red dashed line = overreaching (back off). Orange line = 7-day trend. Dots colored by zone.</Text>
+              <Text style={chartCaption}>Above green line (2.5) = strong adaptation. Between lines = normal training range. Below red line (1.0) = overreaching, back off. Orange = 7-day trend.</Text>
             </Section>
           )}
 
@@ -366,32 +411,46 @@ export default function DailyBriefingEmail({
           )}
 
           {/* ══════ CHECK IN ══════ */}
-          {responseButtons.length > 0 && (
+          {(q1Buttons.length > 0 || q2Buttons.length > 0 || responseButtons.length > 0) && (
             <Section style={sectionPadding}>
               <Text style={sectionHeader}>CHECK IN WITH COACH</Text>
               <Section style={responseCard}>
-                {/* First pair */}
-                <Row style={{ width: '100%', marginBottom: '8px' }}>
-                  {responseButtons.slice(0, 2).map((btn, i) => (
-                    <Column key={i} style={{ width: '50%', paddingRight: i === 0 ? '4px' : '0', paddingLeft: i === 1 ? '4px' : '0' }}>
-                      <Link href={btn.url} style={responseBtnFull}>
-                        {btn.label}
-                      </Link>
-                    </Column>
-                  ))}
-                </Row>
-                {/* Second pair */}
-                {responseButtons.length > 2 && (
-                  <Row style={{ width: '100%' }}>
-                    {responseButtons.slice(2, 4).map((btn, i) => (
-                      <Column key={i} style={{ width: '50%', paddingRight: i === 0 ? '4px' : '0', paddingLeft: i === 1 ? '4px' : '0' }}>
-                        <Link href={btn.url} style={responseBtnFull}>
-                          {btn.label}
-                        </Link>
-                      </Column>
-                    ))}
-                  </Row>
+                {/* Question group 1 */}
+                {q1Buttons.length > 0 && (
+                  <>
+                    <Text style={responseGroupLabel}>{q1Label}</Text>
+                    <Row style={{ width: '100%', marginBottom: '16px' }}>
+                      {q1Buttons.map((btn, i) => (
+                        <Column key={i} style={{ width: `${100 / q1Buttons.length}%`, paddingRight: i < q1Buttons.length - 1 ? '4px' : '0', paddingLeft: i > 0 ? '4px' : '0' }}>
+                          <Link href={btn.url} style={responseBtnFull}>
+                            {btn.label}
+                          </Link>
+                        </Column>
+                      ))}
+                    </Row>
+                  </>
                 )}
+                {/* Question group 2 */}
+                {q2Buttons.length > 0 && (
+                  <>
+                    <Text style={responseGroupLabel}>{q2Label}</Text>
+                    <Row style={{ width: '100%' }}>
+                      {q2Buttons.map((btn, i) => (
+                        <Column key={i} style={{ width: `${100 / q2Buttons.length}%`, paddingRight: i < q2Buttons.length - 1 ? '4px' : '0', paddingLeft: i > 0 ? '4px' : '0' }}>
+                          <Link href={btn.url} style={responseBtnFull}>
+                            {btn.label}
+                          </Link>
+                        </Column>
+                      ))}
+                    </Row>
+                  </>
+                )}
+                {/* Fallback: old-style flat buttons if no structured groups */}
+                {q1Buttons.length === 0 && q2Buttons.length === 0 && responseButtons.map((btn, i) => (
+                  <Link key={i} href={btn.url} style={responseBtn}>
+                    {btn.label}
+                  </Link>
+                ))}
                 {checkinUrl && (
                   <Link href={checkinUrl} style={checkinLink}>
                     Tell me more &rarr;
@@ -654,6 +713,38 @@ const chartImg: React.CSSProperties = {
   border: `1px solid ${SUBTLE}`,
 };
 
+const daysSinceCell: React.CSSProperties = {
+  textAlign: 'center' as const,
+  verticalAlign: 'top' as const,
+  backgroundColor: CARD_BG,
+  border: `1px solid ${SUBTLE}`,
+  borderRadius: '8px',
+  padding: '16px 8px',
+  width: '33%',
+};
+
+const daysSinceIcon: React.CSSProperties = {
+  fontSize: '20px',
+  margin: '0 0 6px',
+  lineHeight: '1',
+};
+
+const daysSinceValue: React.CSSProperties = {
+  fontFamily: '"Bebas Neue", Arial, sans-serif',
+  fontSize: '28px',
+  color: WHITE,
+  margin: '0',
+  lineHeight: '1',
+};
+
+const daysSinceLabel: React.CSSProperties = {
+  fontFamily: '"SF Mono", monospace',
+  fontSize: '9px',
+  letterSpacing: '2px',
+  color: MUTED,
+  margin: '6px 0 0',
+};
+
 const readinessBreakdownSection: React.CSSProperties = {
   backgroundColor: CARD_BG,
   border: `1px solid ${SUBTLE}`,
@@ -791,6 +882,14 @@ const responseBtn: React.CSSProperties = {
   textDecoration: 'none',
   textAlign: 'center' as const,
   margin: '4px',
+};
+
+const responseGroupLabel: React.CSSProperties = {
+  fontFamily: '"SF Mono", monospace',
+  fontSize: '9px',
+  letterSpacing: '2px',
+  color: MUTED,
+  margin: '0 0 8px',
 };
 
 const responseBtnFull: React.CSSProperties = {

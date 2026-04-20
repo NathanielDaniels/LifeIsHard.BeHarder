@@ -26,6 +26,7 @@ const SPORT_COLORS: Record<string, string> = {
   'triathlon': ORANGE,       // orange
   'strength-training': '#d946ef', // fuchsia
   'weightlifting': '#d946ef',     // fuchsia (same category)
+  'functional-fitness': '#d946ef', // fuchsia (same category)
   'yoga': '#10b981',         // emerald
   'hiking': '#84cc16',       // lime
   'ultimate': '#f59e0b',     // amber
@@ -349,11 +350,11 @@ export function recoveryLoadRatioChart(snapshots: DailySnapshot[], days = 21): s
     return window.length >= 3 ? Math.round((window.reduce((a, b) => a + b, 0) / window.length) * 100) / 100 : null;
   });
 
-  // Color points: green if ratio > 1 (recovery outpacing load), red if < 0.7
+  // Color points by zone: green = strong adaptation, yellow = normal, red = overreaching
   const pointColors = ratios.map((v) => {
     if (v === null) return LABEL_COLOR;
-    if (v >= 1.0) return GREEN;
-    if (v >= 0.7) return YELLOW;
+    if (v >= 2.5) return GREEN;
+    if (v >= 1.0) return YELLOW;
     return RED;
   });
 
@@ -424,28 +425,28 @@ export function recoveryLoadRatioChart(snapshots: DailySnapshot[], days = 21): s
         annotations: [
           {
             type: 'box',
-            yMin: 1.0,
-            yMax: 3.0,
-            backgroundColor: 'rgba(34,197,94,0.04)',
+            yMin: 2.5,
+            yMax: MAX_RATIO + 0.5,
+            backgroundColor: 'rgba(34,197,94,0.06)',
           },
           {
             type: 'box',
-            yMin: 0.7,
-            yMax: 1.0,
+            yMin: 1.0,
+            yMax: 2.5,
             backgroundColor: 'rgba(234,179,8,0.04)',
           },
           {
             type: 'box',
             yMin: 0,
-            yMax: 0.7,
-            backgroundColor: 'rgba(239,68,68,0.04)',
+            yMax: 1.0,
+            backgroundColor: 'rgba(239,68,68,0.06)',
           },
           {
             type: 'line',
             mode: 'horizontal',
             scaleID: 'y-axis-0',
-            value: 1.0,
-            borderColor: 'rgba(34,197,94,0.4)',
+            value: 2.5,
+            borderColor: 'rgba(34,197,94,0.5)',
             borderWidth: 1.5,
             borderDash: [6, 4],
           },
@@ -453,8 +454,8 @@ export function recoveryLoadRatioChart(snapshots: DailySnapshot[], days = 21): s
             type: 'line',
             mode: 'horizontal',
             scaleID: 'y-axis-0',
-            value: 0.7,
-            borderColor: 'rgba(239,68,68,0.4)',
+            value: 1.0,
+            borderColor: 'rgba(239,68,68,0.5)',
             borderWidth: 1.5,
             borderDash: [6, 4],
           },
@@ -642,7 +643,141 @@ const NON_TRAINING: Set<string> = new Set([
   'steam-room', 'percussive-massage', 'sauna', 'ice-bath',
   'meditation', 'stretching', 'massage', 'cold-plunge',
   'breathwork', 'dog-walking', 'activity',
+  'cold-shower', 'red_light_therapy', 'red-light-therapy',
 ]);
+
+// ============================================
+// Days Since Last Discipline — swim/bike/run gap tracker
+// ============================================
+
+export interface DaysSinceDiscipline {
+  swim: number | null;   // null = never in dataset
+  bike: number | null;
+  run: number | null;
+}
+
+export function computeDaysSince(workouts: WorkoutEntry[], today: string): DaysSinceDiscipline {
+  const swimSports = new Set(['swimming', 'triathlon']);
+  const bikeSports = new Set(['cycling', 'spin', 'triathlon']);
+  const runSports = new Set(['running', 'triathlon']);
+
+  const todayDate = new Date(today + 'T00:00:00');
+  let lastSwim: string | null = null;
+  let lastBike: string | null = null;
+  let lastRun: string | null = null;
+
+  for (const w of workouts) {
+    if (swimSports.has(w.sport) && (lastSwim === null || w.date > lastSwim)) lastSwim = w.date;
+    if (bikeSports.has(w.sport) && (lastBike === null || w.date > lastBike)) lastBike = w.date;
+    if (runSports.has(w.sport) && (lastRun === null || w.date > lastRun)) lastRun = w.date;
+  }
+
+  const daysBetween = (d: string | null) => {
+    if (!d) return null;
+    const diff = Math.floor((todayDate.getTime() - new Date(d + 'T00:00:00').getTime()) / 86400000);
+    return diff;
+  };
+
+  return {
+    swim: daysBetween(lastSwim),
+    bike: daysBetween(lastBike),
+    run: daysBetween(lastRun),
+  };
+}
+
+// ============================================
+// HR Zone Distribution — time in each heart rate zone
+// Shows training intensity across recent workouts
+// ============================================
+
+export interface WorkoutWithZones {
+  date: string;
+  sport: string;
+  zone_zero_ms: number | null;
+  zone_one_ms: number | null;
+  zone_two_ms: number | null;
+  zone_three_ms: number | null;
+  zone_four_ms: number | null;
+  zone_five_ms: number | null;
+}
+
+export function hrZoneChart(workouts: WorkoutWithZones[], days = 14): string {
+  // Filter to training workouts with zone data
+  const training = workouts.filter((w) =>
+    !NON_TRAINING.has(w.sport) &&
+    (w.zone_one_ms || w.zone_two_ms || w.zone_three_ms || w.zone_four_ms || w.zone_five_ms)
+  );
+  if (training.length < 2) return '';
+
+  // Aggregate total minutes per zone across all workouts
+  const msToMin = (ms: number | null) => Math.round((ms || 0) / 60000);
+  const zones = {
+    'Zone 1': training.reduce((sum, w) => sum + msToMin(w.zone_one_ms), 0),
+    'Zone 2': training.reduce((sum, w) => sum + msToMin(w.zone_two_ms), 0),
+    'Zone 3': training.reduce((sum, w) => sum + msToMin(w.zone_three_ms), 0),
+    'Zone 4': training.reduce((sum, w) => sum + msToMin(w.zone_four_ms), 0),
+    'Zone 5': training.reduce((sum, w) => sum + msToMin(w.zone_five_ms), 0),
+  };
+
+  const zoneColors = [
+    '#3b82f6', // Z1 blue — easy/recovery
+    '#22c55e', // Z2 green — aerobic base
+    '#eab308', // Z3 yellow — tempo
+    '#f97316', // Z4 orange — threshold
+    '#ef4444', // Z5 red — max effort
+  ];
+
+  const labels = Object.keys(zones);
+  const data = Object.values(zones);
+  const total = data.reduce((a, b) => a + b, 0);
+
+  const config = {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        data,
+        backgroundColor: zoneColors,
+        borderRadius: 4,
+      }],
+    },
+    options: {
+      indexAxis: 'y',
+      legend: { display: false },
+      scales: {
+        xAxes: [{
+          ticks: { fontColor: LABEL_COLOR, fontSize: 10, beginAtZero: true },
+          gridLines: { color: GRID, zeroLineColor: GRID },
+          scaleLabel: {
+            display: true,
+            labelString: 'MINUTES',
+            fontColor: LABEL_COLOR,
+            fontSize: 9,
+          },
+        }],
+        yAxes: [{
+          ticks: { fontColor: LABEL_COLOR, fontSize: 11 },
+          gridLines: { display: false },
+        }],
+      },
+      plugins: {
+        datalabels: {
+          color: '#ffffff',
+          font: { size: 10, weight: 'bold' },
+          anchor: 'end',
+          align: 'right',
+          formatter: (v: number) => {
+            if (total === 0) return '';
+            const pct = Math.round((v / total) * 100);
+            return `${v}m (${pct}%)`;
+          },
+        },
+      },
+    },
+  };
+
+  return encodeLarge(config, 480, 200);
+}
 
 export function disciplineBalanceChart(disciplines: DisciplineData): string {
   // Filter to actual training disciplines only
