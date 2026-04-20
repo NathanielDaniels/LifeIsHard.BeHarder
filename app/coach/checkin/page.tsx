@@ -15,6 +15,10 @@ function CheckinForm() {
 
   const [status, setStatus] = useState(confirmed || '');
   const [energyLevel, setEnergyLevel] = useState<number | null>(null);
+  const [bodyFeeling, setBodyFeeling] = useState('');
+  const [stressLevel, setStressLevel] = useState('');
+  const [trainingStatus, setTrainingStatus] = useState('');
+  const [limbStatus, setLimbStatus] = useState('');
   const [notes, setNotes] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -29,7 +33,15 @@ function CheckinForm() {
       const res = await fetch('/api/coach/response', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ date, token, limbStatus: status, energyLevel, notes }),
+        body: JSON.stringify({
+          date, token,
+          limbStatus: limbStatus || status,
+          energyLevel,
+          bodyFeeling,
+          stressLevel,
+          trainingStatus,
+          notes,
+        }),
       });
       if (res.ok) {
         setSubmitted(true);
@@ -68,30 +80,50 @@ function CheckinForm() {
         )}
 
         {/* Coach's question — dynamic from today's briefing */}
+        {coachQuestion && (
+          <div style={section}>
+            <div style={coachQuestionBox}>
+              <label style={label}>COACH ASKED</label>
+              <p style={coachQuestionText}>{coachQuestion}</p>
+            </div>
+          </div>
+        )}
+
+        {/* Training today */}
         <div style={section}>
-          <label style={label}>{coachQuestion || (isLimbMode ? "HOW\u2019S THE LEG?" : "HOW\u2019D IT GO?")}</label>
-          <div style={buttonGroup}>
-            {(coachOptions.length > 0
-              ? coachOptions.map((opt) => ({
-                  value: opt.replace(/[^\w\s-]/g, '').trim().toLowerCase().replace(/\s+/g, '-'),
-                  label: opt,
-                }))
-              : isLimbMode
-              ? [
-                  { value: 'leg-healing', label: 'Still healing' },
-                  { value: 'leg-healed', label: 'Leg healed' },
-                  { value: 'socket-ready', label: 'Socket tested, good to go' },
-                ]
-              : [
-                  { value: 'training-done', label: 'Completed today\u2019s training' },
-                  { value: 'training-modified', label: 'Modified the workout' },
-                  { value: 'rest-day', label: 'Rest day \u2014 needed it' },
-                ]
-            ).map((opt) => (
+          <label style={label}>TRAINING TODAY</label>
+          <div style={buttonRow}>
+            {[
+              { value: 'completed', label: 'Did the workout' },
+              { value: 'modified', label: 'Modified it' },
+              { value: 'skipped', label: 'Skipped' },
+              { value: 'rest-day', label: 'Rest day' },
+            ].map((opt) => (
               <button
                 key={opt.value}
-                onClick={() => setStatus(opt.value)}
-                style={status === opt.value ? selectedBtn : optionBtn}
+                onClick={() => setTrainingStatus(opt.value)}
+                style={trainingStatus === opt.value ? selectedBtnCompact : optionBtnCompact}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Body check */}
+        <div style={section}>
+          <label style={label}>HOW DOES YOUR BODY FEEL?</label>
+          <div style={buttonRow}>
+            {[
+              { value: 'strong', label: '\u{1F4AA} Strong' },
+              { value: 'good', label: '\u{1F44D} Good' },
+              { value: 'tight', label: '\u{1F9B4} Tight/sore' },
+              { value: 'beat-up', label: '\u{1F915} Beat up' },
+            ].map((opt) => (
+              <button
+                key={opt.value}
+                onClick={() => setBodyFeeling(opt.value)}
+                style={bodyFeeling === opt.value ? selectedBtnCompact : optionBtnCompact}
               >
                 {opt.label}
               </button>
@@ -102,26 +134,68 @@ function CheckinForm() {
         {/* Energy Level */}
         <div style={section}>
           <label style={label}>ENERGY LEVEL</label>
-          <div style={buttonGroup}>
+          <div style={buttonRow}>
             {[1, 2, 3, 4, 5].map((n) => (
               <button
                 key={n}
                 onClick={() => setEnergyLevel(n)}
-                style={energyLevel === n ? selectedBtn : optionBtn}
+                style={energyLevel === n ? selectedBtnCompact : optionBtnCompact}
               >
-                {n === 1 ? '1 - Drained' : n === 3 ? '3 - OK' : n === 5 ? '5 - Strong' : String(n)}
+                {n === 1 ? '1 \u2014 Drained' : n === 3 ? '3 \u2014 OK' : n === 5 ? '5 \u2014 Strong' : String(n)}
               </button>
             ))}
           </div>
         </div>
 
-        {/* Notes */}
+        {/* Stress check */}
         <div style={section}>
-          <label style={label}>ANYTHING ELSE?</label>
+          <label style={label}>STRESS OUTSIDE TRAINING</label>
+          <div style={buttonRow}>
+            {[
+              { value: 'low', label: 'Low' },
+              { value: 'moderate', label: 'Moderate' },
+              { value: 'high', label: 'High' },
+              { value: 'none', label: 'All good' },
+            ].map((opt) => (
+              <button
+                key={opt.value}
+                onClick={() => setStressLevel(opt.value)}
+                style={stressLevel === opt.value ? selectedBtnCompact : optionBtnCompact}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Limb status — always available, not just limb mode */}
+        <div style={section}>
+          <label style={label}>LEG / PROSTHETIC</label>
+          <div style={buttonRow}>
+            {[
+              { value: 'good', label: 'Feeling good' },
+              { value: 'minor', label: 'Minor issues' },
+              { value: 'healing', label: 'Still healing' },
+              { value: 'healed', label: 'Fully healed' },
+            ].map((opt) => (
+              <button
+                key={opt.value}
+                onClick={() => setLimbStatus(opt.value)}
+                style={limbStatus === opt.value ? selectedBtnCompact : optionBtnCompact}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Open notes */}
+        <div style={section}>
+          <label style={label}>ANYTHING ELSE FOR COACH?</label>
           <textarea
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
-            placeholder="How did training feel? Any pain? Something on your mind?"
+            placeholder="How training felt, what&apos;s on your mind, plans for tomorrow..."
             style={textArea}
             rows={3}
           />
@@ -233,6 +307,48 @@ const buttonGroup: React.CSSProperties = {
   display: 'flex',
   flexDirection: 'column',
   gap: '8px',
+};
+
+const buttonRow: React.CSSProperties = {
+  display: 'flex',
+  flexWrap: 'wrap',
+  gap: '8px',
+};
+
+const optionBtnCompact: React.CSSProperties = {
+  backgroundColor: '#0a0a0a',
+  border: '1px solid rgba(255,255,255,0.08)',
+  borderRadius: '8px',
+  padding: '10px 14px',
+  color: 'rgba(255,255,255,0.6)',
+  fontSize: '13px',
+  cursor: 'pointer',
+  textAlign: 'center',
+  flex: '1 1 auto',
+  minWidth: '80px',
+};
+
+const selectedBtnCompact: React.CSSProperties = {
+  ...optionBtnCompact,
+  backgroundColor: 'rgba(249,115,22,0.1)',
+  borderColor: '#f97316',
+  color: '#f97316',
+};
+
+const coachQuestionBox: React.CSSProperties = {
+  backgroundColor: 'rgba(249,115,22,0.04)',
+  border: '1px solid rgba(249,115,22,0.15)',
+  borderLeft: '3px solid #f97316',
+  borderRadius: '0 8px 8px 0',
+  padding: '16px',
+};
+
+const coachQuestionText: React.CSSProperties = {
+  fontSize: '15px',
+  lineHeight: '1.6',
+  color: 'rgba(255,255,255,0.7)',
+  margin: '8px 0 0',
+  fontStyle: 'italic',
 };
 
 const optionBtn: React.CSSProperties = {
