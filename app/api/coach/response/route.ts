@@ -77,10 +77,12 @@ export async function GET(request: NextRequest) {
   }
 
   // Redirect to check-in page with confirmation + option to add more detail
+  const mode = searchParams.get('mode') || 'training';
   const checkinUrl = new URL('/coach/checkin', request.url);
   checkinUrl.searchParams.set('date', date);
   checkinUrl.searchParams.set('token', token);
   checkinUrl.searchParams.set('confirmed', error ? 'error' : status);
+  checkinUrl.searchParams.set('mode', mode);
 
   return NextResponse.redirect(checkinUrl);
 }

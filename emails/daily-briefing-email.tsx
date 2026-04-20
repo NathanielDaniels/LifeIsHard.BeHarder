@@ -46,6 +46,7 @@ export interface BriefingEmailProps {
   trainingLoadChartUrl?: string;
   recoveryLoadChartUrl?: string;
   raceReadinessChartUrl?: string;
+  raceReadinessBreakdown?: { score: number; recovery: number; consistency: number; balance: number };
   consistencyChartUrl?: string;
   responseButtons?: { label: string; url: string }[];
   checkinUrl?: string;
@@ -62,7 +63,7 @@ const GREEN = '#22c55e';
 const YELLOW = '#eab308';
 const RED = '#ef4444';
 const WHITE = '#ffffff';
-const MUTED = 'rgba(255,255,255,0.4)';
+const MUTED = 'rgba(255,255,255,0.55)';
 const SUBTLE = 'rgba(255,255,255,0.08)';
 
 function recoveryBgColor(color: string): string {
@@ -131,6 +132,7 @@ export default function DailyBriefingEmail({
   trainingLoadChartUrl = '',
   recoveryLoadChartUrl = '',
   raceReadinessChartUrl = '',
+  raceReadinessBreakdown,
   consistencyChartUrl = '',
   responseButtons = [],
   checkinUrl = '',
@@ -208,7 +210,16 @@ export default function DailyBriefingEmail({
           <Section style={sectionPadding}>
             <Text style={sectionHeader}>TODAY&apos;S TRAINING CALL</Text>
             <Section style={trainingCard}>
-              <Text style={trainingText}>{trainingCall}</Text>
+              {trainingCall.split('\n\n').map((para, i) => (
+                <Text key={i} style={{ ...trainingText, marginBottom: '12px' }}>
+                  {para.split('\n').map((line, j, arr) => (
+                    <React.Fragment key={j}>
+                      {line}
+                      {j < arr.length - 1 && <br />}
+                    </React.Fragment>
+                  ))}
+                </Text>
+              ))}
             </Section>
           </Section>
 
@@ -216,7 +227,16 @@ export default function DailyBriefingEmail({
           <Section style={sectionPadding}>
             <Text style={sectionHeader}>COACH&apos;S NOTE</Text>
             <Section style={coachNoteCard}>
-              <Text style={coachNoteText}>{coachNote}</Text>
+              {coachNote.split('\n\n').map((para, i) => (
+                <Text key={i} style={{ ...coachNoteText, marginBottom: '14px' }}>
+                  {para.split('\n').map((line, j, arr) => (
+                    <React.Fragment key={j}>
+                      {line}
+                      {j < arr.length - 1 && <br />}
+                    </React.Fragment>
+                  ))}
+                </Text>
+              ))}
             </Section>
           </Section>
 
@@ -294,6 +314,27 @@ export default function DailyBriefingEmail({
               <Section style={{ textAlign: 'center' as const }}>
                 <Img src={raceReadinessChartUrl} width="200" height="200" alt="Race readiness score" style={{ ...chartImg, maxWidth: '200px', margin: '0 auto' }} />
               </Section>
+              {raceReadinessBreakdown && (
+                <Section style={readinessBreakdownSection}>
+                  <Row style={{ width: '100%' }}>
+                    <Column style={readinessMetric}>
+                      <Text style={readinessMetricValue}>{raceReadinessBreakdown.recovery}%</Text>
+                      <Text style={readinessMetricLabel}>RECOVERY</Text>
+                      <Text style={readinessMetricSub}>7-day avg</Text>
+                    </Column>
+                    <Column style={readinessMetric}>
+                      <Text style={readinessMetricValue}>{raceReadinessBreakdown.consistency}%</Text>
+                      <Text style={readinessMetricLabel}>CONSISTENCY</Text>
+                      <Text style={readinessMetricSub}>workouts/week</Text>
+                    </Column>
+                    <Column style={readinessMetric}>
+                      <Text style={readinessMetricValue}>{raceReadinessBreakdown.balance}%</Text>
+                      <Text style={readinessMetricLabel}>BALANCE</Text>
+                      <Text style={readinessMetricSub}>swim/bike/run</Text>
+                    </Column>
+                  </Row>
+                </Section>
+              )}
             </Section>
           )}
 
@@ -302,6 +343,7 @@ export default function DailyBriefingEmail({
             <Section style={sectionPadding}>
               <Text style={sectionHeader}>4-WEEK TRAINING LOAD</Text>
               <Img src={trainingLoadChartUrl} width="480" height="200" alt="Weekly training load progression" style={chartImg} />
+              <Text style={chartCaption}>Total cardiovascular strain per week. Rising weeks = volume building. Strain is HR-based — doesn&apos;t capture power/pace intensity.</Text>
             </Section>
           )}
 
@@ -309,7 +351,8 @@ export default function DailyBriefingEmail({
           {recoveryLoadChartUrl && (
             <Section style={sectionPadding}>
               <Text style={sectionHeader}>RECOVERY ÷ LOAD RATIO</Text>
-              <Img src={recoveryLoadChartUrl} width="480" height="200" alt="Recovery to load ratio trend" style={chartImg} />
+              <Img src={recoveryLoadChartUrl} width="480" height="220" alt="Recovery to load ratio trend" style={chartImg} />
+              <Text style={chartCaption}>Green dashed line = adapting (body keeping up with training). Red dashed line = overreaching (back off). Orange line = 7-day trend. Dots colored by zone.</Text>
             </Section>
           )}
 
@@ -317,7 +360,8 @@ export default function DailyBriefingEmail({
           {consistencyChartUrl && (
             <Section style={sectionPadding}>
               <Text style={sectionHeader}>28-DAY ACTIVITY</Text>
-              <Img src={consistencyChartUrl} width="480" height="100" alt="Workout consistency calendar" style={chartImg} />
+              <Img src={consistencyChartUrl} width="480" height="160" alt="Workout consistency calendar" style={chartImg} />
+              <Text style={chartCaption}>Each bar = one day. Bar height = workout strain. Color = sport type. Gray = rest day. Gaps show missed training days.</Text>
             </Section>
           )}
 
@@ -326,11 +370,28 @@ export default function DailyBriefingEmail({
             <Section style={sectionPadding}>
               <Text style={sectionHeader}>CHECK IN WITH COACH</Text>
               <Section style={responseCard}>
-                {responseButtons.map((btn, i) => (
-                  <Link key={i} href={btn.url} style={responseBtn}>
-                    {btn.label}
-                  </Link>
-                ))}
+                {/* First pair */}
+                <Row style={{ width: '100%', marginBottom: '8px' }}>
+                  {responseButtons.slice(0, 2).map((btn, i) => (
+                    <Column key={i} style={{ width: '50%', paddingRight: i === 0 ? '4px' : '0', paddingLeft: i === 1 ? '4px' : '0' }}>
+                      <Link href={btn.url} style={responseBtnFull}>
+                        {btn.label}
+                      </Link>
+                    </Column>
+                  ))}
+                </Row>
+                {/* Second pair */}
+                {responseButtons.length > 2 && (
+                  <Row style={{ width: '100%' }}>
+                    {responseButtons.slice(2, 4).map((btn, i) => (
+                      <Column key={i} style={{ width: '50%', paddingRight: i === 0 ? '4px' : '0', paddingLeft: i === 1 ? '4px' : '0' }}>
+                        <Link href={btn.url} style={responseBtnFull}>
+                          {btn.label}
+                        </Link>
+                      </Column>
+                    ))}
+                  </Row>
+                )}
                 {checkinUrl && (
                   <Link href={checkinUrl} style={checkinLink}>
                     Tell me more &rarr;
@@ -593,6 +654,51 @@ const chartImg: React.CSSProperties = {
   border: `1px solid ${SUBTLE}`,
 };
 
+const readinessBreakdownSection: React.CSSProperties = {
+  backgroundColor: CARD_BG,
+  border: `1px solid ${SUBTLE}`,
+  borderRadius: '8px',
+  padding: '16px 8px',
+  marginTop: '12px',
+};
+
+const readinessMetric: React.CSSProperties = {
+  textAlign: 'center' as const,
+  width: '33%',
+};
+
+const readinessMetricValue: React.CSSProperties = {
+  fontFamily: '"Bebas Neue", Arial, sans-serif',
+  fontSize: '22px',
+  color: WHITE,
+  margin: '0',
+  lineHeight: '1',
+};
+
+const readinessMetricLabel: React.CSSProperties = {
+  fontFamily: '"SF Mono", monospace',
+  fontSize: '9px',
+  letterSpacing: '2px',
+  color: MUTED,
+  margin: '4px 0 2px',
+};
+
+const readinessMetricSub: React.CSSProperties = {
+  fontFamily: '"SF Mono", monospace',
+  fontSize: '8px',
+  color: 'rgba(255,255,255,0.35)',
+  margin: '0',
+};
+
+const chartCaption: React.CSSProperties = {
+  fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+  fontSize: '11px',
+  lineHeight: '1.5',
+  color: 'rgba(255,255,255,0.45)',
+  margin: '8px 0 0',
+  textTransform: 'none' as const,
+};
+
 // --- Key Numbers ---
 const keyNumCell: React.CSSProperties = {
   textAlign: 'center' as const,
@@ -623,7 +729,7 @@ const keyNumLabel: React.CSSProperties = {
 const keyNumBaseline: React.CSSProperties = {
   fontFamily: '"SF Mono", monospace',
   fontSize: '9px',
-  color: 'rgba(255,255,255,0.25)',
+  color: 'rgba(255,255,255,0.4)',
   margin: '0',
 };
 
@@ -687,6 +793,19 @@ const responseBtn: React.CSSProperties = {
   margin: '4px',
 };
 
+const responseBtnFull: React.CSSProperties = {
+  display: 'block',
+  backgroundColor: 'rgba(249,115,22,0.08)',
+  border: `1px solid rgba(249,115,22,0.25)`,
+  borderRadius: '8px',
+  padding: '12px 8px',
+  color: ORANGE,
+  fontSize: '13px',
+  fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+  textDecoration: 'none',
+  textAlign: 'center' as const,
+};
+
 const checkinLink: React.CSSProperties = {
   display: 'block',
   color: ORANGE,
@@ -725,7 +844,7 @@ const footerTagline: React.CSSProperties = {
   fontFamily: '"SF Mono", monospace',
   fontSize: '9px',
   letterSpacing: '3px',
-  color: 'rgba(255,255,255,0.25)',
+  color: 'rgba(255,255,255,0.4)',
   margin: '0 0 16px',
   textAlign: 'center' as const,
 };
@@ -733,7 +852,7 @@ const footerTagline: React.CSSProperties = {
 const footerMuted: React.CSSProperties = {
   fontSize: '11px',
   lineHeight: '1.6',
-  color: 'rgba(255,255,255,0.2)',
+  color: 'rgba(255,255,255,0.35)',
   margin: '0 0 4px',
   textAlign: 'center' as const,
 };

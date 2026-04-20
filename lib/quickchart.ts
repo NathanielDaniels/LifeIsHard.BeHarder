@@ -15,20 +15,21 @@ const YELLOW = '#eab308';
 const RED = '#ef4444';
 const BG = '#0a0a0a';
 const GRID = 'rgba(255,255,255,0.06)';
-const LABEL_COLOR = 'rgba(255,255,255,0.4)';
+const LABEL_COLOR = 'rgba(255,255,255,0.55)';
 
-// Sport-specific colors for discipline chart
+// Sport-specific colors for discipline chart — every training sport gets a distinct color
 const SPORT_COLORS: Record<string, string> = {
   'running': '#ef4444',      // red
   'cycling': '#3b82f6',      // blue
-  'spin': '#3b82f6',         // blue (same as cycling)
+  'spin': '#8b5cf6',         // violet (distinct from cycling)
   'swimming': '#06b6d4',     // cyan
   'triathlon': ORANGE,       // orange
-  'strength-training': '#a855f7', // purple
-  'steam-room': '#6b7280',   // gray
-  'percussive-massage': '#6b7280', // gray
+  'strength-training': '#d946ef', // fuchsia
+  'weightlifting': '#d946ef',     // fuchsia (same category)
   'yoga': '#10b981',         // emerald
   'hiking': '#84cc16',       // lime
+  'ultimate': '#f59e0b',     // amber
+  'other': '#6b7280',        // gray — catch-all bucket
 };
 
 function encode(config: object): string {
@@ -332,11 +333,14 @@ export function recoveryLoadRatioChart(snapshots: DailySnapshot[], days = 21): s
 
   // Compute ratio: recovery / strain (higher = better adapted)
   // Normalize strain to 0-100 scale (strain is 0-21, multiply by ~4.76)
+  // Filter out very low strain days (<2) — they produce meaningless ratios
+  const MAX_RATIO = 4.0; // Cap to prevent outliers from blowing the scale
   const ratios = recent.map((s) => {
     const recovery = s.recovery_score;
     const strain = s.strain;
-    if (recovery == null || strain == null || strain < 0.5) return null;
-    return Math.round((recovery / (strain * 4.76)) * 100) / 100;
+    if (recovery == null || strain == null || strain < 2.0) return null;
+    const ratio = recovery / (strain * 4.76);
+    return Math.round(Math.min(ratio, MAX_RATIO) * 100) / 100;
   });
 
   // 7-day moving average for trend line
@@ -383,14 +387,30 @@ export function recoveryLoadRatioChart(snapshots: DailySnapshot[], days = 21): s
       ],
     },
     options: {
-      legend: { display: false },
+      legend: {
+        display: true,
+        position: 'top',
+        labels: {
+          fontColor: LABEL_COLOR,
+          fontSize: 10,
+          boxWidth: 12,
+          padding: 16,
+          usePointStyle: true,
+        },
+      },
       scales: {
         yAxes: [{
-          ticks: { fontColor: LABEL_COLOR, fontSize: 10 },
+          ticks: {
+            fontColor: LABEL_COLOR,
+            fontSize: 10,
+            min: 0,
+            max: MAX_RATIO + 0.5,
+            stepSize: 0.5,
+          },
           gridLines: { color: GRID, zeroLineColor: GRID },
           scaleLabel: {
             display: true,
-            labelString: 'RECOVERY / LOAD',
+            labelString: 'RECOVERY ÷ LOAD',
             fontColor: LABEL_COLOR,
             fontSize: 9,
           },
@@ -403,21 +423,47 @@ export function recoveryLoadRatioChart(snapshots: DailySnapshot[], days = 21): s
       annotation: {
         annotations: [
           {
+            type: 'box',
+            yMin: 1.0,
+            yMax: 3.0,
+            backgroundColor: 'rgba(34,197,94,0.04)',
+          },
+          {
+            type: 'box',
+            yMin: 0.7,
+            yMax: 1.0,
+            backgroundColor: 'rgba(234,179,8,0.04)',
+          },
+          {
+            type: 'box',
+            yMin: 0,
+            yMax: 0.7,
+            backgroundColor: 'rgba(239,68,68,0.04)',
+          },
+          {
             type: 'line',
             mode: 'horizontal',
             scaleID: 'y-axis-0',
             value: 1.0,
-            borderColor: 'rgba(34,197,94,0.3)',
-            borderWidth: 1,
-            borderDash: [4, 4],
-            label: { content: 'ADAPTED', enabled: true, fontSize: 8, backgroundColor: 'rgba(0,0,0,0.5)', fontColor: GREEN },
+            borderColor: 'rgba(34,197,94,0.4)',
+            borderWidth: 1.5,
+            borderDash: [6, 4],
+          },
+          {
+            type: 'line',
+            mode: 'horizontal',
+            scaleID: 'y-axis-0',
+            value: 0.7,
+            borderColor: 'rgba(239,68,68,0.4)',
+            borderWidth: 1.5,
+            borderDash: [6, 4],
           },
         ],
       },
     },
   };
 
-  return encodeLarge(config, 480, 200);
+  return encodeLarge(config, 480, 220);
 }
 
 // ============================================
@@ -437,9 +483,9 @@ export function raceReadinessGauge(input: RaceReadinessInput): string {
   // 40% recovery trend (are you recovered?)
   // 35% training consistency (have you been training?)
   // 25% discipline balance (are you training the right things?)
-  const recoveryComponent = Math.min(100, input.recoveryTrend);
-  const consistencyComponent = Math.min(100, (input.trainingConsistency / 5) * 100); // 5 workouts/week = 100%
-  const balanceComponent = input.disciplineBalance;
+  const recoveryComponent = Math.min(100, Math.round(input.recoveryTrend));
+  const consistencyComponent = Math.min(100, Math.round((input.trainingConsistency / 5) * 100)); // 5 workouts/week = 100%
+  const balanceComponent = Math.round(input.disciplineBalance);
 
   const score = Math.round(
     recoveryComponent * 0.4 +
@@ -473,59 +519,112 @@ export function raceReadinessGauge(input: RaceReadinessInput): string {
     },
   };
 
+  // Return the URL plus the component scores for the email caption
   return encodeLarge(config, 300, 300);
+}
+
+// Exported so the email renderer can build a detailed caption
+export function computeReadinessBreakdown(input: RaceReadinessInput): {
+  score: number;
+  recovery: number;
+  consistency: number;
+  balance: number;
+} {
+  const recovery = Math.min(100, Math.round(input.recoveryTrend));
+  const consistency = Math.min(100, Math.round((input.trainingConsistency / 5) * 100));
+  const balance = Math.round(input.disciplineBalance);
+  const score = Math.round(recovery * 0.4 + consistency * 0.35 + balance * 0.25);
+  return { score, recovery, consistency, balance };
 }
 
 // ============================================
 // Workout Consistency Calendar — 28-day activity view
-// Each bar = one day, colored by sport or gray for rest
+// Stacked bars: each segment = one workout, colored by sport
+// Uniform height per workout so it's about consistency, not strain
 // ============================================
 
-export function consistencyCalendar(snapshots: DailySnapshot[], days = 28): string {
+export interface WorkoutEntry {
+  date: string;
+  sport: string;
+}
+
+export function consistencyCalendar(snapshots: DailySnapshot[], days = 28, workouts?: WorkoutEntry[]): string {
   const recent = recentDays(snapshots, days);
   if (recent.length < 7) return '';
 
   const labels = recent.map((s) => {
-    const [, , d] = s.date.split('-');
-    return parseInt(d).toString();
+    const [, m, d] = s.date.split('-');
+    return `${parseInt(m)}/${parseInt(d)}`;
   });
 
-  // Each day gets a strain value (workout strain if available, else 0)
-  const data = recent.map((s) => s.workout_strain ?? (s.workout_sport ? s.strain ?? 0.5 : 0.5));
+  // Build a map of date → list of training sports
+  const dateToSports: Record<string, string[]> = {};
+  for (const s of recent) {
+    dateToSports[s.date] = [];
+  }
 
-  // Color by sport type, gray for rest days
-  const barColors = recent.map((s) => {
-    if (!s.workout_sport) return 'rgba(255,255,255,0.06)'; // rest day — barely visible
-    return SPORT_COLORS[s.workout_sport] || ORANGE;
-  });
+  // Dates covered by the workouts file
+  const workoutDates = new Set(workouts ? workouts.map((w) => w.date) : []);
 
-  // Border to highlight workout days
-  const borderColors = recent.map((s) => {
-    if (!s.workout_sport) return 'transparent';
-    return SPORT_COLORS[s.workout_sport] || ORANGE;
-  });
+  // Use workouts file for dates it covers, snapshot data for older dates
+  if (workouts && workouts.length > 0) {
+    for (const w of workouts) {
+      if (dateToSports[w.date] !== undefined && !NON_TRAINING.has(w.sport)) {
+        dateToSports[w.date].push(w.sport);
+      }
+    }
+  }
+  // Fill in older dates from snapshots (workouts file only covers ~14 days)
+  for (const s of recent) {
+    if (!workoutDates.has(s.date) && s.workout_sport && !NON_TRAINING.has(s.workout_sport)) {
+      dateToSports[s.date].push(s.workout_sport);
+    }
+  }
+
+  // Collect all unique sports across all days
+  const allSports = Array.from(new Set(
+    Object.values(dateToSports).flat().filter((s): s is string => s != null)
+  ));
+
+  if (allSports.length === 0) return '';
+
+  // One dataset per sport — stacked, uniform height (1 per workout)
+  const datasets: any[] = allSports.map((sport) => ({
+    label: formatSportName(sport),
+    data: recent.map((s) => {
+      const count = dateToSports[s.date].filter((sp) => sp === sport).length;
+      return count > 0 ? count : null;
+    }),
+    backgroundColor: SPORT_COLORS[sport] || ORANGE,
+    borderColor: SPORT_COLORS[sport] || ORANGE,
+    borderWidth: 1,
+    borderRadius: 2,
+  }));
 
   const config = {
     type: 'bar',
-    data: {
-      labels,
-      datasets: [{
-        data,
-        backgroundColor: barColors,
-        borderColor: borderColors,
-        borderWidth: 1,
-        borderRadius: 2,
-      }],
-    },
+    data: { labels, datasets },
     options: {
-      legend: { display: false },
+      legend: {
+        display: true,
+        position: 'top',
+        labels: {
+          fontColor: LABEL_COLOR,
+          fontSize: 9,
+          boxWidth: 10,
+          padding: 10,
+          usePointStyle: true,
+        },
+      },
       scales: {
         yAxes: [{
           display: false,
+          stacked: true,
           ticks: { min: 0 },
         }],
         xAxes: [{
-          ticks: { fontColor: LABEL_COLOR, fontSize: 8 },
+          stacked: true,
+          ticks: { fontColor: LABEL_COLOR, fontSize: 7, maxRotation: 45 },
           gridLines: { display: false },
         }],
       },
@@ -535,16 +634,41 @@ export function consistencyCalendar(snapshots: DailySnapshot[], days = 28): stri
     },
   };
 
-  return encodeLarge(config, 480, 100);
+  return encodeLarge(config, 480, 160);
 }
 
-export function disciplineBalanceChart(disciplines: DisciplineData): string {
-  const entries = Object.entries(disciplines).sort((a, b) => b[1].minutes - a[1].minutes);
-  if (entries.length === 0) return '';
+// Recovery/wellness/non-training activities excluded from training charts
+const NON_TRAINING: Set<string> = new Set([
+  'steam-room', 'percussive-massage', 'sauna', 'ice-bath',
+  'meditation', 'stretching', 'massage', 'cold-plunge',
+  'breathwork', 'dog-walking', 'activity',
+]);
 
-  const labels = entries.map(([sport]) => formatSportName(sport));
-  const data = entries.map(([, d]) => d.minutes);
-  const colors = entries.map(([sport]) => SPORT_COLORS[sport] || '#6b7280');
+export function disciplineBalanceChart(disciplines: DisciplineData): string {
+  // Filter to actual training disciplines only
+  const trainingEntries = Object.entries(disciplines)
+    .filter(([sport]) => !NON_TRAINING.has(sport))
+    .sort((a, b) => b[1].minutes - a[1].minutes);
+  if (trainingEntries.length === 0) return '';
+
+  // Group anything under 3% into "Other"
+  const totalMin = trainingEntries.reduce((sum, [, d]) => sum + d.minutes, 0);
+  const significant: [string, { minutes: number; pct: number }][] = [];
+  let otherMin = 0;
+  for (const [sport, d] of trainingEntries) {
+    if ((d.minutes / totalMin) * 100 >= 3) {
+      significant.push([sport, d]);
+    } else {
+      otherMin += d.minutes;
+    }
+  }
+  if (otherMin > 0) {
+    significant.push(['other', { minutes: otherMin, pct: (otherMin / totalMin) * 100 }]);
+  }
+
+  const labels = significant.map(([sport]) => formatSportName(sport));
+  const data = significant.map(([, d]) => d.minutes);
+  const colors = significant.map(([sport]) => SPORT_COLORS[sport] || '#6b7280');
 
   const config = {
     type: 'doughnut',
@@ -570,12 +694,12 @@ export function disciplineBalanceChart(disciplines: DisciplineData): string {
       plugins: {
         datalabels: {
           color: '#ffffff',
-          font: { size: 11, weight: 'bold' },
+          font: { size: 12, weight: 'bold' },
           formatter: (value: number, ctx: any) => {
             const total = ctx.dataset.data.reduce((a: number, b: number) => a + b, 0);
             if (total === 0) return '';
             const pct = Math.round((value / total) * 100);
-            return pct >= 5 ? `${pct}%` : '';
+            return pct >= 4 ? `${pct}%` : '';
           },
         },
       },

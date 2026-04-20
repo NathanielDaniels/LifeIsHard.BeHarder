@@ -8,8 +8,12 @@ function CheckinForm() {
   const date = searchParams.get('date') || '';
   const token = searchParams.get('token') || '';
   const confirmed = searchParams.get('confirmed') || '';
+  const mode = searchParams.get('mode') || 'training';
+  const coachQuestion = searchParams.get('q') || '';
+  const coachOptions = (searchParams.get('opts') || '').split('||').filter(Boolean);
+  const isLimbMode = mode === 'limb';
 
-  const [limbStatus, setLimbStatus] = useState(confirmed || '');
+  const [status, setStatus] = useState(confirmed || '');
   const [energyLevel, setEnergyLevel] = useState<number | null>(null);
   const [notes, setNotes] = useState('');
   const [submitted, setSubmitted] = useState(false);
@@ -25,7 +29,7 @@ function CheckinForm() {
       const res = await fetch('/api/coach/response', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ date, token, limbStatus, energyLevel, notes }),
+        body: JSON.stringify({ date, token, limbStatus: status, energyLevel, notes }),
       });
       if (res.ok) {
         setSubmitted(true);
@@ -63,19 +67,31 @@ function CheckinForm() {
           </div>
         )}
 
-        {/* Limb Status */}
+        {/* Coach's question — dynamic from today's briefing */}
         <div style={section}>
-          <label style={label}>HOW&apos;S THE LEG?</label>
+          <label style={label}>{coachQuestion || (isLimbMode ? "HOW\u2019S THE LEG?" : "HOW\u2019D IT GO?")}</label>
           <div style={buttonGroup}>
-            {[
-              { value: 'leg-healing', label: 'Still healing' },
-              { value: 'leg-healed', label: 'Leg healed' },
-              { value: 'socket-ready', label: 'Socket tested, good to go' },
-            ].map((opt) => (
+            {(coachOptions.length > 0
+              ? coachOptions.map((opt) => ({
+                  value: opt.replace(/[^\w\s-]/g, '').trim().toLowerCase().replace(/\s+/g, '-'),
+                  label: opt,
+                }))
+              : isLimbMode
+              ? [
+                  { value: 'leg-healing', label: 'Still healing' },
+                  { value: 'leg-healed', label: 'Leg healed' },
+                  { value: 'socket-ready', label: 'Socket tested, good to go' },
+                ]
+              : [
+                  { value: 'training-done', label: 'Completed today\u2019s training' },
+                  { value: 'training-modified', label: 'Modified the workout' },
+                  { value: 'rest-day', label: 'Rest day \u2014 needed it' },
+                ]
+            ).map((opt) => (
               <button
                 key={opt.value}
-                onClick={() => setLimbStatus(opt.value)}
-                style={limbStatus === opt.value ? selectedBtn : optionBtn}
+                onClick={() => setStatus(opt.value)}
+                style={status === opt.value ? selectedBtn : optionBtn}
               >
                 {opt.label}
               </button>
