@@ -582,7 +582,7 @@ export default function ShowcasePage() {
                       <div key={d.sport} className="flex items-center gap-3">
                         <div className="w-3.5 h-3.5 rounded-full" style={{ backgroundColor: d.color }} />
                         <span className="font-mono text-sm text-white/70 capitalize flex-1">{d.sport.replace('-', ' ')}</span>
-                        <span className="font-mono text-sm text-white/50">{d.minutes}m</span>
+                        <span className="font-mono text-sm text-white/50">{d.minutes} min</span>
                         <span className="font-mono text-xs text-white/30">{Math.round((d.minutes / total) * 100)}%</span>
                       </div>
                     );
