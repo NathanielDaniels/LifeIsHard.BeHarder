@@ -10,47 +10,49 @@ import { ZONE_COLORS, SPORT_COLORS } from '@/lib/dashboard-data';
 
 // ─── Demo data (anonymized) ───
 
-function generateDemoRecovery() {
-  const data = [];
+// Single data source — ratio is derived from recovery/strain
+function generateDemoData() {
+  const recovery: any[] = [];
+  const ratio: { date: string; ratio: number | null; movingAvg: number | null; zone: string | null }[] = [];
   const base = new Date('2026-03-23');
+  const MAX_RATIO = 4.0;
+
   for (let i = 0; i < 28; i++) {
     const d = new Date(base.getTime() + i * 86400000);
     const date = d.toISOString().split('T')[0];
-    const recovery = 40 + Math.round(Math.random() * 45 + Math.sin(i / 5) * 10);
-    const strain = 4 + Math.round((Math.random() * 12 + Math.cos(i / 3) * 4) * 10) / 10;
-    data.push({
-      date,
-      recovery: Math.min(100, Math.max(10, recovery)),
-      strain: Math.min(20, Math.max(2, strain)),
-      zone: recovery >= 67 ? 'green' : recovery >= 34 ? 'yellow' : 'red',
-    });
-  }
-  return data;
-}
+    const rec = 40 + Math.round(Math.random() * 45 + Math.sin(i / 5) * 10);
+    const str = 4 + Math.round((Math.random() * 12 + Math.cos(i / 3) * 4) * 10) / 10;
+    const recClamped = Math.min(100, Math.max(10, rec));
+    const strClamped = Math.min(20, Math.max(2, str));
 
-function generateDemoRatio() {
-  const data: { date: string; ratio: number; movingAvg: number | null; zone: string }[] = [];
-  const base = new Date('2026-03-23');
-  // First pass: generate ratios
-  for (let i = 0; i < 28; i++) {
-    const d = new Date(base.getTime() + i * 86400000);
-    const ratio = 0.8 + Math.random() * 2.5 + Math.sin(i / 4) * 0.5;
-    const clamped = Math.min(4, Math.max(0.3, ratio));
-    data.push({
-      date: d.toISOString().split('T')[0],
-      ratio: Math.round(clamped * 100) / 100,
+    recovery.push({
+      date,
+      recovery: recClamped,
+      strain: strClamped,
+      zone: recClamped >= 67 ? 'green' : recClamped >= 34 ? 'yellow' : 'red',
+    });
+
+    // Compute ratio from the same recovery/strain values
+    const r = strClamped >= 2.0 ? Math.min(recClamped / (strClamped * 4.76), MAX_RATIO) : null;
+    ratio.push({
+      date,
+      ratio: r != null ? Math.round(r * 100) / 100 : null,
       movingAvg: null,
-      zone: clamped >= 2.5 ? 'green' : clamped >= 1.0 ? 'yellow' : 'red',
+      zone: r != null ? (r >= 2.5 ? 'green' : r >= 1.0 ? 'yellow' : 'red') : null,
     });
   }
-  // Second pass: compute real 7-day moving average from ratio values
-  for (let i = 0; i < data.length; i++) {
+
+  // Compute 7-day moving average from ratio values
+  for (let i = 0; i < ratio.length; i++) {
     if (i >= 6) {
-      const window = data.slice(i - 6, i + 1).map(d => d.ratio);
-      data[i].movingAvg = Math.round((window.reduce((a, b) => a + b, 0) / window.length) * 100) / 100;
+      const window = ratio.slice(i - 6, i + 1).map(d => d.ratio).filter((v): v is number => v !== null);
+      if (window.length >= 3) {
+        ratio[i].movingAvg = Math.round((window.reduce((a, b) => a + b, 0) / window.length) * 100) / 100;
+      }
     }
   }
-  return data;
+
+  return { recovery, ratio };
 }
 
 const DEMO_BALANCE = [
@@ -267,8 +269,9 @@ function ShowcaseTooltip({ active, payload, label }: any) {
 }
 
 export default function ShowcasePage() {
-  const recoveryData = useMemo(generateDemoRecovery, []);
-  const ratioData = useMemo(generateDemoRatio, []);
+  const demoData = useMemo(generateDemoData, []);
+  const recoveryData = demoData.recovery;
+  const ratioData = demoData.ratio;
 
   return (
     <div className="min-h-screen bg-black text-white">
