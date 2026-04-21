@@ -701,10 +701,10 @@ export default function ShowcasePage() {
 
           <div className="grid grid-cols-7 gap-3">
             {WEEKLY_FOCUS.map(d => (
-              <div key={d.day} className="bg-white/[0.03] border border-white/8 rounded-xl px-3 py-5 text-center">
-                <p className="font-display text-lg text-orange-500 mb-2">{d.day}</p>
-                <p className="font-mono text-xs tracking-wider text-white/80 mb-1.5 leading-tight">{d.focus}</p>
-                <p className="text-xs text-white/50 leading-tight hidden sm:block">{d.desc}</p>
+              <div key={d.day} className="bg-white/[0.03] border border-white/8 rounded-xl px-3 py-5 text-center flex flex-col">
+                <p className="font-display text-lg text-orange-500 mb-3">{d.day}</p>
+                <p className="font-mono text-xs tracking-wider text-white/80 leading-tight h-8 flex items-center justify-center">{d.focus}</p>
+                <p className="text-xs text-white/50 leading-tight hidden sm:block mt-2 flex-1">{d.desc}</p>
               </div>
             ))}
           </div>
@@ -724,10 +724,10 @@ export default function ShowcasePage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {CONDITIONS.map(c => (
-              <div key={c.label} className="flex gap-4 items-start bg-white/[0.03] border border-white/8 rounded-xl px-6 py-5">
-                <span className="text-2xl shrink-0">{c.icon}</span>
-                <div>
-                  <p className="font-mono text-sm tracking-wider text-white/80 mb-1.5">{c.label}</p>
+              <div key={c.label} className="flex gap-4 bg-white/[0.03] border border-white/8 rounded-xl px-6 py-6">
+                <span className="text-2xl shrink-0 mt-0.5">{c.icon}</span>
+                <div className="flex flex-col">
+                  <p className="font-mono text-sm tracking-wider text-white/80 mb-2 min-h-[2.5rem] flex items-start">{c.label}</p>
                   <p className="text-sm text-white/55 leading-relaxed">{c.desc}</p>
                 </div>
               </div>
