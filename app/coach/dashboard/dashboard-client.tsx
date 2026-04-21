@@ -20,6 +20,8 @@ import HRZoneChart from './components/HRZoneChart';
 import ConsistencyCalendar from './components/ConsistencyCalendar';
 import DisciplineBalance from './components/DisciplineBalance';
 import RecoveryLoadRatio from './components/RecoveryLoadRatio';
+import ResponseHistory from './components/ResponseHistory';
+import CoachMemoryView from './components/CoachMemoryView';
 
 export interface DashboardData {
   snapshots: any[];
@@ -214,5 +216,21 @@ function RecoveryTab({ data }: { data: DashboardData }) {
 }
 
 function HistoryTab({ data }: { data: DashboardData }) {
-  return <p className="text-white/40 font-mono text-sm">Coach log — {data.responses.length} responses</p>;
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* Response timeline — main area */}
+      <div className="lg:col-span-2">
+        <ChartCard title="Check-in History" description="Patrick's responses and engagement timeline">
+          <ResponseHistory responses={data.responses} />
+        </ChartCard>
+      </div>
+
+      {/* Coach memory — sidebar */}
+      <div>
+        <ChartCard title="Coach Memory" description="What the AI remembers about Patrick">
+          <CoachMemoryView />
+        </ChartCard>
+      </div>
+    </div>
+  );
 }
