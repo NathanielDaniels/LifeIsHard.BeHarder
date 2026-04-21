@@ -413,48 +413,78 @@ export default function ShowcasePage() {
             </div>
           </div>
 
-          {/* Row 2: Recovery Trend (full width, hero chart) */}
-          <div className="bg-[#0a0a0a] border border-white/10 rounded-2xl p-8 mb-6">
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h3 className="font-mono text-sm tracking-[3px] text-white/70">RECOVERY TREND</h3>
-                <p className="text-sm text-white/40 mt-1">28-day recovery with strain overlay — hover for daily details</p>
+          {/* Row 2: AI Briefing Preview — the real differentiator */}
+          <div className="bg-[#0a0a0a] border border-white/10 rounded-2xl overflow-hidden mb-6">
+            <div className="px-8 pt-8 pb-4">
+              <div className="flex items-center gap-3 mb-1">
+                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <h3 className="font-mono text-sm tracking-[3px] text-white/70">TODAY&apos;S COACHING BRIEFING</h3>
               </div>
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-1.5">
-                  <div className="w-3 h-3 rounded-full bg-emerald-500" />
-                  <span className="font-mono text-xs text-white/40">67+</span>
+              <p className="text-sm text-white/40">This is what your app can&apos;t do — context, memory, and a training call.</p>
+            </div>
+
+            <div className="px-8 pb-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* The AI's interpretation */}
+              <div className="lg:col-span-2 space-y-5">
+                {/* Headline */}
+                <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl px-6 py-4">
+                  <p className="font-mono text-xs text-emerald-400/70 mb-1">RECOVERY STATUS</p>
+                  <p className="font-display text-2xl text-emerald-400">GREEN LIGHT — READY TO PUSH</p>
                 </div>
-                <div className="flex items-center gap-1.5">
-                  <div className="w-3 h-3 rounded-full bg-yellow-500" />
-                  <span className="font-mono text-xs text-white/40">34-66</span>
+
+                {/* Coach Note */}
+                <div className="bg-white/[0.03] border border-white/8 rounded-xl px-6 py-5">
+                  <p className="font-mono text-xs text-orange-500/70 mb-3">COACH NOTE</p>
+                  <p className="text-base text-white/70 leading-relaxed mb-3">
+                    Your HRV has been climbing for three straight days — 42.5ms is 11% above your 90-day baseline.
+                    Combined with yesterday&apos;s easy spin, your body has fully absorbed last week&apos;s build block.
+                    This is a window. Use it.
+                  </p>
+                  <p className="text-base text-white/70 leading-relaxed">
+                    You told me Saturday you&apos;re targeting a long bike this weekend. Today&apos;s the day to do
+                    a tempo run — your ratio is 2.3 and trending up. Push the pace in the middle miles and
+                    let yourself recover into Saturday&apos;s ride.
+                  </p>
                 </div>
-                <div className="flex items-center gap-1.5">
-                  <div className="w-3 h-3 rounded-full bg-red-500" />
-                  <span className="font-mono text-xs text-white/40">&lt;34</span>
+
+                {/* Training Call */}
+                <div className="bg-orange-500/[0.06] border border-orange-500/20 rounded-xl px-6 py-5">
+                  <p className="font-mono text-xs text-orange-500/70 mb-2">TODAY&apos;S TRAINING CALL</p>
+                  <p className="font-display text-xl text-white/90">
+                    Tempo run — 45 min with 20 min at threshold. Z3-Z4 target. Earn Saturday&apos;s ride.
+                  </p>
                 </div>
+              </div>
+
+              {/* Quick-tap response */}
+              <div className="space-y-4">
+                <div className="bg-white/[0.03] border border-white/8 rounded-xl px-5 py-5">
+                  <p className="font-mono text-xs text-white/50 mb-4">HOW ARE YOU FEELING?</p>
+                  <div className="space-y-2">
+                    {['Strong 💪', 'Good 👍', 'Tight/Sore 🧘', 'Beat Down 😫'].map(opt => (
+                      <div key={opt} className="bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 rounded-lg px-4 py-2.5 text-center cursor-default transition-colors">
+                        <span className="text-sm text-white/70">{opt}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="bg-white/[0.03] border border-white/8 rounded-xl px-5 py-5">
+                  <p className="font-mono text-xs text-white/50 mb-4">READY FOR TODAY?</p>
+                  <div className="space-y-2">
+                    {['Ready to Push', 'Need Easy Day'].map(opt => (
+                      <div key={opt} className="bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 rounded-lg px-4 py-2.5 text-center cursor-default transition-colors">
+                        <span className="text-sm text-white/70">{opt}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <p className="text-xs text-white/30 text-center font-mono">
+                  One tap → coach reads it tomorrow
+                </p>
               </div>
             </div>
-            <ResponsiveContainer width="100%" height={300}>
-              <ComposedChart data={recoveryData} margin={{ top: 10, right: 10, bottom: 0, left: -5 }}>
-                <defs>
-                  <linearGradient id="strainGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#f97316" stopOpacity={0.3} />
-                    <stop offset="100%" stopColor="#f97316" stopOpacity={0.02} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                <XAxis dataKey="date" tick={{ fontSize: 11, fill: 'rgba(255,255,255,0.4)' }} tickFormatter={(d: string) => d.slice(5)} interval={3} />
-                <YAxis yAxisId="left" domain={[0, 100]} tick={{ fontSize: 11, fill: 'rgba(255,255,255,0.35)' }} tickLine={false} axisLine={false} />
-                <YAxis yAxisId="right" orientation="right" domain={[0, 21]} tick={{ fontSize: 11, fill: 'rgba(255,255,255,0.2)' }} tickLine={false} axisLine={false} />
-                <ReferenceLine yAxisId="left" y={67} stroke="rgba(34,197,94,0.25)" strokeDasharray="6 3" />
-                <ReferenceLine yAxisId="left" y={34} stroke="rgba(239,68,68,0.25)" strokeDasharray="6 3" />
-                <Area yAxisId="right" type="monotone" dataKey="strain" fill="url(#strainGradient)" stroke="none" />
-                <Bar yAxisId="right" dataKey="strain" fill="rgba(249,115,22,0.25)" barSize={10} radius={[3, 3, 0, 0]} />
-                <Line yAxisId="left" type="monotone" dataKey="recovery" stroke="rgba(255,255,255,0.2)" strokeWidth={1.5} dot={<DemoDot />} connectNulls />
-                <Tooltip content={<ShowcaseTooltip />} />
-              </ComposedChart>
-            </ResponsiveContainer>
           </div>
 
           {/* Row 3: Race Readiness + Discipline Balance */}
