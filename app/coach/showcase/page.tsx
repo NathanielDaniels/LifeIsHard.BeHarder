@@ -415,73 +415,99 @@ export default function ShowcasePage() {
 
           {/* Row 2: AI Briefing Preview — the real differentiator */}
           <div className="bg-[#0a0a0a] border border-white/10 rounded-2xl overflow-hidden mb-6">
-            <div className="px-8 pt-8 pb-4">
+            <div className="px-8 pt-8 pb-2">
               <div className="flex items-center gap-3 mb-1">
-                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                <h3 className="font-mono text-sm tracking-[3px] text-white/70">TODAY&apos;S COACHING BRIEFING</h3>
+                <div className="w-2 h-2 rounded-full bg-yellow-500 animate-pulse" />
+                <h3 className="font-mono text-sm tracking-[3px] text-white/70">SAMPLE COACHING BRIEFING</h3>
               </div>
-              <p className="text-sm text-white/40">This is what your app can&apos;t do — context, memory, and a training call.</p>
+              <p className="text-sm text-white/40">This is what your app can&apos;t do. This is what you wake up to.</p>
             </div>
 
-            <div className="px-8 pb-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* The AI's interpretation */}
-              <div className="lg:col-span-2 space-y-5">
-                {/* Headline */}
-                <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl px-6 py-4">
-                  <p className="font-mono text-xs text-emerald-400/70 mb-1">RECOVERY STATUS</p>
-                  <p className="font-display text-2xl text-emerald-400">GREEN LIGHT — READY TO PUSH</p>
+            <div className="px-8 pb-8">
+              {/* Recovery headline */}
+              <div className="py-6 border-b border-white/5">
+                <p className="font-mono text-xs text-white/40 mb-2">RECOVERY</p>
+                <div className="flex items-baseline gap-4">
+                  <span className="font-display text-6xl text-yellow-500">34</span>
+                  <span className="font-mono text-sm text-yellow-500/80 px-2 py-0.5 border border-yellow-500/20 rounded">YELLOW</span>
                 </div>
-
-                {/* Coach Note */}
-                <div className="bg-white/[0.03] border border-white/8 rounded-xl px-6 py-5">
-                  <p className="font-mono text-xs text-orange-500/70 mb-3">COACH NOTE</p>
-                  <p className="text-base text-white/70 leading-relaxed mb-3">
-                    Your HRV has been climbing for three straight days — 42.5ms is 11% above your 90-day baseline.
-                    Combined with yesterday&apos;s easy spin, your body has fully absorbed last week&apos;s build block.
-                    This is a window. Use it.
-                  </p>
-                  <p className="text-base text-white/70 leading-relaxed">
-                    You told me Saturday you&apos;re targeting a long bike this weekend. Today&apos;s the day to do
-                    a tempo run — your ratio is 2.3 and trending up. Push the pace in the middle miles and
-                    let yourself recover into Saturday&apos;s ride.
-                  </p>
-                </div>
-
-                {/* Training Call */}
-                <div className="bg-orange-500/[0.06] border border-orange-500/20 rounded-xl px-6 py-5">
-                  <p className="font-mono text-xs text-orange-500/70 mb-2">TODAY&apos;S TRAINING CALL</p>
-                  <p className="font-display text-xl text-white/90">
-                    Tempo run — 45 min with 20 min at threshold. Z3-Z4 target. Earn Saturday&apos;s ride.
-                  </p>
-                </div>
+                <p className="text-lg text-white/70 mt-3 max-w-2xl">
+                  The invoice arrived. Three straight hard days, one body. Today it collects.
+                </p>
               </div>
 
-              {/* Quick-tap response */}
-              <div className="space-y-4">
-                <div className="bg-white/[0.03] border border-white/8 rounded-xl px-5 py-5">
-                  <p className="font-mono text-xs text-white/50 mb-4">HOW ARE YOU FEELING?</p>
-                  <div className="space-y-2">
-                    {['Strong 💪', 'Good 👍', 'Tight/Sore 🧘', 'Beat Down 😫'].map(opt => (
-                      <div key={opt} className="bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 rounded-lg px-4 py-2.5 text-center cursor-default transition-colors">
-                        <span className="text-sm text-white/70">{opt}</span>
-                      </div>
-                    ))}
+              {/* Training Call */}
+              <div className="py-6 border-b border-white/5">
+                <p className="font-mono text-xs text-orange-500/70 mb-3">TODAY&apos;S TRAINING CALL</p>
+                <p className="text-lg text-white/80 leading-relaxed mb-4">
+                  Rest day. Breathwork and 30 minutes of stretching. Nothing else.
+                </p>
+                <p className="text-base text-white/55 leading-relaxed mb-3">
+                  Saturday was a brick. Sunday was a long swim. Yesterday you stacked three spin
+                  sessions for 62 minutes. The body doesn&apos;t file complaints in real time — it waits
+                  until 3am and delivers the bill with your morning HRV. Today is the collection.
+                </p>
+                <p className="text-base text-white/55 leading-relaxed">
+                  Do the work nobody sees. The stretching, the breathwork, the stillness.
+                  That&apos;s where tomorrow&apos;s session gets built.
+                </p>
+              </div>
+
+              {/* Coach's Note */}
+              <div className="py-6 border-b border-white/5">
+                <p className="font-mono text-xs text-orange-500/70 mb-3">COACH&apos;S NOTE</p>
+                <p className="text-base text-white/55 leading-relaxed mb-3">
+                  Yesterday I put you on a run. You went to the Peloton instead — three separate
+                  sessions, 62 minutes total. That&apos;s your call. I&apos;m not here to second-guess it. But
+                  this morning tells you exactly what that decision cost: HRV from 35.4 down to 25.5ms.
+                  Nearly as deep as the valley after your last race.
+                </p>
+                <p className="text-base text-white/55 leading-relaxed mb-3">
+                  Three consecutive hard sessions and the body filed the invoice while you slept.
+                </p>
+                <p className="text-base text-white/55 leading-relaxed mb-3">
+                  This is not a problem. It is information. Saturday&apos;s brick, Sunday&apos;s swim, Monday&apos;s
+                  spin marathon — that is a significant accumulation on a system that is still
+                  managing work stress on top of athletic load. The 27% HRV drop and RHR ticking up
+                  two beats are the body telling you the adaptation work is running in the background.
+                  Let it run.
+                </p>
+                <p className="text-base text-white/55 leading-relaxed">
+                  The run is still coming. Not today. Tonight&apos;s sleep determines whether the gate
+                  opens tomorrow or Wednesday. Work stress has been in the system since Saturday
+                  with no resolution reported — how is that looking right now? Still heavy, or starting to lift?
+                </p>
+              </div>
+
+              {/* Check-in buttons */}
+              <div className="py-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <div>
+                    <p className="font-mono text-xs text-white/50 mb-3">STRESS CHECK</p>
+                    <div className="grid grid-cols-2 gap-2">
+                      {['Still heavy', 'Starting to ease'].map(opt => (
+                        <div key={opt} className="bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 rounded-lg px-4 py-3 text-center cursor-default transition-colors">
+                          <span className="text-sm text-white/70">{opt}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <p className="font-mono text-xs text-white/50 mb-3">ENERGY TODAY</p>
+                    <div className="grid grid-cols-2 gap-2">
+                      {['Flat — need the rest', 'Could move if needed'].map(opt => (
+                        <div key={opt} className="bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 rounded-lg px-4 py-3 text-center cursor-default transition-colors">
+                          <span className="text-sm text-white/70">{opt}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
-
-                <div className="bg-white/[0.03] border border-white/8 rounded-xl px-5 py-5">
-                  <p className="font-mono text-xs text-white/50 mb-4">READY FOR TODAY?</p>
-                  <div className="space-y-2">
-                    {['Ready to Push', 'Need Easy Day'].map(opt => (
-                      <div key={opt} className="bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 rounded-lg px-4 py-2.5 text-center cursor-default transition-colors">
-                        <span className="text-sm text-white/70">{opt}</span>
-                      </div>
-                    ))}
-                  </div>
+                <div className="mt-4 text-center">
+                  <span className="text-orange-500 font-mono text-sm cursor-default">Tell me more →</span>
                 </div>
-
-                <p className="text-xs text-white/30 text-center font-mono">
-                  One tap → coach reads it tomorrow
+                <p className="text-xs text-white/25 text-center font-mono mt-3">
+                  One tap from your inbox. Coach reads your response before tomorrow&apos;s briefing.
                 </p>
               </div>
             </div>
