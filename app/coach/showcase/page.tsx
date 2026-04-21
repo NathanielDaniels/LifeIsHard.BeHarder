@@ -29,8 +29,9 @@ function generateDemoRecovery() {
 }
 
 function generateDemoRatio() {
-  const data = [];
+  const data: { date: string; ratio: number; movingAvg: number | null; zone: string }[] = [];
   const base = new Date('2026-03-23');
+  // First pass: generate ratios
   for (let i = 0; i < 28; i++) {
     const d = new Date(base.getTime() + i * 86400000);
     const ratio = 0.8 + Math.random() * 2.5 + Math.sin(i / 4) * 0.5;
@@ -38,9 +39,16 @@ function generateDemoRatio() {
     data.push({
       date: d.toISOString().split('T')[0],
       ratio: Math.round(clamped * 100) / 100,
-      movingAvg: i >= 6 ? Math.round((1.5 + Math.sin(i / 6) * 0.6) * 100) / 100 : null,
+      movingAvg: null,
       zone: clamped >= 2.5 ? 'green' : clamped >= 1.0 ? 'yellow' : 'red',
     });
+  }
+  // Second pass: compute real 7-day moving average from ratio values
+  for (let i = 0; i < data.length; i++) {
+    if (i >= 6) {
+      const window = data.slice(i - 6, i + 1).map(d => d.ratio);
+      data[i].movingAvg = Math.round((window.reduce((a, b) => a + b, 0) / window.length) * 100) / 100;
+    }
   }
   return data;
 }
@@ -485,14 +493,16 @@ export default function ShowcasePage() {
                 <div className="flex items-center gap-4 mb-4">
                   <div className="flex items-center gap-1.5">
                     <div className="flex items-center gap-0.5">
-                      <div className="w-2 h-2 rounded-full bg-emerald-500" />
-                      <div className="w-3 h-0.5 bg-white/30" />
-                      <div className="w-2 h-2 rounded-full bg-yellow-500" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
+                      <div className="w-2 h-0.5 bg-white/30" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-yellow-500" />
+                      <div className="w-2 h-0.5 bg-white/30" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-red-500" />
                     </div>
                     <span className="font-mono text-[10px] text-white/50">Daily Ratio</span>
                   </div>
                   <div className="flex items-center gap-1.5">
-                    <div className="w-5 h-0.5 bg-orange-500 rounded" />
+                    <div className="w-6 h-[3px] bg-orange-500 rounded" />
                     <span className="font-mono text-[10px] text-white/50">7-Day Trend</span>
                   </div>
                 </div>
