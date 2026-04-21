@@ -5,11 +5,19 @@ import {
   recoveryTrendData,
   daysSinceDisciplines,
   raceReadinessScore,
+  weeklyTrainingLoad,
+  hrZoneAggregation,
+  consistencyCalendarData,
+  disciplineBalanceData,
 } from '@/lib/dashboard-data';
 import ChartCard from './components/ChartCard';
 import DaysSinceCards from './components/DaysSinceCards';
 import RaceReadiness from './components/RaceReadiness';
 import RecoveryChart from './components/RecoveryChart';
+import TrainingLoadChart from './components/TrainingLoadChart';
+import HRZoneChart from './components/HRZoneChart';
+import ConsistencyCalendar from './components/ConsistencyCalendar';
+import DisciplineBalance from './components/DisciplineBalance';
 
 export interface DashboardData {
   snapshots: any[];
@@ -147,7 +155,34 @@ function OverviewTab({ data }: { data: DashboardData }) {
 }
 
 function TrainingTab({ data }: { data: DashboardData }) {
-  return <p className="text-white/40 font-mono text-sm">Training — {data.workouts.length} workouts</p>;
+  const loadData = useMemo(() => weeklyTrainingLoad(data.snapshots), [data.snapshots]);
+  const zones = useMemo(() => hrZoneAggregation(data.workouts), [data.workouts]);
+  const calendar = useMemo(() => consistencyCalendarData(data.snapshots, data.workouts), [data.snapshots, data.workouts]);
+  const balance = useMemo(() => disciplineBalanceData(data.workouts), [data.workouts]);
+
+  return (
+    <div className="space-y-6">
+      {/* Top row: Training Load + HR Zones */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <ChartCard title="Weekly Training Load" description="Total strain by week">
+          <TrainingLoadChart data={loadData} />
+        </ChartCard>
+        <ChartCard title="HR Zone Distribution" description="Time in each zone (28 days)">
+          <HRZoneChart data={zones} />
+        </ChartCard>
+      </div>
+
+      {/* Bottom row: Consistency Calendar + Discipline Balance */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <ChartCard title="Training Consistency" description="28-day activity heatmap">
+          <ConsistencyCalendar data={calendar} />
+        </ChartCard>
+        <ChartCard title="Discipline Balance" description="Time split across sports">
+          <DisciplineBalance data={balance} />
+        </ChartCard>
+      </div>
+    </div>
+  );
 }
 
 function RecoveryTab({ data }: { data: DashboardData }) {
