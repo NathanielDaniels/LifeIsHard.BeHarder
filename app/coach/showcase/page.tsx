@@ -67,24 +67,34 @@ const DEMO_LOAD = [
   { label: '4/15–4/21', strain: 53.4 },
 ];
 
+// Stacked activity data — each day can have multiple sport segments
 const DEMO_ACTIVITY = (() => {
-  const sports = ['running', 'cycling', 'swimming', 'strength-training', 'spin', 'triathlon'];
-  const data = [];
+  const data: Record<string, any>[] = [];
   const base = new Date('2026-03-24');
+  // Pre-defined realistic schedule (some days 2 workouts, some rest)
+  const schedule: (string[] | null)[] = [
+    ['running'], ['cycling', 'strength-training'], null, ['swimming'], ['running'],
+    ['cycling'], ['triathlon'], null, ['running', 'strength-training'], ['spin'],
+    ['swimming'], null, ['running'], ['cycling'], null, ['running', 'strength-training'],
+    ['cycling'], ['swimming'], null, ['running'], ['spin', 'strength-training'],
+    ['cycling'], null, ['running'], ['swimming'], ['cycling', 'running'],
+    null, ['triathlon'],
+  ];
   for (let i = 0; i < 28; i++) {
     const d = new Date(base.getTime() + i * 86400000);
-    const hasWorkout = Math.random() > 0.25;
-    const sport = hasWorkout ? sports[Math.floor(Math.random() * sports.length)] : null;
-    const strain = hasWorkout ? 4 + Math.round(Math.random() * 14 * 10) / 10 : 0;
-    data.push({
-      date: d.toISOString().split('T')[0].slice(5),
-      strain,
-      sport,
-      color: sport ? (SPORT_COLORS[sport] || '#6b7280') : 'rgba(255,255,255,0.05)',
-    });
+    const sports = schedule[i];
+    const entry: Record<string, any> = { date: d.toISOString().split('T')[0].slice(5) };
+    if (sports) {
+      for (const sport of sports) {
+        entry[sport] = 3 + Math.round(Math.random() * 12 * 10) / 10;
+      }
+    }
+    data.push(entry);
   }
   return data;
 })();
+
+const ACTIVITY_SPORTS = ['running', 'cycling', 'swimming', 'strength-training', 'spin', 'triathlon'];
 
 const DEMO_KEY_NUMBERS = [
   { label: 'HRV', value: '42.5 MS', trend: '↑', trendColor: 'text-emerald-400', baseline: 'vs 38.2 ms avg' },
@@ -468,10 +478,20 @@ export default function ShowcasePage() {
               </div>
             </div>
 
-            {/* Recovery + Load Ratio */}
+            {/* Recovery + Load Ratio — bars with trend line like the real email */}
             <div className="px-8 pb-6">
               <p className="font-mono text-xs tracking-[3px] text-white/50 mb-4">RECOVERY + LOAD RATIO</p>
               <div className="bg-[#0e0e0e] border border-white/10 rounded-xl p-6">
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-4 h-3 bg-white/20 rounded-sm" />
+                    <span className="font-mono text-[10px] text-white/50">Daily Ratio</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-4 h-0.5 bg-orange-500 rounded" />
+                    <span className="font-mono text-[10px] text-white/50">7-Day Trend</span>
+                  </div>
+                </div>
                 <ResponsiveContainer width="100%" height={240}>
                   <ComposedChart data={ratioData} margin={{ top: 5, right: 10, bottom: 0, left: -10 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
@@ -479,10 +499,10 @@ export default function ShowcasePage() {
                     <ReferenceArea y1={1.0} y2={2.5} fill="rgba(234,179,8,0.04)" />
                     <ReferenceArea y1={0} y2={1.0} fill="rgba(239,68,68,0.08)" />
                     <XAxis dataKey="date" tick={{ fontSize: 10, fill: 'rgba(255,255,255,0.4)' }} tickFormatter={(d: string) => d.slice(5)} interval={3} />
-                    <YAxis domain={[0, 4]} tick={{ fontSize: 11, fill: 'rgba(255,255,255,0.35)' }} tickLine={false} axisLine={false} ticks={[0, 1, 2.5, 4]} label={{ value: 'RECOVERY / LOAD', angle: -90, position: 'insideLeft', style: { fontSize: 9, fill: 'rgba(255,255,255,0.3)' } }} />
-                    <ReferenceLine y={2.5} stroke="rgba(34,197,94,0.4)" strokeDasharray="4 4" />
-                    <ReferenceLine y={1.0} stroke="rgba(239,68,68,0.4)" strokeDasharray="4 4" />
-                    <Line type="monotone" dataKey="ratio" stroke="none" dot={<RatioDot />} />
+                    <YAxis domain={[0, 4.5]} tick={{ fontSize: 11, fill: 'rgba(255,255,255,0.35)' }} tickLine={false} axisLine={false} ticks={[0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0]} label={{ value: 'RECOVERY / LOAD', angle: -90, position: 'insideLeft', style: { fontSize: 9, fill: 'rgba(255,255,255,0.3)' } }} />
+                    <ReferenceLine y={2.5} stroke="rgba(34,197,94,0.5)" strokeDasharray="6 3" />
+                    <ReferenceLine y={1.0} stroke="rgba(239,68,68,0.5)" strokeDasharray="6 3" />
+                    <Bar dataKey="ratio" fill="rgba(255,255,255,0.15)" barSize={10} radius={[2, 2, 0, 0]} />
                     <Line type="monotone" dataKey="movingAvg" stroke="#f97316" strokeWidth={2.5} dot={false} connectNulls />
                   </ComposedChart>
                 </ResponsiveContainer>
@@ -490,31 +510,29 @@ export default function ShowcasePage() {
               </div>
             </div>
 
-            {/* 28-Day Activity */}
+            {/* 28-Day Activity — stacked bars, multiple sports per day */}
             <div className="px-8 pb-8">
               <p className="font-mono text-xs tracking-[3px] text-white/50 mb-4">28-DAY ACTIVITY</p>
               <div className="bg-[#0e0e0e] border border-white/10 rounded-xl p-6">
                 {/* Sport legend */}
                 <div className="flex flex-wrap gap-3 mb-4">
-                  {Object.entries(SPORT_COLORS).slice(0, 6).map(([sport, color]) => (
+                  {ACTIVITY_SPORTS.map(sport => (
                     <div key={sport} className="flex items-center gap-1.5">
-                      <div className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: color }} />
+                      <div className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: SPORT_COLORS[sport] || '#6b7280' }} />
                       <span className="font-mono text-[10px] text-white/50 capitalize">{sport.replace('-', ' ')}</span>
                     </div>
                   ))}
                 </div>
-                <ResponsiveContainer width="100%" height={180}>
-                  <BarChart data={DEMO_ACTIVITY} margin={{ top: 5, right: 0, bottom: 0, left: -10 }}>
+                <ResponsiveContainer width="100%" height={200}>
+                  <BarChart data={DEMO_ACTIVITY} margin={{ top: 5, right: 0, bottom: 0, left: -10 }} stackOffset="none">
                     <XAxis dataKey="date" tick={{ fontSize: 8, fill: 'rgba(255,255,255,0.3)' }} interval={2} />
                     <YAxis tick={{ fontSize: 10, fill: 'rgba(255,255,255,0.3)' }} tickLine={false} axisLine={false} />
-                    <Bar dataKey="strain" radius={[2, 2, 0, 0]} barSize={12}>
-                      {DEMO_ACTIVITY.map((entry, i) => (
-                        <Cell key={i} fill={entry.color} fillOpacity={entry.strain > 0 ? 0.8 : 0.1} />
-                      ))}
-                    </Bar>
+                    {ACTIVITY_SPORTS.map(sport => (
+                      <Bar key={sport} dataKey={sport} stackId="a" fill={SPORT_COLORS[sport] || '#6b7280'} fillOpacity={0.85} barSize={14} radius={[1, 1, 0, 0]} />
+                    ))}
                   </BarChart>
                 </ResponsiveContainer>
-                <p className="text-xs text-white/40 mt-3">Each bar = one day. Bar height = workout strain. Color = sport type. Gray = rest day. Gaps show missed training days.</p>
+                <p className="text-xs text-white/40 mt-3">Each bar = one day. Bar height = workout strain. Color = sport type. Stacked segments = multiple workouts. Gaps = rest days.</p>
               </div>
             </div>
 
