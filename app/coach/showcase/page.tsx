@@ -232,9 +232,9 @@ function DemoDot(props: any) {
 
 function RatioDot(props: any) {
   const { cx, cy, payload } = props;
-  if (cx == null || cy == null) return null;
+  if (cx == null || cy == null || payload.ratio == null) return null;
   const color = payload.zone === 'green' ? '#22c55e' : payload.zone === 'yellow' ? '#eab308' : '#ef4444';
-  return <circle cx={cx} cy={cy} r={3} fill={color} stroke="none" />;
+  return <circle cx={cx} cy={cy} r={5} fill={color} stroke="#0e0e0e" strokeWidth={1.5} />;
 }
 
 export default function ShowcasePage() {
@@ -478,32 +478,38 @@ export default function ShowcasePage() {
               </div>
             </div>
 
-            {/* Recovery + Load Ratio — bars with trend line like the real email */}
+            {/* Recovery + Load Ratio — connected line with zone-colored dots + orange trend */}
             <div className="px-8 pb-6">
               <p className="font-mono text-xs tracking-[3px] text-white/50 mb-4">RECOVERY + LOAD RATIO</p>
               <div className="bg-[#0e0e0e] border border-white/10 rounded-xl p-6">
                 <div className="flex items-center gap-4 mb-4">
                   <div className="flex items-center gap-1.5">
-                    <div className="w-4 h-3 bg-white/20 rounded-sm" />
+                    <div className="flex items-center gap-0.5">
+                      <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                      <div className="w-3 h-0.5 bg-white/30" />
+                      <div className="w-2 h-2 rounded-full bg-yellow-500" />
+                    </div>
                     <span className="font-mono text-[10px] text-white/50">Daily Ratio</span>
                   </div>
                   <div className="flex items-center gap-1.5">
-                    <div className="w-4 h-0.5 bg-orange-500 rounded" />
+                    <div className="w-5 h-0.5 bg-orange-500 rounded" />
                     <span className="font-mono text-[10px] text-white/50">7-Day Trend</span>
                   </div>
                 </div>
                 <ResponsiveContainer width="100%" height={240}>
                   <ComposedChart data={ratioData} margin={{ top: 5, right: 10, bottom: 0, left: -10 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
-                    <ReferenceArea y1={2.5} y2={4} fill="rgba(34,197,94,0.08)" />
-                    <ReferenceArea y1={1.0} y2={2.5} fill="rgba(234,179,8,0.04)" />
-                    <ReferenceArea y1={0} y2={1.0} fill="rgba(239,68,68,0.08)" />
+                    <ReferenceArea y1={2.5} y2={4.5} fill="rgba(34,197,94,0.06)" />
+                    <ReferenceArea y1={1.0} y2={2.5} fill="rgba(234,179,8,0.03)" />
+                    <ReferenceArea y1={0} y2={1.0} fill="rgba(239,68,68,0.06)" />
                     <XAxis dataKey="date" tick={{ fontSize: 10, fill: 'rgba(255,255,255,0.4)' }} tickFormatter={(d: string) => d.slice(5)} interval={3} />
                     <YAxis domain={[0, 4.5]} tick={{ fontSize: 11, fill: 'rgba(255,255,255,0.35)' }} tickLine={false} axisLine={false} ticks={[0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0]} label={{ value: 'RECOVERY / LOAD', angle: -90, position: 'insideLeft', style: { fontSize: 9, fill: 'rgba(255,255,255,0.3)' } }} />
                     <ReferenceLine y={2.5} stroke="rgba(34,197,94,0.5)" strokeDasharray="6 3" />
                     <ReferenceLine y={1.0} stroke="rgba(239,68,68,0.5)" strokeDasharray="6 3" />
-                    <Bar dataKey="ratio" fill="rgba(255,255,255,0.15)" barSize={10} radius={[2, 2, 0, 0]} />
-                    <Line type="monotone" dataKey="movingAvg" stroke="#f97316" strokeWidth={2.5} dot={false} connectNulls />
+                    {/* Daily ratio — connected line with zone-colored dots */}
+                    <Line type="linear" dataKey="ratio" stroke="rgba(255,255,255,0.25)" strokeWidth={1.5} dot={<RatioDot />} connectNulls />
+                    {/* 7-day moving average — bold orange trend line */}
+                    <Line type="monotone" dataKey="movingAvg" stroke="#f97316" strokeWidth={3} dot={false} connectNulls />
                   </ComposedChart>
                 </ResponsiveContainer>
                 <p className="text-xs text-white/40 mt-3">Above green line (2.5) = strong adaptation. Between lines = normal training range. Below red line (1.0) = overreaching, back off. Orange = 7-day trend.</p>
