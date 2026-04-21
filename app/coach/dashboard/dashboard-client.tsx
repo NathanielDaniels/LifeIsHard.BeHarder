@@ -9,6 +9,7 @@ import {
   hrZoneAggregation,
   consistencyCalendarData,
   disciplineBalanceData,
+  recoveryLoadRatioData,
 } from '@/lib/dashboard-data';
 import ChartCard from './components/ChartCard';
 import DaysSinceCards from './components/DaysSinceCards';
@@ -18,6 +19,7 @@ import TrainingLoadChart from './components/TrainingLoadChart';
 import HRZoneChart from './components/HRZoneChart';
 import ConsistencyCalendar from './components/ConsistencyCalendar';
 import DisciplineBalance from './components/DisciplineBalance';
+import RecoveryLoadRatio from './components/RecoveryLoadRatio';
 
 export interface DashboardData {
   snapshots: any[];
@@ -186,7 +188,29 @@ function TrainingTab({ data }: { data: DashboardData }) {
 }
 
 function RecoveryTab({ data }: { data: DashboardData }) {
-  return <p className="text-white/40 font-mono text-sm">Recovery tab</p>;
+  const ratioData = useMemo(() => recoveryLoadRatioData(data.snapshots), [data.snapshots]);
+
+  return (
+    <div className="space-y-6">
+      <ChartCard
+        title="Recovery-to-Load Ratio"
+        description="Green (>2.5) = well recovered, Yellow (1.0-2.5) = moderate, Red (<1.0) = strained"
+      >
+        <RecoveryLoadRatio data={ratioData} />
+      </ChartCard>
+
+      {/* Sleep section placeholder */}
+      <div className="bg-[#0a0a0a] border border-white/8 rounded-lg p-6">
+        <h3 className="font-mono text-xs tracking-[3px] text-white/55 uppercase mb-2">
+          Sleep Analytics
+        </h3>
+        <p className="text-xs text-white/30 font-mono">
+          Pending WHOOP sleep scope authorization — sleep performance, efficiency, and stage
+          breakdown will appear here once enabled.
+        </p>
+      </div>
+    </div>
+  );
 }
 
 function HistoryTab({ data }: { data: DashboardData }) {
