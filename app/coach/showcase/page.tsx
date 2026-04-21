@@ -209,66 +209,66 @@ export default function ShowcasePage() {
   return (
     <div className="min-h-screen bg-black text-white">
       {/* ═══ HERO ═══ */}
-      <section className="relative overflow-hidden py-24 px-6">
+      <section className="relative overflow-hidden py-28 sm:py-36 px-6 sm:px-10">
         <div className="absolute inset-0 bg-gradient-to-b from-orange-500/5 via-transparent to-transparent" />
-        <div className="max-w-4xl mx-auto relative">
-          <p className="font-mono text-xs tracking-[4px] text-orange-500/70 mb-4">
+        <div className="max-w-5xl mx-auto relative">
+          <p className="font-mono text-sm tracking-[5px] text-orange-500 mb-6">
             AI-POWERED COACHING
           </p>
-          <h1 className="font-display text-5xl sm:text-7xl tracking-wider leading-tight mb-6">
+          <h1 className="font-display text-6xl sm:text-8xl tracking-wider leading-[0.95] mb-8">
             YOUR DATA.<br />
             <span className="text-orange-500">YOUR COACH.</span><br />
             EVERY MORNING.
           </h1>
-          <p className="text-white/65 text-lg max-w-2xl leading-relaxed mb-4">
+          <p className="text-white/80 text-xl sm:text-2xl max-w-2xl leading-relaxed mb-4">
             Not an app. Not a dashboard. A coaching relationship.
           </p>
-          <p className="text-white/70 text-sm max-w-2xl leading-relaxed mb-8">
+          <p className="text-white/60 text-base sm:text-lg max-w-2xl leading-relaxed mb-10">
             An AI that reads your biometrics overnight, remembers every conversation you&apos;ve had,
             knows your race calendar, understands your medical conditions, and delivers a
             personalized briefing waiting for you when you wake up. Then listens to your response
             and adapts tomorrow.
           </p>
           <div className="flex flex-wrap gap-3">
-            <span className="font-mono text-[10px] tracking-wider text-white/65 border border-white/20 rounded-full px-3 py-1">WHOOP INTEGRATION</span>
-            <span className="font-mono text-[10px] tracking-wider text-white/65 border border-white/20 rounded-full px-3 py-1">CONDITION-AWARE</span>
-            <span className="font-mono text-[10px] tracking-wider text-white/65 border border-white/20 rounded-full px-3 py-1">CONTINUOUS MEMORY</span>
-            <span className="font-mono text-[10px] tracking-wider text-white/65 border border-white/20 rounded-full px-3 py-1">RACE CALENDAR SYNCED</span>
+            <span className="font-mono text-xs tracking-wider text-white/70 border border-white/25 rounded-full px-4 py-1.5">WHOOP INTEGRATION</span>
+            <span className="font-mono text-xs tracking-wider text-white/70 border border-white/25 rounded-full px-4 py-1.5">CONDITION-AWARE</span>
+            <span className="font-mono text-xs tracking-wider text-white/70 border border-white/25 rounded-full px-4 py-1.5">CONTINUOUS MEMORY</span>
+            <span className="font-mono text-xs tracking-wider text-white/70 border border-white/25 rounded-full px-4 py-1.5">RACE CALENDAR SYNCED</span>
           </div>
         </div>
       </section>
 
       {/* ═══ THE LOOP — How it actually works ═══ */}
-      <section className="py-20 px-6 border-t border-white/5">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="font-display text-3xl tracking-widest mb-3 text-center">
+      <section className="py-24 px-6 sm:px-10 border-t border-white/5">
+        <div className="max-w-5xl mx-auto">
+          <h2 className="font-display text-4xl sm:text-5xl tracking-widest mb-4 text-center">
             THE DAILY LOOP
           </h2>
-          <p className="text-white/70 text-sm text-center mb-16 max-w-lg mx-auto">
+          <p className="text-white/60 text-base sm:text-lg text-center mb-20 max-w-xl mx-auto">
             This isn&apos;t a one-way broadcast. It&apos;s a continuous coaching conversation
             that gets smarter every day.
           </p>
 
           <div className="space-y-0 relative">
             {/* Vertical connecting line */}
-            <div className="absolute left-[19px] top-6 bottom-6 w-px bg-gradient-to-b from-orange-500/30 via-orange-500/15 to-orange-500/30" />
+            <div className="absolute left-[23px] top-6 bottom-6 w-px bg-gradient-to-b from-orange-500/30 via-orange-500/15 to-orange-500/30" />
 
             {LOOP_STEPS.map((step, i) => (
-              <div key={step.num} className="flex gap-6 relative">
+              <div key={step.num} className="flex gap-8 relative">
                 {/* Number circle */}
-                <div className="shrink-0 w-10 flex flex-col items-center">
-                  <div className="w-10 h-10 rounded-full border border-orange-500/30 bg-orange-500/5 flex items-center justify-center z-10">
-                    <span className="font-display text-sm text-orange-500/70">{step.num}</span>
+                <div className="shrink-0 w-12 flex flex-col items-center">
+                  <div className="w-12 h-12 rounded-full border border-orange-500/30 bg-orange-500/5 flex items-center justify-center z-10">
+                    <span className="font-display text-lg text-orange-500">{step.num}</span>
                   </div>
                 </div>
 
                 {/* Content */}
-                <div className={`flex-1 pb-10 ${i === LOOP_STEPS.length - 1 ? 'pb-0' : ''}`}>
-                  <p className="font-mono text-[9px] tracking-[3px] text-orange-500/70 mb-1">{step.time}</p>
-                  <h3 className="font-display text-xl tracking-wider mb-2">{step.title}</h3>
-                  <p className="text-sm text-white/75 leading-relaxed mb-3">{step.desc}</p>
-                  <div className="bg-white/[0.02] border border-white/5 rounded-lg px-4 py-3">
-                    <p className="text-xs text-white/65 leading-relaxed italic">{step.detail}</p>
+                <div className={`flex-1 pb-14 ${i === LOOP_STEPS.length - 1 ? 'pb-0' : ''}`}>
+                  <p className="font-mono text-xs tracking-[4px] text-orange-500/80 mb-2">{step.time}</p>
+                  <h3 className="font-display text-2xl sm:text-3xl tracking-wider mb-3">{step.title}</h3>
+                  <p className="text-base text-white/70 leading-relaxed mb-4">{step.desc}</p>
+                  <div className="bg-white/[0.03] border border-white/8 rounded-lg px-5 py-4">
+                    <p className="text-sm text-white/55 leading-relaxed italic">{step.detail}</p>
                   </div>
                 </div>
               </div>
@@ -278,83 +278,83 @@ export default function ShowcasePage() {
       </section>
 
       {/* ═══ WHAT THE COACH SEES — Charts ═══ */}
-      <section className="py-16 px-6 border-t border-white/5">
+      <section className="py-24 px-6 sm:px-10 border-t border-white/5">
         <div className="max-w-6xl mx-auto">
-          <h2 className="font-display text-3xl tracking-widest mb-3 text-center">
+          <h2 className="font-display text-4xl sm:text-5xl tracking-widest mb-4 text-center">
             9 CHARTS. EVERY EMAIL.
           </h2>
-          <p className="text-white/70 text-sm text-center mb-12 max-w-lg mx-auto">
+          <p className="text-white/60 text-base sm:text-lg text-center mb-16 max-w-xl mx-auto">
             Your morning briefing includes visual analysis — not just numbers, but patterns,
             trends, and context that turn raw biometrics into actionable intelligence.
           </p>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
             {/* Recovery Trend */}
-            <div className="bg-[#0a0a0a] border border-white/8 rounded-lg p-6">
-              <h3 className="font-mono text-xs tracking-[3px] text-white/70 mb-1">RECOVERY TREND</h3>
-              <p className="text-[10px] text-white/75 mb-4">Zone-coded recovery scores with daily strain overlay</p>
-              <ResponsiveContainer width="100%" height={180}>
-                <ComposedChart data={recoveryData} margin={{ top: 5, right: 5, bottom: 0, left: -15 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
+            <div className="bg-[#0a0a0a] border border-white/10 rounded-xl p-8">
+              <h3 className="font-mono text-sm tracking-[3px] text-white/80 mb-1">RECOVERY TREND</h3>
+              <p className="text-sm text-white/50 mb-6">Zone-coded recovery scores with daily strain overlay</p>
+              <ResponsiveContainer width="100%" height={240}>
+                <ComposedChart data={recoveryData} margin={{ top: 5, right: 5, bottom: 0, left: -10 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
                   <XAxis dataKey="date" tick={false} />
-                  <YAxis yAxisId="left" domain={[0, 100]} tick={{ fontSize: 9, fill: 'rgba(255,255,255,0.2)' }} tickLine={false} axisLine={false} />
-                  <YAxis yAxisId="right" orientation="right" domain={[0, 21]} tick={{ fontSize: 9, fill: 'rgba(255,255,255,0.15)' }} tickLine={false} axisLine={false} />
-                  <ReferenceLine yAxisId="left" y={67} stroke="rgba(34,197,94,0.15)" strokeDasharray="4 4" />
-                  <ReferenceLine yAxisId="left" y={34} stroke="rgba(239,68,68,0.15)" strokeDasharray="4 4" />
-                  <Bar yAxisId="right" dataKey="strain" fill="rgba(249,115,22,0.12)" barSize={6} radius={[2, 2, 0, 0]} />
-                  <Line yAxisId="left" type="monotone" dataKey="recovery" stroke="rgba(255,255,255,0.25)" strokeWidth={1.5} dot={<DemoDot />} />
+                  <YAxis yAxisId="left" domain={[0, 100]} tick={{ fontSize: 11, fill: 'rgba(255,255,255,0.35)' }} tickLine={false} axisLine={false} />
+                  <YAxis yAxisId="right" orientation="right" domain={[0, 21]} tick={{ fontSize: 11, fill: 'rgba(255,255,255,0.25)' }} tickLine={false} axisLine={false} />
+                  <ReferenceLine yAxisId="left" y={67} stroke="rgba(34,197,94,0.2)" strokeDasharray="4 4" />
+                  <ReferenceLine yAxisId="left" y={34} stroke="rgba(239,68,68,0.2)" strokeDasharray="4 4" />
+                  <Bar yAxisId="right" dataKey="strain" fill="rgba(249,115,22,0.15)" barSize={8} radius={[2, 2, 0, 0]} />
+                  <Line yAxisId="left" type="monotone" dataKey="recovery" stroke="rgba(255,255,255,0.35)" strokeWidth={2} dot={<DemoDot />} />
                 </ComposedChart>
               </ResponsiveContainer>
             </div>
 
             {/* Recovery-to-Load Ratio */}
-            <div className="bg-[#0a0a0a] border border-white/8 rounded-lg p-6">
-              <h3 className="font-mono text-xs tracking-[3px] text-white/70 mb-1">RECOVERY-TO-LOAD RATIO</h3>
-              <p className="text-[10px] text-white/75 mb-4">Are you recovering as hard as you&apos;re training?</p>
-              <ResponsiveContainer width="100%" height={180}>
-                <ComposedChart data={ratioData} margin={{ top: 5, right: 5, bottom: 0, left: -15 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
-                  <ReferenceArea y1={2.5} y2={4} fill="rgba(34,197,94,0.04)" />
-                  <ReferenceArea y1={1.0} y2={2.5} fill="rgba(234,179,8,0.02)" />
-                  <ReferenceArea y1={0} y2={1.0} fill="rgba(239,68,68,0.04)" />
+            <div className="bg-[#0a0a0a] border border-white/10 rounded-xl p-8">
+              <h3 className="font-mono text-sm tracking-[3px] text-white/80 mb-1">RECOVERY-TO-LOAD RATIO</h3>
+              <p className="text-sm text-white/50 mb-6">Are you recovering as hard as you&apos;re training?</p>
+              <ResponsiveContainer width="100%" height={240}>
+                <ComposedChart data={ratioData} margin={{ top: 5, right: 5, bottom: 0, left: -10 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
+                  <ReferenceArea y1={2.5} y2={4} fill="rgba(34,197,94,0.06)" />
+                  <ReferenceArea y1={1.0} y2={2.5} fill="rgba(234,179,8,0.03)" />
+                  <ReferenceArea y1={0} y2={1.0} fill="rgba(239,68,68,0.06)" />
                   <XAxis dataKey="date" tick={false} />
-                  <YAxis domain={[0, 4]} tick={{ fontSize: 9, fill: 'rgba(255,255,255,0.2)' }} tickLine={false} axisLine={false} ticks={[0, 1, 2.5, 4]} />
+                  <YAxis domain={[0, 4]} tick={{ fontSize: 11, fill: 'rgba(255,255,255,0.35)' }} tickLine={false} axisLine={false} ticks={[0, 1, 2.5, 4]} />
                   <Line type="monotone" dataKey="ratio" stroke="none" dot={<RatioDot />} />
-                  <Line type="monotone" dataKey="movingAvg" stroke="#f97316" strokeWidth={2} dot={false} connectNulls />
+                  <Line type="monotone" dataKey="movingAvg" stroke="#f97316" strokeWidth={2.5} dot={false} connectNulls />
                 </ComposedChart>
               </ResponsiveContainer>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
             {/* Weekly Load */}
-            <div className="bg-[#0a0a0a] border border-white/8 rounded-lg p-6">
-              <h3 className="font-mono text-xs tracking-[3px] text-white/70 mb-1">TRAINING LOAD</h3>
-              <p className="text-[10px] text-white/75 mb-4">Weekly strain periodization</p>
-              <ResponsiveContainer width="100%" height={140}>
-                <BarChart data={DEMO_LOAD} margin={{ top: 0, right: 0, bottom: 0, left: -20 }}>
-                  <XAxis dataKey="label" tick={{ fontSize: 8, fill: 'rgba(255,255,255,0.25)' }} tickLine={false} />
-                  <YAxis tick={{ fontSize: 8, fill: 'rgba(255,255,255,0.2)' }} tickLine={false} axisLine={false} />
-                  <Bar dataKey="strain" fill="rgba(249,115,22,0.5)" radius={[3, 3, 0, 0]} barSize={24} />
+            <div className="bg-[#0a0a0a] border border-white/10 rounded-xl p-8">
+              <h3 className="font-mono text-sm tracking-[3px] text-white/80 mb-1">TRAINING LOAD</h3>
+              <p className="text-sm text-white/50 mb-6">Weekly strain periodization</p>
+              <ResponsiveContainer width="100%" height={200}>
+                <BarChart data={DEMO_LOAD} margin={{ top: 0, right: 0, bottom: 0, left: -15 }}>
+                  <XAxis dataKey="label" tick={{ fontSize: 11, fill: 'rgba(255,255,255,0.4)' }} tickLine={false} />
+                  <YAxis tick={{ fontSize: 11, fill: 'rgba(255,255,255,0.3)' }} tickLine={false} axisLine={false} />
+                  <Bar dataKey="strain" fill="rgba(249,115,22,0.6)" radius={[4, 4, 0, 0]} barSize={32} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
 
             {/* HR Zones */}
-            <div className="bg-[#0a0a0a] border border-white/8 rounded-lg p-6">
-              <h3 className="font-mono text-xs tracking-[3px] text-white/70 mb-1">HR ZONES</h3>
-              <p className="text-[10px] text-white/75 mb-4">Time in each training zone</p>
-              <div className="space-y-2 mt-2">
+            <div className="bg-[#0a0a0a] border border-white/10 rounded-xl p-8">
+              <h3 className="font-mono text-sm tracking-[3px] text-white/80 mb-1">HR ZONES</h3>
+              <p className="text-sm text-white/50 mb-6">Time in each training zone</p>
+              <div className="space-y-3 mt-4">
                 {DEMO_ZONES.map((z, i) => {
                   const total = DEMO_ZONES.reduce((s, d) => s + d.minutes, 0);
                   const pct = Math.round((z.minutes / total) * 100);
                   return (
-                    <div key={z.zone} className="flex items-center gap-2">
-                      <span className="font-mono text-[9px] text-white/70 w-5">{z.zone}</span>
-                      <div className="flex-1 h-3 bg-white/5 rounded-full overflow-hidden">
-                        <div className="h-full rounded-full" style={{ width: `${pct}%`, backgroundColor: ZONE_COLORS[i], opacity: 0.7 }} />
+                    <div key={z.zone} className="flex items-center gap-3">
+                      <span className="font-mono text-xs text-white/60 w-6">{z.zone}</span>
+                      <div className="flex-1 h-4 bg-white/5 rounded-full overflow-hidden">
+                        <div className="h-full rounded-full" style={{ width: `${pct}%`, backgroundColor: ZONE_COLORS[i], opacity: 0.8 }} />
                       </div>
-                      <span className="font-mono text-[9px] text-white/70 w-8 text-right">{pct}%</span>
+                      <span className="font-mono text-xs text-white/60 w-10 text-right">{pct}%</span>
                     </div>
                   );
                 })}
@@ -362,24 +362,24 @@ export default function ShowcasePage() {
             </div>
 
             {/* Discipline Balance */}
-            <div className="bg-[#0a0a0a] border border-white/8 rounded-lg p-6">
-              <h3 className="font-mono text-xs tracking-[3px] text-white/70 mb-1">SPORT BALANCE</h3>
-              <p className="text-[10px] text-white/75 mb-4">Time across disciplines</p>
-              <div className="flex items-center gap-4">
-                <ResponsiveContainer width={100} height={100}>
+            <div className="bg-[#0a0a0a] border border-white/10 rounded-xl p-8">
+              <h3 className="font-mono text-sm tracking-[3px] text-white/80 mb-1">SPORT BALANCE</h3>
+              <p className="text-sm text-white/50 mb-6">Time across disciplines</p>
+              <div className="flex items-center gap-6">
+                <ResponsiveContainer width={130} height={130}>
                   <PieChart>
-                    <Pie data={DEMO_BALANCE} cx="50%" cy="50%" innerRadius={28} outerRadius={42} dataKey="minutes" stroke="none" paddingAngle={3}>
+                    <Pie data={DEMO_BALANCE} cx="50%" cy="50%" innerRadius={36} outerRadius={55} dataKey="minutes" stroke="none" paddingAngle={3}>
                       {DEMO_BALANCE.map((entry, i) => (
-                        <Cell key={i} fill={entry.color} fillOpacity={0.7} />
+                        <Cell key={i} fill={entry.color} fillOpacity={0.8} />
                       ))}
                     </Pie>
                   </PieChart>
                 </ResponsiveContainer>
-                <div className="space-y-1.5">
+                <div className="space-y-2.5">
                   {DEMO_BALANCE.map(d => (
-                    <div key={d.sport} className="flex items-center gap-1.5">
-                      <div className="w-2 h-2 rounded-full" style={{ backgroundColor: d.color }} />
-                      <span className="font-mono text-[9px] text-white/75 capitalize">{d.sport.replace('-', ' ')}</span>
+                    <div key={d.sport} className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full" style={{ backgroundColor: d.color }} />
+                      <span className="font-mono text-xs text-white/70 capitalize">{d.sport.replace('-', ' ')}</span>
                     </div>
                   ))}
                 </div>
@@ -387,33 +387,33 @@ export default function ShowcasePage() {
             </div>
           </div>
 
-          <p className="text-[10px] font-mono text-white/15 mt-4 text-center">
+          <p className="text-xs font-mono text-white/30 mt-6 text-center">
             SAMPLE DATA — NOT REAL ATHLETE METRICS
           </p>
         </div>
       </section>
 
       {/* ═══ WHY THIS IS DIFFERENT — side-by-side ═══ */}
-      <section className="py-16 px-6 border-t border-white/5">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="font-display text-3xl tracking-widest mb-3 text-center">
+      <section className="py-24 px-6 sm:px-10 border-t border-white/5">
+        <div className="max-w-5xl mx-auto">
+          <h2 className="font-display text-4xl sm:text-5xl tracking-widest mb-4 text-center">
             YOUR APP VS. YOUR COACH
           </h2>
-          <p className="text-white/70 text-sm text-center mb-12 max-w-lg mx-auto">
+          <p className="text-white/60 text-base sm:text-lg text-center mb-16 max-w-xl mx-auto">
             Your biometric app gives you data. This gives you a coaching relationship that
             learns, remembers, and adapts — every single day.
           </p>
 
-          <div className="space-y-3">
+          <div className="space-y-4">
             {GENERIC_VS.map((row, i) => (
-              <div key={i} className="grid grid-cols-1 sm:grid-cols-2 gap-0 sm:gap-0">
-                <div className="bg-white/[0.02] border border-white/5 sm:rounded-l-lg sm:rounded-r-none rounded-t-lg sm:rounded-t-none sm:rounded-tl-lg px-5 py-4 flex items-start gap-3">
-                  <span className="font-mono text-[9px] text-red-400/80 mt-0.5 shrink-0">GENERIC</span>
-                  <p className="text-xs text-white/65 leading-relaxed">{row.generic}</p>
+              <div key={i} className="grid grid-cols-1 sm:grid-cols-2 gap-0">
+                <div className="bg-white/[0.02] border border-white/8 sm:rounded-l-xl sm:rounded-r-none rounded-t-xl sm:rounded-t-none sm:rounded-tl-xl px-6 py-5 flex items-start gap-4">
+                  <span className="font-mono text-xs text-red-400/90 mt-0.5 shrink-0">GENERIC</span>
+                  <p className="text-sm text-white/60 leading-relaxed">{row.generic}</p>
                 </div>
-                <div className="bg-orange-500/[0.03] border border-orange-500/10 sm:rounded-r-lg sm:rounded-l-none rounded-b-lg sm:rounded-b-none sm:rounded-br-lg px-5 py-4 flex items-start gap-3">
-                  <span className="font-mono text-[9px] text-orange-500/80 mt-0.5 shrink-0">COACH</span>
-                  <p className="text-xs text-white/65 leading-relaxed">{row.coach}</p>
+                <div className="bg-orange-500/[0.04] border border-orange-500/15 sm:rounded-r-xl sm:rounded-l-none rounded-b-xl sm:rounded-b-none sm:rounded-br-xl px-6 py-5 flex items-start gap-4">
+                  <span className="font-mono text-xs text-orange-500 mt-0.5 shrink-0">COACH</span>
+                  <p className="text-sm text-white/75 leading-relaxed">{row.coach}</p>
                 </div>
               </div>
             ))}
@@ -422,22 +422,22 @@ export default function ShowcasePage() {
       </section>
 
       {/* ═══ WEEKLY INTELLIGENCE — focus rotation ═══ */}
-      <section className="py-16 px-6 border-t border-white/5">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="font-display text-3xl tracking-widest mb-3 text-center">
+      <section className="py-24 px-6 sm:px-10 border-t border-white/5">
+        <div className="max-w-5xl mx-auto">
+          <h2 className="font-display text-4xl sm:text-5xl tracking-widest mb-4 text-center">
             EVERY ANGLE. EVERY WEEK.
           </h2>
-          <p className="text-white/70 text-sm text-center mb-12 max-w-lg mx-auto">
+          <p className="text-white/60 text-base sm:text-lg text-center mb-16 max-w-xl mx-auto">
             The coach rotates its focus daily — strategy, response, balance, intelligence, prep,
             execution, review. Nothing falls through the cracks.
           </p>
 
-          <div className="grid grid-cols-7 gap-2">
+          <div className="grid grid-cols-7 gap-3">
             {WEEKLY_FOCUS.map(d => (
-              <div key={d.day} className="bg-white/[0.02] border border-white/5 rounded-lg px-3 py-4 text-center">
-                <p className="font-display text-sm text-orange-500/80 mb-2">{d.day}</p>
-                <p className="font-mono text-[9px] tracking-wider text-white/75 mb-1 leading-tight">{d.focus}</p>
-                <p className="text-[9px] text-white/75 leading-tight hidden sm:block">{d.desc}</p>
+              <div key={d.day} className="bg-white/[0.03] border border-white/8 rounded-xl px-3 py-5 text-center">
+                <p className="font-display text-lg text-orange-500 mb-2">{d.day}</p>
+                <p className="font-mono text-xs tracking-wider text-white/80 mb-1.5 leading-tight">{d.focus}</p>
+                <p className="text-xs text-white/50 leading-tight hidden sm:block">{d.desc}</p>
               </div>
             ))}
           </div>
@@ -445,23 +445,23 @@ export default function ShowcasePage() {
       </section>
 
       {/* ═══ CONDITION-AWARE ═══ */}
-      <section className="py-16 px-6 border-t border-white/5">
+      <section className="py-24 px-6 sm:px-10 border-t border-white/5">
         <div className="max-w-5xl mx-auto">
-          <h2 className="font-display text-3xl tracking-widest mb-3 text-center">
+          <h2 className="font-display text-4xl sm:text-5xl tracking-widest mb-4 text-center">
             YOUR CONDITION. UNDERSTOOD.
           </h2>
-          <p className="text-white/70 text-sm text-center mb-12 max-w-lg mx-auto">
+          <p className="text-white/60 text-base sm:text-lg text-center mb-16 max-w-xl mx-auto">
             Generic apps ignore what makes your body different. This one starts there.
             Whatever affects your training — the coach knows, adapts, and never forgets.
           </p>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {CONDITIONS.map(c => (
-              <div key={c.label} className="flex gap-3 items-start bg-white/[0.02] rounded-lg px-4 py-4">
-                <span className="text-xl shrink-0">{c.icon}</span>
+              <div key={c.label} className="flex gap-4 items-start bg-white/[0.03] border border-white/8 rounded-xl px-6 py-5">
+                <span className="text-2xl shrink-0">{c.icon}</span>
                 <div>
-                  <p className="font-mono text-xs tracking-wider text-white/75 mb-1">{c.label}</p>
-                  <p className="text-[11px] text-white/65 leading-relaxed">{c.desc}</p>
+                  <p className="font-mono text-sm tracking-wider text-white/80 mb-1.5">{c.label}</p>
+                  <p className="text-sm text-white/55 leading-relaxed">{c.desc}</p>
                 </div>
               </div>
             ))}
@@ -470,27 +470,27 @@ export default function ShowcasePage() {
       </section>
 
       {/* ═══ COACHING VOICE ═══ */}
-      <section className="py-16 px-6 border-t border-white/5">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="font-display text-3xl tracking-widest mb-3 text-center">
+      <section className="py-24 px-6 sm:px-10 border-t border-white/5">
+        <div className="max-w-5xl mx-auto">
+          <h2 className="font-display text-4xl sm:text-5xl tracking-widest mb-4 text-center">
             YOUR COACHING VOICE
           </h2>
-          <p className="text-white/70 text-sm text-center mb-12 max-w-lg mx-auto">
+          <p className="text-white/60 text-base sm:text-lg text-center mb-16 max-w-xl mx-auto">
             The same data, delivered in the voice that actually moves you.
           </p>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             {COACHING_STYLES.map(s => (
-              <div key={s.name} className="bg-white/[0.02] hover:bg-white/[0.04] border border-white/5 rounded-lg p-5 transition-colors">
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="font-mono text-xs tracking-wider text-white/70">{s.name}</h3>
-                  <span className="font-mono text-[9px] tracking-wider text-orange-500/70 border border-orange-500/15 rounded-full px-2 py-0.5">
+              <div key={s.name} className="bg-white/[0.03] hover:bg-white/[0.05] border border-white/8 rounded-xl p-7 transition-colors">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="font-mono text-sm tracking-wider text-white/90">{s.name}</h3>
+                  <span className="font-mono text-xs tracking-wider text-orange-500 border border-orange-500/25 rounded-full px-3 py-1">
                     {s.tag}
                   </span>
                 </div>
-                <p className="text-xs text-white/70 leading-relaxed mb-3">{s.desc}</p>
-                <div className="bg-black/40 border border-white/5 rounded px-3 py-2">
-                  <p className="text-[11px] text-orange-500/70 italic leading-relaxed">{s.sample}</p>
+                <p className="text-sm text-white/60 leading-relaxed mb-4">{s.desc}</p>
+                <div className="bg-black/50 border border-white/8 rounded-lg px-4 py-3">
+                  <p className="text-sm text-orange-500/80 italic leading-relaxed">{s.sample}</p>
                 </div>
               </div>
             ))}
@@ -499,25 +499,25 @@ export default function ShowcasePage() {
       </section>
 
       {/* ═══ THE ONE SURPRISING THING ═══ */}
-      <section className="py-16 px-6 border-t border-white/5">
-        <div className="max-w-3xl mx-auto text-center">
-          <h2 className="font-display text-3xl tracking-widest mb-6">
+      <section className="py-24 px-6 sm:px-10 border-t border-white/5">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="font-display text-4xl sm:text-5xl tracking-widest mb-6">
             ONE SURPRISING THING
           </h2>
-          <p className="text-white/40 text-sm leading-relaxed max-w-xl mx-auto mb-10">
+          <p className="text-white/60 text-base sm:text-lg leading-relaxed max-w-xl mx-auto mb-12">
             Every briefing surfaces one non-obvious pattern — a correlation your app will never
             show you. A confirmed prediction. A trend break. Something that makes you say
             &ldquo;I didn&apos;t know that about my body.&rdquo;
           </p>
 
-          <div className="space-y-3 text-left max-w-lg mx-auto">
+          <div className="space-y-4 text-left max-w-2xl mx-auto">
             {[
               '"Your HRV has been 15% above baseline every Monday for the last month. Your weekend recovery protocol is working — don\'t change it."',
               '"Three of your last four red recovery days came after evening strength sessions. Morning lifts recover faster for your body."',
               '"You\'ve averaged 6.2 days between swims for 3 weeks. At race pace, that gap costs you 30-45 seconds in transition confidence."',
             ].map((insight, i) => (
-              <div key={i} className="bg-orange-500/[0.03] border border-orange-500/8 rounded-lg px-5 py-4">
-                <p className="text-xs text-white/40 italic leading-relaxed">{insight}</p>
+              <div key={i} className="bg-orange-500/[0.04] border border-orange-500/15 rounded-xl px-6 py-5">
+                <p className="text-sm text-white/70 italic leading-relaxed">{insight}</p>
               </div>
             ))}
           </div>
@@ -525,38 +525,38 @@ export default function ShowcasePage() {
       </section>
 
       {/* ═══ RACE DAY MODE ═══ */}
-      <section className="py-16 px-6 border-t border-white/5">
-        <div className="max-w-3xl mx-auto text-center">
-          <h2 className="font-display text-3xl tracking-widest mb-6">
+      <section className="py-24 px-6 sm:px-10 border-t border-white/5">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="font-display text-4xl sm:text-5xl tracking-widest mb-6">
             RACE DAY MODE
           </h2>
-          <p className="text-white/40 text-sm leading-relaxed max-w-xl mx-auto mb-8">
+          <p className="text-white/60 text-base sm:text-lg leading-relaxed max-w-xl mx-auto mb-10">
             On race morning, the coaching voice shifts. No analysis. No suggestions.
             A pre-scripted execution command built around your training, your race plan,
             and the conditions on the ground.
           </p>
 
-          <div className="bg-[#0a0a0a] border border-orange-500/15 rounded-lg p-8 text-left max-w-lg mx-auto">
-            <p className="font-mono text-[9px] tracking-[3px] text-orange-500/70 mb-4">RACE DAY BRIEFING</p>
-            <div className="space-y-3 text-sm text-white/65 leading-relaxed font-mono">
-              <p className="text-white/70">This is not a discussion. This is what we do.</p>
+          <div className="bg-[#0a0a0a] border border-orange-500/20 rounded-xl p-10 text-left max-w-2xl mx-auto">
+            <p className="font-mono text-xs tracking-[4px] text-orange-500 mb-6">RACE DAY BRIEFING</p>
+            <div className="space-y-4 text-lg text-white/60 leading-relaxed font-mono">
+              <p className="text-white/90">This is not a discussion. This is what we do.</p>
               <p>You trained for this. You suffered for this. This is the payoff.</p>
               <p>You do not control conditions. You control effort.</p>
               <p>You do not negotiate with pain. Pain is expected.</p>
-              <p className="text-orange-500/80">You finish what you start.</p>
+              <p className="text-orange-500">You finish what you start.</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* ═══ CTA ═══ */}
-      <section className="py-20 px-6 border-t border-white/5">
-        <div className="max-w-3xl mx-auto text-center">
-          <h2 className="font-display text-4xl sm:text-5xl tracking-widest mb-6">
+      <section className="py-28 px-6 sm:px-10 border-t border-white/5">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="font-display text-5xl sm:text-7xl tracking-widest mb-8">
             COACHING THAT<br />
             <span className="text-orange-500">KNOWS YOU.</span>
           </h2>
-          <p className="text-white/40 text-sm mb-8 max-w-md mx-auto">
+          <p className="text-white/60 text-base sm:text-lg mb-10 max-w-lg mx-auto">
             Whether you manage a medical condition, train for competition, or just want
             a coach that actually understands your body — this is built for you.
           </p>
@@ -564,7 +564,7 @@ export default function ShowcasePage() {
             href="https://www.instagram.com/patwingit"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-block bg-orange-500 hover:bg-orange-600 text-black font-mono text-xs tracking-widest px-8 py-3 rounded transition-colors"
+            className="inline-block bg-orange-500 hover:bg-orange-600 text-black font-mono text-sm tracking-widest px-10 py-4 rounded-lg transition-colors"
           >
             GET EARLY ACCESS
           </a>
@@ -572,11 +572,11 @@ export default function ShowcasePage() {
       </section>
 
       {/* ═══ FOOTER ═══ */}
-      <footer className="border-t border-white/5 py-8 px-6">
-        <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="font-mono text-xs text-white/40">
+      <footer className="border-t border-white/8 py-10 px-6 sm:px-10">
+        <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p className="font-mono text-sm text-white/50">
             Built by{' '}
-            <a href="https://patrickwingert.com" className="text-white/40 hover:text-white/75 transition-colors">
+            <a href="https://patrickwingert.com" className="text-white/70 hover:text-white transition-colors">
               patrickwingert.com
             </a>
           </p>
@@ -584,7 +584,7 @@ export default function ShowcasePage() {
             href="https://www.dare2tri.org"
             target="_blank"
             rel="noopener noreferrer"
-            className="font-mono text-xs text-white/40 hover:text-white/40 transition-colors"
+            className="font-mono text-sm text-white/50 hover:text-white/70 transition-colors"
           >
             Dare2Tri Foundation
           </a>
