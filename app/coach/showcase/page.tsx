@@ -61,10 +61,35 @@ const DEMO_ZONES = [
 ];
 
 const DEMO_LOAD = [
-  { label: 'Week 1', strain: 62.4 },
-  { label: 'Week 2', strain: 71.8 },
-  { label: 'Week 3', strain: 78.2 },
-  { label: 'Week 4', strain: 55.1 },
+  { label: '3/25–3/31', strain: 65 },
+  { label: '4/1–4/7', strain: 71.8 },
+  { label: '4/8–4/14', strain: 46.2 },
+  { label: '4/15–4/21', strain: 53.4 },
+];
+
+const DEMO_ACTIVITY = (() => {
+  const sports = ['running', 'cycling', 'swimming', 'strength-training', 'spin', 'triathlon'];
+  const data = [];
+  const base = new Date('2026-03-24');
+  for (let i = 0; i < 28; i++) {
+    const d = new Date(base.getTime() + i * 86400000);
+    const hasWorkout = Math.random() > 0.25;
+    const sport = hasWorkout ? sports[Math.floor(Math.random() * sports.length)] : null;
+    const strain = hasWorkout ? 4 + Math.round(Math.random() * 14 * 10) / 10 : 0;
+    data.push({
+      date: d.toISOString().split('T')[0].slice(5),
+      strain,
+      sport,
+      color: sport ? (SPORT_COLORS[sport] || '#6b7280') : 'rgba(255,255,255,0.05)',
+    });
+  }
+  return data;
+})();
+
+const DEMO_KEY_NUMBERS = [
+  { label: 'HRV', value: '42.5 MS', trend: '↑', trendColor: 'text-emerald-400', baseline: 'vs 38.2 ms avg' },
+  { label: 'RHR', value: '54 BPM', trend: '↓', trendColor: 'text-emerald-400', baseline: 'vs 56.1 bpm avg' },
+  { label: 'SPO2', value: '98.2%', trend: '→', trendColor: 'text-white/50', baseline: 'vs 97.8 avg' },
 ];
 
 // ─── The Loop steps ───
@@ -277,119 +302,229 @@ export default function ShowcasePage() {
         </div>
       </section>
 
-      {/* ═══ WHAT THE COACH SEES — Charts ═══ */}
+      {/* ═══ WHAT YOU WAKE UP TO — Email Preview ═══ */}
       <section className="py-24 px-6 sm:px-10 border-t border-white/5">
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-5xl mx-auto">
           <h2 className="font-display text-4xl sm:text-5xl tracking-widest mb-4 text-center">
-            9 CHARTS. EVERY EMAIL.
+            WHAT YOU WAKE UP TO
           </h2>
           <p className="text-white/60 text-base sm:text-lg text-center mb-16 max-w-xl mx-auto">
-            Your morning briefing includes visual analysis — not just numbers, but patterns,
-            trends, and context that turn raw biometrics into actionable intelligence.
+            Every morning, a complete coaching briefing — charts, numbers, baselines,
+            and a training call — personalized to you and waiting in your inbox.
           </p>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-            {/* Recovery Trend */}
-            <div className="bg-[#0a0a0a] border border-white/10 rounded-xl p-8">
-              <h3 className="font-mono text-sm tracking-[3px] text-white/80 mb-1">RECOVERY TREND</h3>
-              <p className="text-sm text-white/50 mb-6">Zone-coded recovery scores with daily strain overlay</p>
-              <ResponsiveContainer width="100%" height={240}>
-                <ComposedChart data={recoveryData} margin={{ top: 5, right: 5, bottom: 0, left: -10 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
-                  <XAxis dataKey="date" tick={false} />
-                  <YAxis yAxisId="left" domain={[0, 100]} tick={{ fontSize: 11, fill: 'rgba(255,255,255,0.35)' }} tickLine={false} axisLine={false} />
-                  <YAxis yAxisId="right" orientation="right" domain={[0, 21]} tick={{ fontSize: 11, fill: 'rgba(255,255,255,0.25)' }} tickLine={false} axisLine={false} />
-                  <ReferenceLine yAxisId="left" y={67} stroke="rgba(34,197,94,0.2)" strokeDasharray="4 4" />
-                  <ReferenceLine yAxisId="left" y={34} stroke="rgba(239,68,68,0.2)" strokeDasharray="4 4" />
-                  <Bar yAxisId="right" dataKey="strain" fill="rgba(249,115,22,0.15)" barSize={8} radius={[2, 2, 0, 0]} />
-                  <Line yAxisId="left" type="monotone" dataKey="recovery" stroke="rgba(255,255,255,0.35)" strokeWidth={2} dot={<DemoDot />} />
-                </ComposedChart>
-              </ResponsiveContainer>
+          {/* Email-style preview container */}
+          <div className="bg-[#080808] border border-white/10 rounded-2xl overflow-hidden max-w-3xl mx-auto">
+
+            {/* Race Countdown */}
+            <div className="px-8 pt-8 pb-6">
+              <p className="font-mono text-xs tracking-[3px] text-white/50 mb-4">RACE COUNTDOWN</p>
+              <div className="bg-[#0e0e0e] border border-white/10 rounded-xl p-5 mb-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-display text-xl tracking-wider">YOUR NEXT RACE</p>
+                    <p className="font-mono text-sm text-white/50 mt-1">Sprint (500m swim / 18.7km bike / 5km run)</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-display text-4xl text-orange-500">47</p>
+                    <p className="font-mono text-xs text-white/40">DAYS</p>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-[#0e0e0e] border border-orange-500/20 rounded-xl p-4 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <span className="text-orange-500">★</span>
+                  <span className="font-mono text-sm text-white/70">NATIONALS — MILWAUKEE</span>
+                </div>
+                <div className="text-right">
+                  <span className="font-display text-xl text-orange-500">110D</span>
+                </div>
+              </div>
+              <p className="font-mono text-xs text-orange-500 mt-2 ml-1">BUILD</p>
             </div>
 
-            {/* Recovery-to-Load Ratio */}
-            <div className="bg-[#0a0a0a] border border-white/10 rounded-xl p-8">
-              <h3 className="font-mono text-sm tracking-[3px] text-white/80 mb-1">RECOVERY-TO-LOAD RATIO</h3>
-              <p className="text-sm text-white/50 mb-6">Are you recovering as hard as you&apos;re training?</p>
-              <ResponsiveContainer width="100%" height={240}>
-                <ComposedChart data={ratioData} margin={{ top: 5, right: 5, bottom: 0, left: -10 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
-                  <ReferenceArea y1={2.5} y2={4} fill="rgba(34,197,94,0.06)" />
-                  <ReferenceArea y1={1.0} y2={2.5} fill="rgba(234,179,8,0.03)" />
-                  <ReferenceArea y1={0} y2={1.0} fill="rgba(239,68,68,0.06)" />
-                  <XAxis dataKey="date" tick={false} />
-                  <YAxis domain={[0, 4]} tick={{ fontSize: 11, fill: 'rgba(255,255,255,0.35)' }} tickLine={false} axisLine={false} ticks={[0, 1, 2.5, 4]} />
-                  <Line type="monotone" dataKey="ratio" stroke="none" dot={<RatioDot />} />
-                  <Line type="monotone" dataKey="movingAvg" stroke="#f97316" strokeWidth={2.5} dot={false} connectNulls />
-                </ComposedChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
-            {/* Weekly Load */}
-            <div className="bg-[#0a0a0a] border border-white/10 rounded-xl p-8">
-              <h3 className="font-mono text-sm tracking-[3px] text-white/80 mb-1">TRAINING LOAD</h3>
-              <p className="text-sm text-white/50 mb-6">Weekly strain periodization</p>
-              <ResponsiveContainer width="100%" height={200}>
-                <BarChart data={DEMO_LOAD} margin={{ top: 0, right: 0, bottom: 0, left: -15 }}>
-                  <XAxis dataKey="label" tick={{ fontSize: 11, fill: 'rgba(255,255,255,0.4)' }} tickLine={false} />
-                  <YAxis tick={{ fontSize: 11, fill: 'rgba(255,255,255,0.3)' }} tickLine={false} axisLine={false} />
-                  <Bar dataKey="strain" fill="rgba(249,115,22,0.6)" radius={[4, 4, 0, 0]} barSize={32} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-
-            {/* HR Zones */}
-            <div className="bg-[#0a0a0a] border border-white/10 rounded-xl p-8">
-              <h3 className="font-mono text-sm tracking-[3px] text-white/80 mb-1">HR ZONES</h3>
-              <p className="text-sm text-white/50 mb-6">Time in each training zone</p>
-              <div className="space-y-3 mt-4">
-                {DEMO_ZONES.map((z, i) => {
-                  const total = DEMO_ZONES.reduce((s, d) => s + d.minutes, 0);
-                  const pct = Math.round((z.minutes / total) * 100);
-                  return (
-                    <div key={z.zone} className="flex items-center gap-3">
-                      <span className="font-mono text-xs text-white/60 w-6">{z.zone}</span>
-                      <div className="flex-1 h-4 bg-white/5 rounded-full overflow-hidden">
-                        <div className="h-full rounded-full" style={{ width: `${pct}%`, backgroundColor: ZONE_COLORS[i], opacity: 0.8 }} />
-                      </div>
-                      <span className="font-mono text-xs text-white/60 w-10 text-right">{pct}%</span>
-                    </div>
-                  );
-                })}
+            {/* Key Numbers */}
+            <div className="px-8 pb-6">
+              <p className="font-mono text-xs tracking-[3px] text-white/50 mb-4">KEY NUMBERS</p>
+              <div className="grid grid-cols-3 gap-3">
+                {DEMO_KEY_NUMBERS.map(n => (
+                  <div key={n.label} className="bg-[#0e0e0e] border border-white/10 rounded-xl p-4 text-center">
+                    <p className="font-display text-xl sm:text-2xl">
+                      {n.value} <span className={`text-lg ${n.trendColor}`}>{n.trend}</span>
+                    </p>
+                    <p className="font-mono text-xs text-white/60 mt-1">{n.label}</p>
+                    <p className="font-mono text-[11px] text-white/35 mt-0.5">{n.baseline}</p>
+                  </div>
+                ))}
               </div>
             </div>
 
-            {/* Discipline Balance */}
-            <div className="bg-[#0a0a0a] border border-white/10 rounded-xl p-8">
-              <h3 className="font-mono text-sm tracking-[3px] text-white/80 mb-1">SPORT BALANCE</h3>
-              <p className="text-sm text-white/50 mb-6">Time across disciplines</p>
-              <div className="flex items-center gap-6">
-                <ResponsiveContainer width={130} height={130}>
+            {/* Days Since */}
+            <div className="px-8 pb-6">
+              <p className="font-mono text-xs tracking-[3px] text-white/50 mb-4">LAST SESSION</p>
+              <div className="grid grid-cols-3 gap-3">
+                {[
+                  { sport: 'SWIM', days: 2, icon: '🏊' },
+                  { sport: 'BIKE', days: 1, icon: '🚴' },
+                  { sport: 'RUN', days: 4, icon: '🏃' },
+                ].map(d => (
+                  <div key={d.sport} className="bg-[#0e0e0e] border border-white/10 rounded-xl p-4 text-center">
+                    <p className="text-lg mb-1">{d.icon}</p>
+                    <p className="font-display text-3xl">{d.days}D</p>
+                    <p className="font-mono text-xs text-white/50 mt-1">{d.sport}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Training Balance Doughnut */}
+            <div className="px-8 pb-6">
+              <p className="font-mono text-xs tracking-[3px] text-white/50 mb-4">14-DAY TRAINING BALANCE</p>
+              <div className="bg-[#0e0e0e] border border-white/10 rounded-xl p-6 flex items-center justify-center gap-8">
+                <ResponsiveContainer width={200} height={200}>
                   <PieChart>
-                    <Pie data={DEMO_BALANCE} cx="50%" cy="50%" innerRadius={36} outerRadius={55} dataKey="minutes" stroke="none" paddingAngle={3}>
+                    <Pie data={DEMO_BALANCE} cx="50%" cy="50%" innerRadius={55} outerRadius={85} dataKey="minutes" stroke="none" paddingAngle={2} label={({ value }) => `${value}`} >
                       {DEMO_BALANCE.map((entry, i) => (
-                        <Cell key={i} fill={entry.color} fillOpacity={0.8} />
+                        <Cell key={i} fill={entry.color} fillOpacity={0.85} />
                       ))}
                     </Pie>
                   </PieChart>
                 </ResponsiveContainer>
-                <div className="space-y-2.5">
+                <div className="space-y-3">
                   {DEMO_BALANCE.map(d => (
-                    <div key={d.sport} className="flex items-center gap-2">
+                    <div key={d.sport} className="flex items-center gap-2.5">
                       <div className="w-3 h-3 rounded-full" style={{ backgroundColor: d.color }} />
-                      <span className="font-mono text-xs text-white/70 capitalize">{d.sport.replace('-', ' ')}</span>
+                      <span className="font-mono text-sm text-white/70 capitalize">{d.sport.replace('-', ' ')}</span>
                     </div>
                   ))}
                 </div>
               </div>
             </div>
-          </div>
 
-          <p className="text-xs font-mono text-white/30 mt-6 text-center">
-            SAMPLE DATA — NOT REAL ATHLETE METRICS
-          </p>
+            {/* Race Readiness Gauge */}
+            <div className="px-8 pb-6">
+              <p className="font-mono text-xs tracking-[3px] text-white/50 mb-4">RACE READINESS</p>
+              <div className="bg-[#0e0e0e] border border-white/10 rounded-xl p-6 text-center">
+                <div className="relative w-40 h-40 mx-auto mb-4">
+                  <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90">
+                    <circle cx="50" cy="50" r="40" fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="8" />
+                    <circle cx="50" cy="50" r="40" fill="none" stroke="#f97316" strokeWidth="8"
+                      strokeDasharray={`${59 * 2.51} ${100 * 2.51}`} strokeLinecap="round" />
+                  </svg>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center">
+                    <p className="font-display text-3xl text-orange-500">59%</p>
+                    <p className="font-mono text-[10px] text-white/40 mt-0.5">Your Next Race</p>
+                  </div>
+                </div>
+                <div className="grid grid-cols-3 gap-4 mt-2">
+                  {[
+                    { label: 'RECOVERY', value: '52%', sub: '7-day avg' },
+                    { label: 'CONSISTENCY', value: '80%', sub: 'workouts/week' },
+                    { label: 'BALANCE', value: '41%', sub: 'swim/bike/run' },
+                  ].map(m => (
+                    <div key={m.label}>
+                      <p className="font-display text-xl text-orange-500">{m.value}</p>
+                      <p className="font-mono text-[10px] tracking-wider text-white/60">{m.label}</p>
+                      <p className="font-mono text-[10px] text-white/30">{m.sub}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* 4-Week Training Load */}
+            <div className="px-8 pb-6">
+              <p className="font-mono text-xs tracking-[3px] text-white/50 mb-4">4-WEEK TRAINING LOAD</p>
+              <div className="bg-[#0e0e0e] border border-white/10 rounded-xl p-6">
+                <ResponsiveContainer width="100%" height={220}>
+                  <BarChart data={DEMO_LOAD} margin={{ top: 20, right: 10, bottom: 0, left: -10 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
+                    <XAxis dataKey="label" tick={{ fontSize: 11, fill: 'rgba(255,255,255,0.5)' }} tickLine={false} />
+                    <YAxis tick={{ fontSize: 11, fill: 'rgba(255,255,255,0.35)' }} tickLine={false} axisLine={false} label={{ value: 'TOTAL STRAIN', angle: -90, position: 'insideLeft', style: { fontSize: 9, fill: 'rgba(255,255,255,0.3)' } }} />
+                    <Bar dataKey="strain" fill="rgba(249,115,22,0.7)" radius={[4, 4, 0, 0]} barSize={40} label={{ position: 'top', fill: 'rgba(255,255,255,0.6)', fontSize: 12 }} />
+                  </BarChart>
+                </ResponsiveContainer>
+                <p className="text-xs text-white/40 mt-3">Total cardiovascular strain per week. Rising weeks = volume building. Strain is HR-based — doesn&apos;t capture power/pace intensity.</p>
+              </div>
+            </div>
+
+            {/* HR Zones */}
+            <div className="px-8 pb-6">
+              <p className="font-mono text-xs tracking-[3px] text-white/50 mb-4">HEART RATE ZONES (14-DAY)</p>
+              <div className="bg-[#0e0e0e] border border-white/10 rounded-xl p-6">
+                <ResponsiveContainer width="100%" height={220}>
+                  <BarChart data={DEMO_ZONES.map((z, i) => ({ ...z, fill: ZONE_COLORS[i] }))} margin={{ top: 20, right: 10, bottom: 0, left: -10 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
+                    <XAxis dataKey="zone" tick={{ fontSize: 12, fill: 'rgba(255,255,255,0.5)' }} tickLine={false} />
+                    <YAxis tick={{ fontSize: 11, fill: 'rgba(255,255,255,0.35)' }} tickLine={false} axisLine={false} label={{ value: 'MINUTES', angle: -90, position: 'insideLeft', style: { fontSize: 9, fill: 'rgba(255,255,255,0.3)' } }} />
+                    <Bar dataKey="minutes" radius={[4, 4, 0, 0]} barSize={40} label={{ position: 'top', fill: 'rgba(255,255,255,0.6)', fontSize: 12 }}>
+                      {DEMO_ZONES.map((_, i) => (
+                        <Cell key={i} fill={ZONE_COLORS[i]} fillOpacity={0.8} />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+                <p className="text-xs text-white/40 mt-3">Total training minutes per HR zone. Z1-2 = aerobic base. Z3 = tempo. Z4-5 = threshold/max effort. More Z2 time = better endurance foundation.</p>
+              </div>
+            </div>
+
+            {/* Recovery + Load Ratio */}
+            <div className="px-8 pb-6">
+              <p className="font-mono text-xs tracking-[3px] text-white/50 mb-4">RECOVERY + LOAD RATIO</p>
+              <div className="bg-[#0e0e0e] border border-white/10 rounded-xl p-6">
+                <ResponsiveContainer width="100%" height={240}>
+                  <ComposedChart data={ratioData} margin={{ top: 5, right: 10, bottom: 0, left: -10 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
+                    <ReferenceArea y1={2.5} y2={4} fill="rgba(34,197,94,0.08)" />
+                    <ReferenceArea y1={1.0} y2={2.5} fill="rgba(234,179,8,0.04)" />
+                    <ReferenceArea y1={0} y2={1.0} fill="rgba(239,68,68,0.08)" />
+                    <XAxis dataKey="date" tick={{ fontSize: 10, fill: 'rgba(255,255,255,0.4)' }} tickFormatter={(d: string) => d.slice(5)} interval={3} />
+                    <YAxis domain={[0, 4]} tick={{ fontSize: 11, fill: 'rgba(255,255,255,0.35)' }} tickLine={false} axisLine={false} ticks={[0, 1, 2.5, 4]} label={{ value: 'RECOVERY / LOAD', angle: -90, position: 'insideLeft', style: { fontSize: 9, fill: 'rgba(255,255,255,0.3)' } }} />
+                    <ReferenceLine y={2.5} stroke="rgba(34,197,94,0.4)" strokeDasharray="4 4" />
+                    <ReferenceLine y={1.0} stroke="rgba(239,68,68,0.4)" strokeDasharray="4 4" />
+                    <Line type="monotone" dataKey="ratio" stroke="none" dot={<RatioDot />} />
+                    <Line type="monotone" dataKey="movingAvg" stroke="#f97316" strokeWidth={2.5} dot={false} connectNulls />
+                  </ComposedChart>
+                </ResponsiveContainer>
+                <p className="text-xs text-white/40 mt-3">Above green line (2.5) = strong adaptation. Between lines = normal training range. Below red line (1.0) = overreaching, back off. Orange = 7-day trend.</p>
+              </div>
+            </div>
+
+            {/* 28-Day Activity */}
+            <div className="px-8 pb-8">
+              <p className="font-mono text-xs tracking-[3px] text-white/50 mb-4">28-DAY ACTIVITY</p>
+              <div className="bg-[#0e0e0e] border border-white/10 rounded-xl p-6">
+                {/* Sport legend */}
+                <div className="flex flex-wrap gap-3 mb-4">
+                  {Object.entries(SPORT_COLORS).slice(0, 6).map(([sport, color]) => (
+                    <div key={sport} className="flex items-center gap-1.5">
+                      <div className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: color }} />
+                      <span className="font-mono text-[10px] text-white/50 capitalize">{sport.replace('-', ' ')}</span>
+                    </div>
+                  ))}
+                </div>
+                <ResponsiveContainer width="100%" height={180}>
+                  <BarChart data={DEMO_ACTIVITY} margin={{ top: 5, right: 0, bottom: 0, left: -10 }}>
+                    <XAxis dataKey="date" tick={{ fontSize: 8, fill: 'rgba(255,255,255,0.3)' }} interval={2} />
+                    <YAxis tick={{ fontSize: 10, fill: 'rgba(255,255,255,0.3)' }} tickLine={false} axisLine={false} />
+                    <Bar dataKey="strain" radius={[2, 2, 0, 0]} barSize={12}>
+                      {DEMO_ACTIVITY.map((entry, i) => (
+                        <Cell key={i} fill={entry.color} fillOpacity={entry.strain > 0 ? 0.8 : 0.1} />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+                <p className="text-xs text-white/40 mt-3">Each bar = one day. Bar height = workout strain. Color = sport type. Gray = rest day. Gaps show missed training days.</p>
+              </div>
+            </div>
+
+            {/* Sample data disclaimer */}
+            <div className="border-t border-white/5 px-8 py-4">
+              <p className="text-xs font-mono text-white/30 text-center">
+                SAMPLE DATA — NOT REAL ATHLETE METRICS • CHARTS CUSTOM PER USER
+              </p>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -411,7 +546,7 @@ export default function ShowcasePage() {
                   <span className="font-mono text-xs text-red-400/90 mt-0.5 shrink-0">GENERIC</span>
                   <p className="text-sm text-white/60 leading-relaxed">{row.generic}</p>
                 </div>
-                <div className="bg-orange-500/[0.04] border border-orange-500/15 sm:rounded-r-xl sm:rounded-l-none rounded-b-xl sm:rounded-b-none sm:rounded-br-xl px-6 py-5 flex items-start gap-4">
+                <div className="bg-orange-500/[0.08] border border-orange-500/30 sm:rounded-r-xl sm:rounded-l-none rounded-b-xl sm:rounded-b-none sm:rounded-br-xl px-6 py-5 flex items-start gap-4">
                   <span className="font-mono text-xs text-orange-500 mt-0.5 shrink-0">COACH</span>
                   <p className="text-sm text-white/75 leading-relaxed">{row.coach}</p>
                 </div>
@@ -516,7 +651,7 @@ export default function ShowcasePage() {
               '"Three of your last four red recovery days came after evening strength sessions. Morning lifts recover faster for your body."',
               '"You\'ve averaged 6.2 days between swims for 3 weeks. At race pace, that gap costs you 30-45 seconds in transition confidence."',
             ].map((insight, i) => (
-              <div key={i} className="bg-orange-500/[0.04] border border-orange-500/15 rounded-xl px-6 py-5">
+              <div key={i} className="bg-orange-500/[0.08] border border-orange-500/30 rounded-xl px-6 py-5">
                 <p className="text-sm text-white/70 italic leading-relaxed">{insight}</p>
               </div>
             ))}
