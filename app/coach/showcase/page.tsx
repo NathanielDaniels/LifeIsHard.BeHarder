@@ -220,20 +220,20 @@ export default function ShowcasePage() {
             <span className="text-orange-500">YOUR COACH.</span><br />
             EVERY MORNING.
           </h1>
-          <p className="text-white/50 text-lg max-w-2xl leading-relaxed mb-4">
+          <p className="text-white/65 text-lg max-w-2xl leading-relaxed mb-4">
             Not an app. Not a dashboard. A coaching relationship.
           </p>
-          <p className="text-white/35 text-sm max-w-2xl leading-relaxed mb-8">
+          <p className="text-white/70 text-sm max-w-2xl leading-relaxed mb-8">
             An AI that reads your biometrics overnight, remembers every conversation you&apos;ve had,
             knows your race calendar, understands your medical conditions, and delivers a
             personalized briefing waiting for you when you wake up. Then listens to your response
             and adapts tomorrow.
           </p>
           <div className="flex flex-wrap gap-3">
-            <span className="font-mono text-[10px] tracking-wider text-white/30 border border-white/10 rounded-full px-3 py-1">WHOOP INTEGRATION</span>
-            <span className="font-mono text-[10px] tracking-wider text-white/30 border border-white/10 rounded-full px-3 py-1">CONDITION-AWARE</span>
-            <span className="font-mono text-[10px] tracking-wider text-white/30 border border-white/10 rounded-full px-3 py-1">CONTINUOUS MEMORY</span>
-            <span className="font-mono text-[10px] tracking-wider text-white/30 border border-white/10 rounded-full px-3 py-1">RACE CALENDAR SYNCED</span>
+            <span className="font-mono text-[10px] tracking-wider text-white/65 border border-white/20 rounded-full px-3 py-1">WHOOP INTEGRATION</span>
+            <span className="font-mono text-[10px] tracking-wider text-white/65 border border-white/20 rounded-full px-3 py-1">CONDITION-AWARE</span>
+            <span className="font-mono text-[10px] tracking-wider text-white/65 border border-white/20 rounded-full px-3 py-1">CONTINUOUS MEMORY</span>
+            <span className="font-mono text-[10px] tracking-wider text-white/65 border border-white/20 rounded-full px-3 py-1">RACE CALENDAR SYNCED</span>
           </div>
         </div>
       </section>
@@ -244,7 +244,7 @@ export default function ShowcasePage() {
           <h2 className="font-display text-3xl tracking-widest mb-3 text-center">
             THE DAILY LOOP
           </h2>
-          <p className="text-white/35 text-sm text-center mb-16 max-w-lg mx-auto">
+          <p className="text-white/70 text-sm text-center mb-16 max-w-lg mx-auto">
             This isn&apos;t a one-way broadcast. It&apos;s a continuous coaching conversation
             that gets smarter every day.
           </p>
@@ -264,11 +264,11 @@ export default function ShowcasePage() {
 
                 {/* Content */}
                 <div className={`flex-1 pb-10 ${i === LOOP_STEPS.length - 1 ? 'pb-0' : ''}`}>
-                  <p className="font-mono text-[9px] tracking-[3px] text-orange-500/40 mb-1">{step.time}</p>
+                  <p className="font-mono text-[9px] tracking-[3px] text-orange-500/70 mb-1">{step.time}</p>
                   <h3 className="font-display text-xl tracking-wider mb-2">{step.title}</h3>
-                  <p className="text-sm text-white/45 leading-relaxed mb-3">{step.desc}</p>
+                  <p className="text-sm text-white/75 leading-relaxed mb-3">{step.desc}</p>
                   <div className="bg-white/[0.02] border border-white/5 rounded-lg px-4 py-3">
-                    <p className="text-xs text-white/30 leading-relaxed italic">{step.detail}</p>
+                    <p className="text-xs text-white/65 leading-relaxed italic">{step.detail}</p>
                   </div>
                 </div>
               </div>
@@ -283,7 +283,7 @@ export default function ShowcasePage() {
           <h2 className="font-display text-3xl tracking-widest mb-3 text-center">
             9 CHARTS. EVERY EMAIL.
           </h2>
-          <p className="text-white/35 text-sm text-center mb-12 max-w-lg mx-auto">
+          <p className="text-white/70 text-sm text-center mb-12 max-w-lg mx-auto">
             Your morning briefing includes visual analysis — not just numbers, but patterns,
             trends, and context that turn raw biometrics into actionable intelligence.
           </p>
@@ -291,8 +291,8 @@ export default function ShowcasePage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
             {/* Recovery Trend */}
             <div className="bg-[#0a0a0a] border border-white/8 rounded-lg p-6">
-              <h3 className="font-mono text-xs tracking-[3px] text-white/55 mb-1">RECOVERY TREND</h3>
-              <p className="text-[10px] text-white/25 mb-4">Zone-coded recovery scores with daily strain overlay</p>
+              <h3 className="font-mono text-xs tracking-[3px] text-white/70 mb-1">RECOVERY TREND</h3>
+              <p className="text-[10px] text-white/75 mb-4">Zone-coded recovery scores with daily strain overlay</p>
               <ResponsiveContainer width="100%" height={180}>
                 <ComposedChart data={recoveryData} margin={{ top: 5, right: 5, bottom: 0, left: -15 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
@@ -309,8 +309,8 @@ export default function ShowcasePage() {
 
             {/* Recovery-to-Load Ratio */}
             <div className="bg-[#0a0a0a] border border-white/8 rounded-lg p-6">
-              <h3 className="font-mono text-xs tracking-[3px] text-white/55 mb-1">RECOVERY-TO-LOAD RATIO</h3>
-              <p className="text-[10px] text-white/25 mb-4">Are you recovering as hard as you&apos;re training?</p>
+              <h3 className="font-mono text-xs tracking-[3px] text-white/70 mb-1">RECOVERY-TO-LOAD RATIO</h3>
+              <p className="text-[10px] text-white/75 mb-4">Are you recovering as hard as you&apos;re training?</p>
               <ResponsiveContainer width="100%" height={180}>
                 <ComposedChart data={ratioData} margin={{ top: 5, right: 5, bottom: 0, left: -15 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
@@ -329,8 +329,8 @@ export default function ShowcasePage() {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             {/* Weekly Load */}
             <div className="bg-[#0a0a0a] border border-white/8 rounded-lg p-6">
-              <h3 className="font-mono text-xs tracking-[3px] text-white/55 mb-1">TRAINING LOAD</h3>
-              <p className="text-[10px] text-white/25 mb-4">Weekly strain periodization</p>
+              <h3 className="font-mono text-xs tracking-[3px] text-white/70 mb-1">TRAINING LOAD</h3>
+              <p className="text-[10px] text-white/75 mb-4">Weekly strain periodization</p>
               <ResponsiveContainer width="100%" height={140}>
                 <BarChart data={DEMO_LOAD} margin={{ top: 0, right: 0, bottom: 0, left: -20 }}>
                   <XAxis dataKey="label" tick={{ fontSize: 8, fill: 'rgba(255,255,255,0.25)' }} tickLine={false} />
@@ -342,19 +342,19 @@ export default function ShowcasePage() {
 
             {/* HR Zones */}
             <div className="bg-[#0a0a0a] border border-white/8 rounded-lg p-6">
-              <h3 className="font-mono text-xs tracking-[3px] text-white/55 mb-1">HR ZONES</h3>
-              <p className="text-[10px] text-white/25 mb-4">Time in each training zone</p>
+              <h3 className="font-mono text-xs tracking-[3px] text-white/70 mb-1">HR ZONES</h3>
+              <p className="text-[10px] text-white/75 mb-4">Time in each training zone</p>
               <div className="space-y-2 mt-2">
                 {DEMO_ZONES.map((z, i) => {
                   const total = DEMO_ZONES.reduce((s, d) => s + d.minutes, 0);
                   const pct = Math.round((z.minutes / total) * 100);
                   return (
                     <div key={z.zone} className="flex items-center gap-2">
-                      <span className="font-mono text-[9px] text-white/35 w-5">{z.zone}</span>
+                      <span className="font-mono text-[9px] text-white/70 w-5">{z.zone}</span>
                       <div className="flex-1 h-3 bg-white/5 rounded-full overflow-hidden">
                         <div className="h-full rounded-full" style={{ width: `${pct}%`, backgroundColor: ZONE_COLORS[i], opacity: 0.7 }} />
                       </div>
-                      <span className="font-mono text-[9px] text-white/35 w-8 text-right">{pct}%</span>
+                      <span className="font-mono text-[9px] text-white/70 w-8 text-right">{pct}%</span>
                     </div>
                   );
                 })}
@@ -363,8 +363,8 @@ export default function ShowcasePage() {
 
             {/* Discipline Balance */}
             <div className="bg-[#0a0a0a] border border-white/8 rounded-lg p-6">
-              <h3 className="font-mono text-xs tracking-[3px] text-white/55 mb-1">SPORT BALANCE</h3>
-              <p className="text-[10px] text-white/25 mb-4">Time across disciplines</p>
+              <h3 className="font-mono text-xs tracking-[3px] text-white/70 mb-1">SPORT BALANCE</h3>
+              <p className="text-[10px] text-white/75 mb-4">Time across disciplines</p>
               <div className="flex items-center gap-4">
                 <ResponsiveContainer width={100} height={100}>
                   <PieChart>
@@ -379,7 +379,7 @@ export default function ShowcasePage() {
                   {DEMO_BALANCE.map(d => (
                     <div key={d.sport} className="flex items-center gap-1.5">
                       <div className="w-2 h-2 rounded-full" style={{ backgroundColor: d.color }} />
-                      <span className="font-mono text-[9px] text-white/45 capitalize">{d.sport.replace('-', ' ')}</span>
+                      <span className="font-mono text-[9px] text-white/75 capitalize">{d.sport.replace('-', ' ')}</span>
                     </div>
                   ))}
                 </div>
@@ -399,7 +399,7 @@ export default function ShowcasePage() {
           <h2 className="font-display text-3xl tracking-widest mb-3 text-center">
             YOUR APP VS. YOUR COACH
           </h2>
-          <p className="text-white/35 text-sm text-center mb-12 max-w-lg mx-auto">
+          <p className="text-white/70 text-sm text-center mb-12 max-w-lg mx-auto">
             Your biometric app gives you data. This gives you a coaching relationship that
             learns, remembers, and adapts — every single day.
           </p>
@@ -408,12 +408,12 @@ export default function ShowcasePage() {
             {GENERIC_VS.map((row, i) => (
               <div key={i} className="grid grid-cols-1 sm:grid-cols-2 gap-0 sm:gap-0">
                 <div className="bg-white/[0.02] border border-white/5 sm:rounded-l-lg sm:rounded-r-none rounded-t-lg sm:rounded-t-none sm:rounded-tl-lg px-5 py-4 flex items-start gap-3">
-                  <span className="font-mono text-[9px] text-red-400/50 mt-0.5 shrink-0">GENERIC</span>
-                  <p className="text-xs text-white/30 leading-relaxed">{row.generic}</p>
+                  <span className="font-mono text-[9px] text-red-400/80 mt-0.5 shrink-0">GENERIC</span>
+                  <p className="text-xs text-white/65 leading-relaxed">{row.generic}</p>
                 </div>
                 <div className="bg-orange-500/[0.03] border border-orange-500/10 sm:rounded-r-lg sm:rounded-l-none rounded-b-lg sm:rounded-b-none sm:rounded-br-lg px-5 py-4 flex items-start gap-3">
-                  <span className="font-mono text-[9px] text-orange-500/60 mt-0.5 shrink-0">COACH</span>
-                  <p className="text-xs text-white/50 leading-relaxed">{row.coach}</p>
+                  <span className="font-mono text-[9px] text-orange-500/80 mt-0.5 shrink-0">COACH</span>
+                  <p className="text-xs text-white/65 leading-relaxed">{row.coach}</p>
                 </div>
               </div>
             ))}
@@ -427,7 +427,7 @@ export default function ShowcasePage() {
           <h2 className="font-display text-3xl tracking-widest mb-3 text-center">
             EVERY ANGLE. EVERY WEEK.
           </h2>
-          <p className="text-white/35 text-sm text-center mb-12 max-w-lg mx-auto">
+          <p className="text-white/70 text-sm text-center mb-12 max-w-lg mx-auto">
             The coach rotates its focus daily — strategy, response, balance, intelligence, prep,
             execution, review. Nothing falls through the cracks.
           </p>
@@ -435,9 +435,9 @@ export default function ShowcasePage() {
           <div className="grid grid-cols-7 gap-2">
             {WEEKLY_FOCUS.map(d => (
               <div key={d.day} className="bg-white/[0.02] border border-white/5 rounded-lg px-3 py-4 text-center">
-                <p className="font-display text-sm text-orange-500/50 mb-2">{d.day}</p>
-                <p className="font-mono text-[9px] tracking-wider text-white/60 mb-1 leading-tight">{d.focus}</p>
-                <p className="text-[9px] text-white/25 leading-tight hidden sm:block">{d.desc}</p>
+                <p className="font-display text-sm text-orange-500/80 mb-2">{d.day}</p>
+                <p className="font-mono text-[9px] tracking-wider text-white/75 mb-1 leading-tight">{d.focus}</p>
+                <p className="text-[9px] text-white/75 leading-tight hidden sm:block">{d.desc}</p>
               </div>
             ))}
           </div>
@@ -450,7 +450,7 @@ export default function ShowcasePage() {
           <h2 className="font-display text-3xl tracking-widest mb-3 text-center">
             YOUR CONDITION. UNDERSTOOD.
           </h2>
-          <p className="text-white/35 text-sm text-center mb-12 max-w-lg mx-auto">
+          <p className="text-white/70 text-sm text-center mb-12 max-w-lg mx-auto">
             Generic apps ignore what makes your body different. This one starts there.
             Whatever affects your training — the coach knows, adapts, and never forgets.
           </p>
@@ -460,8 +460,8 @@ export default function ShowcasePage() {
               <div key={c.label} className="flex gap-3 items-start bg-white/[0.02] rounded-lg px-4 py-4">
                 <span className="text-xl shrink-0">{c.icon}</span>
                 <div>
-                  <p className="font-mono text-xs tracking-wider text-white/60 mb-1">{c.label}</p>
-                  <p className="text-[11px] text-white/30 leading-relaxed">{c.desc}</p>
+                  <p className="font-mono text-xs tracking-wider text-white/75 mb-1">{c.label}</p>
+                  <p className="text-[11px] text-white/65 leading-relaxed">{c.desc}</p>
                 </div>
               </div>
             ))}
@@ -475,7 +475,7 @@ export default function ShowcasePage() {
           <h2 className="font-display text-3xl tracking-widest mb-3 text-center">
             YOUR COACHING VOICE
           </h2>
-          <p className="text-white/35 text-sm text-center mb-12 max-w-lg mx-auto">
+          <p className="text-white/70 text-sm text-center mb-12 max-w-lg mx-auto">
             The same data, delivered in the voice that actually moves you.
           </p>
 
@@ -484,13 +484,13 @@ export default function ShowcasePage() {
               <div key={s.name} className="bg-white/[0.02] hover:bg-white/[0.04] border border-white/5 rounded-lg p-5 transition-colors">
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="font-mono text-xs tracking-wider text-white/70">{s.name}</h3>
-                  <span className="font-mono text-[9px] tracking-wider text-orange-500/40 border border-orange-500/15 rounded-full px-2 py-0.5">
+                  <span className="font-mono text-[9px] tracking-wider text-orange-500/70 border border-orange-500/15 rounded-full px-2 py-0.5">
                     {s.tag}
                   </span>
                 </div>
-                <p className="text-xs text-white/35 leading-relaxed mb-3">{s.desc}</p>
+                <p className="text-xs text-white/70 leading-relaxed mb-3">{s.desc}</p>
                 <div className="bg-black/40 border border-white/5 rounded px-3 py-2">
-                  <p className="text-[11px] text-orange-500/40 italic leading-relaxed">{s.sample}</p>
+                  <p className="text-[11px] text-orange-500/70 italic leading-relaxed">{s.sample}</p>
                 </div>
               </div>
             ))}
@@ -537,13 +537,13 @@ export default function ShowcasePage() {
           </p>
 
           <div className="bg-[#0a0a0a] border border-orange-500/15 rounded-lg p-8 text-left max-w-lg mx-auto">
-            <p className="font-mono text-[9px] tracking-[3px] text-orange-500/40 mb-4">RACE DAY BRIEFING</p>
-            <div className="space-y-3 text-sm text-white/50 leading-relaxed font-mono">
+            <p className="font-mono text-[9px] tracking-[3px] text-orange-500/70 mb-4">RACE DAY BRIEFING</p>
+            <div className="space-y-3 text-sm text-white/65 leading-relaxed font-mono">
               <p className="text-white/70">This is not a discussion. This is what we do.</p>
               <p>You trained for this. You suffered for this. This is the payoff.</p>
               <p>You do not control conditions. You control effort.</p>
               <p>You do not negotiate with pain. Pain is expected.</p>
-              <p className="text-orange-500/60">You finish what you start.</p>
+              <p className="text-orange-500/80">You finish what you start.</p>
             </div>
           </div>
         </div>
@@ -574,9 +574,9 @@ export default function ShowcasePage() {
       {/* ═══ FOOTER ═══ */}
       <footer className="border-t border-white/5 py-8 px-6">
         <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="font-mono text-xs text-white/20">
+          <p className="font-mono text-xs text-white/40">
             Built by{' '}
-            <a href="https://patrickwingert.com" className="text-white/40 hover:text-white/60 transition-colors">
+            <a href="https://patrickwingert.com" className="text-white/40 hover:text-white/75 transition-colors">
               patrickwingert.com
             </a>
           </p>
@@ -584,7 +584,7 @@ export default function ShowcasePage() {
             href="https://www.dare2tri.org"
             target="_blank"
             rel="noopener noreferrer"
-            className="font-mono text-xs text-white/20 hover:text-white/40 transition-colors"
+            className="font-mono text-xs text-white/40 hover:text-white/40 transition-colors"
           >
             Dare2Tri Foundation
           </a>
