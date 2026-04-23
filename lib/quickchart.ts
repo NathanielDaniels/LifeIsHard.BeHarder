@@ -351,11 +351,20 @@ export function recoveryLoadRatioChart(snapshots: DailySnapshot[], days = 21): s
   });
 
   // Color points by zone: green = strong adaptation, yellow = normal, red = overreaching
-  const pointColors = ratios.map((v) => {
+  const zoneColor = (v: number | null) => {
     if (v === null) return LABEL_COLOR;
     if (v >= 2.5) return GREEN;
     if (v >= 1.0) return YELLOW;
     return RED;
+  };
+  const pointColors = ratios.map(zoneColor);
+
+  // Segment colors — each line segment colored by the average zone of its two endpoints
+  const segmentColors = ratios.slice(0, -1).map((v, i) => {
+    const next = ratios[i + 1];
+    if (v === null || next === null) return LABEL_COLOR;
+    const avg = (v + next) / 2;
+    return zoneColor(avg);
   });
 
   const config = {
@@ -366,13 +375,14 @@ export function recoveryLoadRatioChart(snapshots: DailySnapshot[], days = 21): s
         {
           label: 'Daily Ratio',
           data: ratios,
-          borderColor: pointColors,
-          borderWidth: 1.5,
+          borderColor: segmentColors,
+          backgroundColor: 'rgba(255,255,255,0.4)',
+          borderWidth: 2,
           pointBackgroundColor: pointColors,
           pointBorderColor: pointColors,
-          pointRadius: 3,
+          pointRadius: 4,
           fill: false,
-          tension: 0.2,
+          tension: 0,
           spanGaps: true,
         },
         {
@@ -394,9 +404,9 @@ export function recoveryLoadRatioChart(snapshots: DailySnapshot[], days = 21): s
         labels: {
           fontColor: LABEL_COLOR,
           fontSize: 10,
-          boxWidth: 12,
+          boxWidth: 20,
           padding: 16,
-          usePointStyle: true,
+          usePointStyle: false,
           generateLabels: () => [
             {
               text: 'Adapted (>2.5)',
