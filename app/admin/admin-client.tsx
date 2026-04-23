@@ -223,10 +223,11 @@ export default function AdminClient() {
 
     setActionLoading(serviceId);
     try {
-      // For WHOOP, use the existing disconnect endpoint
       // Cookie session handles auth automatically
       if (serviceId === "whoop") {
         await fetch("/api/whoop/disconnect", { method: "POST" });
+      } else if (serviceId === "strava") {
+        await fetch("/api/strava/disconnect", { method: "POST" });
       }
       await fetchStatus();
     } catch {
