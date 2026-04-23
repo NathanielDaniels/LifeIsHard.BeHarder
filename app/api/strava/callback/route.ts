@@ -61,12 +61,15 @@ export async function GET(request: NextRequest) {
   try {
     // Exchange code for tokens
     const tokens = await exchangeCodeForTokens(code);
+    console.log('[strava-callback] Token exchange OK, expires_at:', tokens.expires_at, 'type:', typeof tokens.expires_at);
 
     // Get athlete profile
     const athlete = await getAthlete(tokens.access_token);
+    console.log('[strava-callback] Athlete:', athlete.id, athlete.firstname);
 
     // Store tokens in Supabase
     await storeTokens(tokens, athlete.id);
+    console.log('[strava-callback] Tokens stored successfully');
 
     // Record connection status (fire-and-forget)
     markConnected('strava', tokens.expires_at).catch(() => {});

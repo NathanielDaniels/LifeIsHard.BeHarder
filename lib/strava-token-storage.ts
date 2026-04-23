@@ -68,7 +68,7 @@ export async function storeTokens(
     .upsert(row, { onConflict: 'id' });
 
   if (error) {
-    console.error('[strava-token-storage] storeTokens error:', error);
+    console.error('[strava-token-storage] storeTokens error:', JSON.stringify({ message: error.message, code: error.code, details: error.details, hint: error.hint }));
     throw new Error(`Token storage failed: ${error.message}`);
   }
 }
