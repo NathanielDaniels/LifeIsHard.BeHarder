@@ -93,9 +93,10 @@ export async function GET(request: NextRequest) {
       ),
     );
   } catch (err) {
-    console.error('Strava token exchange error:', err);
+    const errMsg = err instanceof Error ? err.message : String(err);
+    console.error('Strava token exchange error:', errMsg);
     return NextResponse.redirect(
-      new URL('/admin?error=strava_token_exchange_failed', request.url),
+      new URL(`/admin?error=strava_token_exchange_failed&detail=${encodeURIComponent(errMsg)}`, request.url),
     );
   }
 }
