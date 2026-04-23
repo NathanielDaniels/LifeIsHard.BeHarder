@@ -37,13 +37,16 @@ export async function GET(request: NextRequest) {
     .single();
 
   if (stateError || !stateRow || stateRow.state !== state) {
-    console.error('Strava OAuth state mismatch:', {
-      stateError,
+    const debugInfo = {
+      stateError: stateError ? { message: stateError.message, code: stateError.code, hint: stateError.hint } : null,
       hasRow: !!stateRow,
+      dbState: stateRow?.state?.slice(0, 8) ?? 'none',
+      urlState: state?.slice(0, 8) ?? 'none',
       matches: stateRow?.state === state,
-    });
+    };
+    console.error('Strava OAuth state mismatch:', JSON.stringify(debugInfo));
     return NextResponse.redirect(
-      new URL('/admin?error=strava_invalid_state', request.url),
+      new URL(`/admin?error=strava_invalid_state&detail=${encodeURIComponent(JSON.stringify(debugInfo))}`, request.url),
     );
   }
 
@@ -74,17 +77,16 @@ export async function GET(request: NextRequest) {
     // Record connection status (fire-and-forget)
     markConnected('strava', tokens.expires_at).catch(() => {});
 
-    // Backfill recent activities in the background (fire-and-forget)
-    backfillActivities(tokens.access_token)
-      .then((result) => {
-        console.log(`[strava-callback] Backfilled ${result.saved} activities`);
-        if (result.errors.length > 0) {
-          console.warn('[strava-callback] Backfill errors:', result.errors);
-        }
-      })
-      .catch((err) => {
-        console.error('[strava-callback] Backfill failed:', err);
-      });
+    // Backfill recent activities (must await — Vercel kills fire-and-forget promises)
+    try {
+      const backfill = await backfillActivities(tokens.access_token);
+      console.log(`[strava-callback] Backfilled ${backfill.saved} activities`);
+      if (backfill.errors.length > 0) {
+        console.warn('[strava-callback] Backfill errors:', backfill.errors);
+      }
+    } catch (err) {
+      console.error('[strava-callback] Backfill failed (non-fatal):', err);
+    }
 
     return NextResponse.redirect(
       new URL(
