@@ -366,7 +366,7 @@ export function recoveryLoadRatioChart(snapshots: DailySnapshot[], days = 21): s
         {
           label: 'Daily Ratio',
           data: ratios,
-          borderColor: 'rgba(249,115,22,0.4)',
+          borderColor: pointColors,
           borderWidth: 1.5,
           pointBackgroundColor: pointColors,
           pointBorderColor: pointColors,
@@ -397,6 +397,37 @@ export function recoveryLoadRatioChart(snapshots: DailySnapshot[], days = 21): s
           boxWidth: 12,
           padding: 16,
           usePointStyle: true,
+          generateLabels: () => [
+            {
+              text: 'Adapted (>2.5)',
+              fillStyle: GREEN,
+              strokeStyle: GREEN,
+              pointStyle: 'circle',
+              hidden: false,
+            },
+            {
+              text: 'Normal (1–2.5)',
+              fillStyle: YELLOW,
+              strokeStyle: YELLOW,
+              pointStyle: 'circle',
+              hidden: false,
+            },
+            {
+              text: 'Strained (<1)',
+              fillStyle: RED,
+              strokeStyle: RED,
+              pointStyle: 'circle',
+              hidden: false,
+            },
+            {
+              text: '7-Day Trend',
+              fillStyle: ORANGE,
+              strokeStyle: ORANGE,
+              pointStyle: 'line',
+              hidden: false,
+              datasetIndex: 1,
+            },
+          ],
         },
       },
       scales: {
