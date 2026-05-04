@@ -208,6 +208,13 @@ export default function WelcomeEmail({ email }: WelcomeEmailProps) {
               >
                 INSTAGRAM
               </Link>
+              <span style={socialDot}> • </span>
+              <Link
+                href="https://www.youtube.com/@PatWingIt"
+                style={socialLink}
+              >
+                YOUTUBE
+              </Link>
               {/* <span style={socialDot}> • </span>
               <Link
                 href="https://strava.app.link/gVriWQZiL0b"

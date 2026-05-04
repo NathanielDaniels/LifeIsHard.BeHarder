@@ -192,6 +192,13 @@ export default function SiteLaunchEmail({ email }: SiteLaunchEmailProps) {
               </Link>
               <span style={socialDot}> · </span>
               <Link
+                href="https://www.youtube.com/@PatWingIt"
+                style={socialLink}
+              >
+                YOUTUBE
+              </Link>
+              <span style={socialDot}> · </span>
+              <Link
                 href="https://give.dare2tri.org/fundraiser/6928347"
                 style={socialLink}
               >
