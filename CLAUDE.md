@@ -334,9 +334,14 @@ Smooth animation eases between milestones. If API hangs, forced completion at 8 
 
 1. **Hero** - "LIFE IS HARD. BE HARDER." with heartbeat line, parallax, glitch text, live HR display
 2. **The Story / Stats** - "THEY SAID IT WAS IMPOSSIBLE. THEY WERE WRONG." + three animated counters (Days Since Accident, Days Sober, Days Until Next Race)
-3. **Live Biometrics** - Full WHOOP data dashboard (recovery, strain, HR, HRV, SpO2, temp, calories, last workout)
-4. **Email Capture** - "DON'T MISS THE MOMENT." + email subscription form with glow effects
-5. **Footer** - Minimal branding
+3. **Email Capture** - "DON'T MISS THE MOMENT." + email subscription form with glow effects
+4. **Become a Sponsor CTA** - Card linking to /sponsors page with "BECOME A SPONSOR." headline and "GET INVOLVED" arrow link
+5. **Live Biometrics** - Full WHOOP data dashboard (recovery, strain, HR, HRV, SpO2, temp, calories, last workout)
+6. **Running Photo** - Parallax grayscale-to-color reveal of Patrick running
+7. **Race Map Globe** - Interactive 3D globe + 2D map with race markers
+8. **Race Schedule** - Full race calendar with countdowns
+9. **Sponsors** - Logo bar of current sponsors
+10. **Footer** - Minimal branding
 
 ---
 
@@ -365,7 +370,7 @@ The full site (`page.full-site.tsx`) uses scroll-driven storytelling with an ora
 ### Additional Pages
 
 - **/schedule** - Full race calendar (SchedulePage component)
-- **/sponsors** - Sponsors page
+- **/sponsors** - Sponsors page (CTA-first layout: "Sponsor The Mission" header → contact form → sponsor grid → Dare2Tri donation)
 - **/team** - Team page
 
 ---
