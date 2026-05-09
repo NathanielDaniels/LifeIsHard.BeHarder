@@ -50,6 +50,68 @@ export interface StravaActivity {
     id: string;
     summary_polyline: string;
   };
+  average_temp?: number;      // celsius
+  trainer?: boolean;          // indoor trainer
+  pr_count?: number;          // personal records hit
+  perceived_exertion?: number; // RPE 1-10
+  workout_type?: number;      // Strava workout sub-classification
+  gear_id?: string;           // equipment identifier
+  description?: string;       // athlete's activity notes
+  // Detail endpoint fields (only present on detail calls)
+  splits_metric?: any[];
+  laps?: any[];
+  best_efforts?: any[];
+  device_name?: string;
+}
+
+// ============================================
+// Enrichment Types (stored in extras JSONB)
+// ============================================
+
+export interface StravaSplit {
+  distance_m: number;
+  elapsed_time_s: number;
+  moving_time_s: number;
+  avg_hr: number | null;
+  pace_sec_per_km: number | null;
+  elevation_diff: number | null;
+}
+
+export interface StravaBestEffort {
+  name: string;           // "1 mile", "5k", etc.
+  elapsed_time_s: number;
+  distance_m: number;
+  pr_rank: number | null; // 1 = PR, 2 = 2nd best, etc.
+}
+
+export interface StravaHRZone {
+  min: number;
+  max: number;
+  time_s: number;
+}
+
+export interface StravaLap {
+  name: string;
+  distance_m: number;
+  elapsed_time_s: number;
+  avg_hr: number | null;
+  max_hr: number | null;
+  avg_watts: number | null;
+  avg_cadence: number | null;
+}
+
+export interface StravaExtras {
+  enriched: boolean;
+  enriched_at: string;
+  splits?: StravaSplit[];
+  best_efforts?: StravaBestEffort[];
+  hr_zones?: StravaHRZone[];
+  laps?: StravaLap[];
+  power_zones?: StravaHRZone[];
+  device_name?: string;
+  calories_burned?: number;
+  normalized_power?: number;
+  avg_cadence?: number;
 }
 
 export interface StravaStream {
@@ -87,6 +149,15 @@ export interface StravaActivityRecord {
   has_heartrate: boolean;
   device_watts: boolean;
   summary_polyline: string | null;
+  average_temp: number | null;
+  start_time_local: string | null;   // HH:MM:SS
+  trainer: boolean;
+  pr_count: number;
+  description: string | null;
+  gear_id: string | null;
+  perceived_exertion: number | null;
+  workout_type: number | null;
+  extras: StravaExtras | null;
 }
 
 export interface StravaSyncLog {
