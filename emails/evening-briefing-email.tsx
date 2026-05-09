@@ -158,15 +158,24 @@ function DisciplineCostCard({ data }: { data: DisciplineRecoveryCost }) {
   return (
     <Section style={intelCard}>
       <Text style={intelTag}>📊 DISCIPLINE RECOVERY COST</Text>
+      <Text style={{ ...intelMeta, marginBottom: '10px' }}>
+        Recovery points lost per unit of strain (next-day impact)
+      </Text>
       <Row style={{ width: '100%' }}>
-        {data.disciplines.map((d, i) => (
-          <Column key={i} style={disciplineCell}>
-            <Text style={disciplineEmoji}>{d.emoji}</Text>
-            <Text style={disciplineSport}>{d.sport}</Text>
-            <Text style={disciplineCost}>{d.costPerStrain}</Text>
-            <Text style={disciplineLabel}>{d.label}</Text>
-          </Column>
-        ))}
+        {data.disciplines.map((d, i) => {
+          const costColor = d.costPerStrain <= 0 ? GREEN : d.costPerStrain <= 2 ? MUTED : d.costPerStrain <= 4 ? YELLOW : RED;
+          return (
+            <Column key={i} style={disciplineCell}>
+              <Text style={disciplineEmoji}>{d.emoji}</Text>
+              <Text style={disciplineSport}>{d.sport}</Text>
+              <Text style={{ ...disciplineCost, color: costColor }}>
+                {d.costPerStrain > 0 ? '+' : ''}{d.costPerStrain}
+              </Text>
+              <Text style={disciplineUnit}>pts/strain</Text>
+              <Text style={disciplineLabel}>{d.label}</Text>
+            </Column>
+          );
+        })}
       </Row>
       {data.insight && (
         <Text style={{ ...intelMeta, marginTop: '10px' }}>{data.insight}</Text>
@@ -559,6 +568,13 @@ const disciplineCost: React.CSSProperties = {
   color: ORANGE,
   margin: '0',
   lineHeight: '1',
+};
+
+const disciplineUnit: React.CSSProperties = {
+  fontFamily: '"SF Mono", monospace',
+  fontSize: '8px',
+  color: 'rgba(255,255,255,0.35)',
+  margin: '2px 0 0',
 };
 
 const disciplineLabel: React.CSSProperties = {
