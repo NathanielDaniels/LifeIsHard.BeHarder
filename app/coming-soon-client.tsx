@@ -818,6 +818,41 @@ export default function ComingSoonClient() {
         </motion.div>
       </section>
 
+      {/* === BECOME A SPONSOR CTA === */}
+      <section className="relative pb-20 md:pb-32 px-6">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+          className="max-w-3xl mx-auto"
+        >
+          <a
+            href="/sponsors"
+            className="group block p-12 md:p-16 rounded-2xl border border-white/10 hover:border-orange-500/30 bg-white/[0.02] hover:bg-orange-500/[0.03] transition-all duration-500 text-center"
+          >
+            <span className="font-mono text-xs tracking-[0.3em] text-white/50 uppercase block mb-4">
+              Partner with Patrick
+            </span>
+            <span className="font-display text-4xl md:text-5xl lg:text-6xl tracking-wide text-white block mb-5 leading-none">
+              BECOME A <span style={{ color: themeColor }}>SPONSOR.</span>
+            </span>
+            <span className="text-white/50 text-base md:text-lg leading-relaxed block mb-8 max-w-lg mx-auto">
+              Put your brand behind an athlete who doesn't quit. Equipment, travel, race sponsorship, gear.
+            </span>
+            <span
+              className="inline-flex items-center gap-2 font-display text-lg tracking-wider transition-all duration-300 group-hover:gap-3"
+              style={{ color: themeColor }}
+            >
+              GET INVOLVED
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="transition-transform duration-300 group-hover:translate-x-1">
+                <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </span>
+          </a>
+        </motion.div>
+      </section>
+
       {/* === LIVE BIOMETRICS === */}
       <section className="relative py-32 md:py-48 px-6">
         <motion.div

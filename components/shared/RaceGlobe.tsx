@@ -81,11 +81,12 @@ export default function RaceGlobe({ themeColor }: RaceGlobeProps) {
 
       <button
         onClick={() => setShowMap(true)}
-        className="mt-4 font-mono text-[10px] md:text-xs tracking-[0.2em] px-5 py-2 rounded-full border transition-all duration-300 hover:scale-105"
+        className="mt-6 font-display text-sm md:text-base tracking-[0.2em] px-8 py-3 rounded-full border transition-all duration-300 hover:scale-105"
         style={{
-          borderColor: `${themeColor}44`,
-          color: `${themeColor}aa`,
-          backgroundColor: 'transparent',
+          borderColor: `${themeColor}66`,
+          color: themeColor,
+          backgroundColor: `${themeColor}10`,
+          boxShadow: `0 0 20px ${themeColor}22`,
         }}
       >
         EXPLORE RACE MAP →
