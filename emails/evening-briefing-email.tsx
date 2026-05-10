@@ -19,10 +19,10 @@ import type {
   RecoveryCostForecast,
   TemperatureImpact,
   DisciplineRecoveryCost,
-} from '../types/intelligence';
+} from '@/types/intelligence';
 
 // ============================================
-// Colors (shared with daily-briefing-email)
+// Colors (shared with morning email)
 // ============================================
 
 const ORANGE = '#f97316';
@@ -44,43 +44,26 @@ function zoneColor(zone: string): string {
   }
 }
 
-function sportEmoji(sport: string): string {
-  switch (sport.toLowerCase()) {
-    case 'run':
-    case 'running': return '🏃';
-    case 'ride':
-    case 'bike':
-    case 'cycling': return '🚴';
-    case 'swim':
-    case 'swimming': return '🏊';
-    case 'triathlon': return '🏅';
-    default: return '🏋️';
-  }
-}
-
 // ============================================
 // Intelligence Card Components
 // ============================================
 
 function PerformanceCard({ data }: { data: PerformanceContext }) {
   return (
-    <Section style={intelCard}>
-      <Text style={intelTag}>⚡ RECOVERY-ADJUSTED PERFORMANCE</Text>
+    <Section style={intelligenceCard}>
+      <Text style={cardTag}>&#x26A1; RECOVERY-ADJUSTED PERFORMANCE</Text>
       <Row style={{ width: '100%' }}>
         <Column style={{ width: '25%', textAlign: 'center' as const, verticalAlign: 'middle' as const }}>
-          <Text style={{ ...intelGrade, color: data.gradeColor }}>{data.grade}</Text>
+          <Text style={{ ...gradeText, color: data.gradeColor }}>{data.grade}</Text>
         </Column>
-        <Column style={{ width: '75%', verticalAlign: 'middle' as const, paddingLeft: '12px' }}>
-          <Text style={intelHeadline}>
-            {data.todayPace} on{' '}
-            <span style={{ color: zoneColor(data.todayRecoveryColor) }}>
-              {data.todayRecoveryColor} ({data.todayRecovery}%)
-            </span>
+        <Column style={{ width: '75%', verticalAlign: 'middle' as const, paddingLeft: '16px' }}>
+          <Text style={cardHeadline}>
+            {data.todayPace} on {data.todayRecoveryColor} ({data.todayRecovery}%)
           </Text>
-          <Text style={intelBody}>{data.comparisonText}</Text>
+          <Text style={cardInsight}>{data.comparisonText}</Text>
         </Column>
       </Row>
-      <Text style={intelMeta}>
+      <Text style={cardMeta}>
         EPR: {data.effortPerRecovery} (vs {data.comparisonEPR} comparison)
       </Text>
     </Section>
@@ -89,18 +72,18 @@ function PerformanceCard({ data }: { data: PerformanceContext }) {
 
 function PatternCard({ data }: { data: PatternDetection }) {
   return (
-    <Section style={intelCard}>
-      <Text style={intelTag}>🔍 PATTERN DETECTED</Text>
-      <Text style={intelBody}>{data.pattern}</Text>
+    <Section style={intelligenceCard}>
+      <Text style={cardTag}>&#x1F50D; PATTERN DETECTED</Text>
+      <Text style={cardHeadline}>{data.pattern}</Text>
       <Row style={{ width: '100%', marginTop: '8px' }}>
         <Column style={{ width: '50%' }}>
-          <Text style={intelMeta}>
-            Today: {data.todayMatch ? '✅ conditions met' : '❌ not matched'}
+          <Text style={cardInsight}>
+            Today: {data.todayMatch ? '✅ conditions match' : '❌ conditions don\'t match'}
           </Text>
         </Column>
         <Column style={{ width: '50%', textAlign: 'right' as const }}>
-          <Text style={intelMeta}>
-            {data.confidence}% confidence · {data.sampleCount} samples
+          <Text style={cardMeta}>
+            {data.confidence}% confidence ({data.sampleCount} sessions)
           </Text>
         </Column>
       </Row>
@@ -109,19 +92,21 @@ function PatternCard({ data }: { data: PatternDetection }) {
 }
 
 function ForecastCard({ data }: { data: RecoveryCostForecast }) {
-  const forecastColor = zoneColor(data.expectedZone);
+  const color = zoneColor(data.expectedZone);
   return (
-    <Section style={intelCard}>
-      <Text style={intelTag}>🔮 TOMORROW&apos;S RECOVERY FORECAST</Text>
+    <Section style={intelligenceCard}>
+      <Text style={cardTag}>&#x1F52E; TOMORROW&apos;S RECOVERY FORECAST</Text>
       <Row style={{ width: '100%' }}>
         <Column style={{ width: '30%', textAlign: 'center' as const, verticalAlign: 'middle' as const }}>
-          <Text style={{ ...intelZoneBadge, backgroundColor: `${forecastColor}22`, color: forecastColor }}>
+          <Text style={{ ...forecastZone, color, backgroundColor: `${color}22` }}>
+            {data.expectedRange}
+          </Text>
+        </Column>
+        <Column style={{ width: '70%', verticalAlign: 'middle' as const, paddingLeft: '16px' }}>
+          <Text style={{ ...cardHeadline, color }}>
             {data.expectedZone.toUpperCase()}
           </Text>
-          <Text style={{ ...intelGradeSmall, color: forecastColor }}>{data.expectedRange}</Text>
-        </Column>
-        <Column style={{ width: '70%', verticalAlign: 'middle' as const, paddingLeft: '12px' }}>
-          <Text style={intelBody}>{data.explanation}</Text>
+          <Text style={cardInsight}>{data.explanation}</Text>
         </Column>
       </Row>
     </Section>
@@ -132,53 +117,37 @@ function TemperatureCard({ data }: { data: TemperatureImpact }) {
   const sign = data.paceDeltaSecPerKm > 0 ? '+' : '';
   const direction = data.paceDeltaSecPerKm > 0 ? 'slower' : 'faster';
   return (
-    <Section style={intelCard}>
-      <Text style={intelTag}>🌡️ TEMPERATURE IMPACT</Text>
-      <Row style={{ width: '100%' }}>
-        <Column style={{ width: '30%', textAlign: 'center' as const, verticalAlign: 'middle' as const }}>
-          <Text style={intelGradeSmall}>
-            {sign}{data.paceDeltaSecPerKm}s/km
-          </Text>
-          <Text style={intelMeta}>{direction}</Text>
-        </Column>
-        <Column style={{ width: '70%', verticalAlign: 'middle' as const, paddingLeft: '12px' }}>
-          <Text style={intelBody}>{data.explanation}</Text>
-          {data.raceImplication && (
-            <Text style={{ ...intelMeta, color: ORANGE, marginTop: '6px' }}>
-              {data.raceImplication}
-            </Text>
-          )}
-        </Column>
-      </Row>
+    <Section style={intelligenceCard}>
+      <Text style={cardTag}>&#x1F321;&#xFE0F; TEMPERATURE IMPACT</Text>
+      <Text style={cardHeadline}>
+        {sign}{data.paceDeltaSecPerKm} sec/km {direction}
+      </Text>
+      <Text style={cardInsight}>{data.explanation}</Text>
+      {data.raceImplication && (
+        <Text style={{ ...cardMeta, color: ORANGE, marginTop: '8px' }}>
+          {data.raceImplication}
+        </Text>
+      )}
     </Section>
   );
 }
 
 function DisciplineCostCard({ data }: { data: DisciplineRecoveryCost }) {
   return (
-    <Section style={intelCard}>
-      <Text style={intelTag}>📊 DISCIPLINE RECOVERY COST</Text>
-      <Text style={{ ...intelMeta, marginBottom: '10px' }}>
-        Recovery points lost per unit of strain (next-day impact)
-      </Text>
-      <Row style={{ width: '100%' }}>
-        {data.disciplines.map((d, i) => {
-          const costColor = d.costPerStrain <= 0 ? GREEN : d.costPerStrain <= 2 ? MUTED : d.costPerStrain <= 4 ? YELLOW : RED;
-          return (
-            <Column key={i} style={disciplineCell}>
-              <Text style={disciplineEmoji}>{d.emoji}</Text>
-              <Text style={disciplineSport}>{d.sport}</Text>
-              <Text style={{ ...disciplineCost, color: costColor }}>
-                {d.costPerStrain > 0 ? '+' : ''}{d.costPerStrain}
-              </Text>
-              <Text style={disciplineUnit}>pts/strain</Text>
-              <Text style={disciplineLabel}>{d.label}</Text>
-            </Column>
-          );
-        })}
+    <Section style={intelligenceCard}>
+      <Text style={cardTag}>&#x1F4CA; DISCIPLINE RECOVERY COST</Text>
+      <Row style={{ width: '100%', marginTop: '8px' }}>
+        {data.disciplines.map((d, i) => (
+          <Column key={i} style={disciplineCell}>
+            <Text style={disciplineEmoji}>{d.emoji}</Text>
+            <Text style={disciplineSport}>{d.sport}</Text>
+            <Text style={disciplineCost}>{d.costPerStrain}</Text>
+            <Text style={disciplineLabel}>{d.label}</Text>
+          </Column>
+        ))}
       </Row>
       {data.insight && (
-        <Text style={{ ...intelMeta, marginTop: '10px' }}>{data.insight}</Text>
+        <Text style={{ ...cardInsight, marginTop: '12px' }}>{data.insight}</Text>
       )}
     </Section>
   );
@@ -192,9 +161,9 @@ export default function EveningBriefingEmail({
   date = '2026-05-09',
   workoutName = 'Evening Run',
   workoutSport = 'Run',
-  workoutDistance = '5.2 km',
-  workoutDuration = '32:15',
-  workoutStrain = 12.4,
+  workoutDistance = '5.0 km',
+  workoutDuration = '30:00',
+  workoutStrain = null,
   intelligence = {},
   coachAnalysis = '',
   q1Label = '',
@@ -203,6 +172,10 @@ export default function EveningBriefingEmail({
   q2Buttons = [],
   checkinUrl = '',
 }: EveningBriefingProps) {
+  const sportEmoji: Record<string, string> = {
+    Run: '🏃', Ride: '🚴', Swim: '🏊', Bike: '🚴', Walk: '🚶',
+  };
+  const emoji = sportEmoji[workoutSport] || '💪';
   const hasIntelligence = Object.keys(intelligence).length > 0;
 
   return (
@@ -223,7 +196,7 @@ export default function EveningBriefingEmail({
       </Head>
 
       <Preview>
-        {`Evening Debrief — ${workoutName} · ${workoutDistance} · ${workoutDuration}`}
+        {`Evening Debrief — ${workoutSport} ${workoutDistance} | ${date}`}
       </Preview>
 
       <Body style={body}>
@@ -234,7 +207,7 @@ export default function EveningBriefingEmail({
           {/* ══════ HEADER ══════ */}
           <Section style={headerZone}>
             <Text style={systemTag}>{'>'} EVENING DEBRIEF // {date}</Text>
-            <Text style={systemTag}>{'>'} COACH AI — POST-WORKOUT ANALYSIS</Text>
+            <Text style={systemTag}>{'>'} POST-WORKOUT INTELLIGENCE</Text>
 
             <Text style={ecgLine}>───────╱╲___╱╲───────</Text>
 
@@ -242,16 +215,14 @@ export default function EveningBriefingEmail({
             <Text style={headerDate}>{date}</Text>
           </Section>
 
-          {/* ══════ WORKOUT RECAP ══════ */}
+          {/* ══════ WORKOUT RECAP HERO ══════ */}
           <Section style={sectionPadding}>
             <Section style={workoutHero}>
-              <Text style={workoutSportBadge}>
-                {sportEmoji(workoutSport)} {workoutSport.toUpperCase()}
-              </Text>
-              <Text style={workoutNameText}>{workoutName}</Text>
+              <Text style={workoutEmojiText}>{emoji}</Text>
+              <Text style={workoutNameText}>{workoutName.toUpperCase()}</Text>
               <Text style={workoutStats}>
-                {workoutDistance}  ·  {workoutDuration}
-                {workoutStrain != null && `  ·  Strain ${workoutStrain}`}
+                {workoutDistance}{'  '}&#x2022;{'  '}{workoutDuration}
+                {workoutStrain != null && (<>{'  '}&#x2022;{'  '}Strain {workoutStrain}</>)}
               </Text>
             </Section>
           </Section>
@@ -264,28 +235,32 @@ export default function EveningBriefingEmail({
               {intelligence.performanceContext && (
                 <PerformanceCard data={intelligence.performanceContext} />
               )}
+
               {intelligence.patternDetection && (
                 <PatternCard data={intelligence.patternDetection} />
               )}
+
               {intelligence.recoveryCostForecast && (
                 <ForecastCard data={intelligence.recoveryCostForecast} />
               )}
+
               {intelligence.temperatureImpact && (
                 <TemperatureCard data={intelligence.temperatureImpact} />
               )}
+
               {intelligence.disciplineRecoveryCost && (
                 <DisciplineCostCard data={intelligence.disciplineRecoveryCost} />
               )}
             </Section>
           )}
 
-          {/* ══════ COACH ANALYSIS ══════ */}
+          {/* ══════ COACH'S EVENING ANALYSIS ══════ */}
           {coachAnalysis && (
             <Section style={sectionPadding}>
-              <Text style={sectionHeader}>COACH&apos;S EVENING ANALYSIS</Text>
-              <Section style={coachNoteCard}>
+              <Text style={sectionHeader}>COACH&apos;S ANALYSIS</Text>
+              <Section style={coachCard}>
                 {coachAnalysis.split('\n\n').map((para, i) => (
-                  <Text key={i} style={{ ...coachNoteText, marginBottom: '14px' }}>
+                  <Text key={i} style={{ ...coachText, marginBottom: '14px' }}>
                     {para.split('\n').map((line, j, arr) => (
                       <React.Fragment key={j}>
                         {line}
@@ -301,7 +276,7 @@ export default function EveningBriefingEmail({
           {/* ══════ CHECK IN ══════ */}
           {(q1Buttons.length > 0 || q2Buttons.length > 0) && (
             <Section style={sectionPadding}>
-              <Text style={sectionHeader}>EVENING CHECK-IN</Text>
+              <Text style={sectionHeader}>EVENING CHECK IN</Text>
               <Section style={responseCard}>
                 {q1Buttons.length > 0 && (
                   <>
@@ -434,21 +409,19 @@ const workoutHero: React.CSSProperties = {
   textAlign: 'center' as const,
 };
 
-const workoutSportBadge: React.CSSProperties = {
-  fontFamily: '"SF Mono", monospace',
-  fontSize: '11px',
-  letterSpacing: '3px',
-  color: ORANGE,
+const workoutEmojiText: React.CSSProperties = {
+  fontSize: '32px',
   margin: '0 0 8px',
+  lineHeight: '1',
 };
 
 const workoutNameText: React.CSSProperties = {
   fontFamily: '"Bebas Neue", Arial, sans-serif',
-  fontSize: '28px',
-  letterSpacing: '2px',
+  fontSize: '24px',
+  letterSpacing: '3px',
   color: WHITE,
   margin: '0 0 8px',
-  lineHeight: '1.1',
+  lineHeight: '1.2',
 };
 
 const workoutStats: React.CSSProperties = {
@@ -457,6 +430,7 @@ const workoutStats: React.CSSProperties = {
   letterSpacing: '1px',
   color: MUTED,
   margin: '0',
+  lineHeight: '1.4',
 };
 
 // --- Section ---
@@ -473,79 +447,70 @@ const sectionHeader: React.CSSProperties = {
 };
 
 // --- Intelligence Cards ---
-const intelCard: React.CSSProperties = {
+const intelligenceCard: React.CSSProperties = {
   backgroundColor: 'rgba(249,115,22,0.04)',
-  border: '1px solid rgba(249,115,22,0.15)',
   borderLeft: `3px solid ${ORANGE}`,
   borderRadius: '0 8px 8px 0',
-  padding: '16px 20px',
+  padding: '20px',
   marginBottom: '12px',
 };
 
-const intelTag: React.CSSProperties = {
+const cardTag: React.CSSProperties = {
   fontFamily: '"SF Mono", monospace',
   fontSize: '9px',
   letterSpacing: '3px',
   color: MUTED,
-  margin: '0 0 10px',
+  margin: '0 0 12px',
 };
 
-const intelGrade: React.CSSProperties = {
+const gradeText: React.CSSProperties = {
   fontFamily: '"Bebas Neue", Arial, sans-serif',
   fontSize: '48px',
   lineHeight: '1',
   margin: '0',
 };
 
-const intelGradeSmall: React.CSSProperties = {
-  fontFamily: '"Bebas Neue", Arial, sans-serif',
-  fontSize: '24px',
-  lineHeight: '1',
-  color: WHITE,
-  margin: '0',
-};
-
-const intelZoneBadge: React.CSSProperties = {
-  display: 'inline-block',
-  fontFamily: '"SF Mono", monospace',
-  fontSize: '10px',
-  letterSpacing: '2px',
-  padding: '4px 12px',
-  borderRadius: '4px',
-  margin: '0 0 6px',
-};
-
-const intelHeadline: React.CSSProperties = {
+const cardHeadline: React.CSSProperties = {
   fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
   fontSize: '15px',
   lineHeight: '1.5',
-  color: 'rgba(255,255,255,0.8)',
+  color: 'rgba(255,255,255,0.85)',
   margin: '0 0 4px',
-  textTransform: 'none' as const,
 };
 
-const intelBody: React.CSSProperties = {
+const cardInsight: React.CSSProperties = {
   fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
   fontSize: '14px',
-  lineHeight: '1.6',
-  color: 'rgba(255,255,255,0.65)',
+  lineHeight: '1.5',
+  color: 'rgba(255,255,255,0.6)',
   margin: '0',
-  textTransform: 'none' as const,
 };
 
-const intelMeta: React.CSSProperties = {
+const cardMeta: React.CSSProperties = {
   fontFamily: '"SF Mono", monospace',
   fontSize: '11px',
-  color: 'rgba(255,255,255,0.45)',
-  margin: '0',
+  color: 'rgba(255,255,255,0.4)',
+  margin: '8px 0 0',
 };
 
-// --- Discipline Cost Card ---
+// --- Forecast Zone ---
+const forecastZone: React.CSSProperties = {
+  fontFamily: '"Bebas Neue", Arial, sans-serif',
+  fontSize: '18px',
+  letterSpacing: '1px',
+  padding: '8px 12px',
+  borderRadius: '6px',
+  margin: '0',
+  textAlign: 'center' as const,
+  lineHeight: '1.2',
+};
+
+// --- Discipline Cost ---
 const disciplineCell: React.CSSProperties = {
   textAlign: 'center' as const,
   verticalAlign: 'top' as const,
   width: '33%',
-  padding: '8px 4px',
+  padding: '4px',
 };
 
 const disciplineEmoji: React.CSSProperties = {
@@ -555,38 +520,30 @@ const disciplineEmoji: React.CSSProperties = {
 };
 
 const disciplineSport: React.CSSProperties = {
-  fontFamily: '"Bebas Neue", Arial, sans-serif',
-  fontSize: '16px',
-  color: WHITE,
-  margin: '0 0 2px',
-  lineHeight: '1',
+  fontFamily: '"SF Mono", monospace',
+  fontSize: '10px',
+  letterSpacing: '2px',
+  color: MUTED,
+  margin: '0 0 4px',
 };
 
 const disciplineCost: React.CSSProperties = {
   fontFamily: '"Bebas Neue", Arial, sans-serif',
-  fontSize: '22px',
-  color: ORANGE,
+  fontSize: '24px',
+  color: WHITE,
   margin: '0',
   lineHeight: '1',
 };
 
-const disciplineUnit: React.CSSProperties = {
-  fontFamily: '"SF Mono", monospace',
-  fontSize: '8px',
-  color: 'rgba(255,255,255,0.35)',
-  margin: '2px 0 0',
-};
-
 const disciplineLabel: React.CSSProperties = {
   fontFamily: '"SF Mono", monospace',
-  fontSize: '8px',
-  letterSpacing: '1px',
-  color: MUTED,
+  fontSize: '9px',
+  color: 'rgba(255,255,255,0.45)',
   margin: '4px 0 0',
 };
 
-// --- Coach Note ---
-const coachNoteCard: React.CSSProperties = {
+// --- Coach Analysis ---
+const coachCard: React.CSSProperties = {
   backgroundColor: 'rgba(249,115,22,0.04)',
   border: '1px solid rgba(249,115,22,0.15)',
   borderLeft: `3px solid ${ORANGE}`,
@@ -594,7 +551,7 @@ const coachNoteCard: React.CSSProperties = {
   padding: '20px',
 };
 
-const coachNoteText: React.CSSProperties = {
+const coachText: React.CSSProperties = {
   fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
   fontSize: '15px',
   lineHeight: '1.8',
@@ -678,16 +635,14 @@ const footerTagline: React.CSSProperties = {
 };
 
 const footerMuted: React.CSSProperties = {
-  fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
   fontSize: '11px',
   lineHeight: '1.6',
-  color: 'rgba(255,255,255,0.3)',
+  color: 'rgba(255,255,255,0.35)',
   margin: '0 0 4px',
   textAlign: 'center' as const,
-  textTransform: 'none' as const,
 };
 
 const footerLink: React.CSSProperties = {
-  color: 'rgba(255,255,255,0.4)',
+  color: ORANGE,
   textDecoration: 'none',
 };
