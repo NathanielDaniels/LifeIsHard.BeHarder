@@ -173,9 +173,10 @@ export default function EveningBriefingEmail({
   checkinUrl = '',
 }: EveningBriefingProps) {
   const sportEmoji: Record<string, string> = {
-    Run: '🏃', Ride: '🚴', Swim: '🏊', Bike: '🚴', Walk: '🚶',
+    Run: '🏃', Ride: '🚴', Swim: '🏊', Bike: '🚴', Walk: '🚶', Rest: '🧘',
   };
-  const emoji = sportEmoji[workoutSport] || '💪';
+  const isRestDay = workoutSport === 'Rest' || !workoutDistance;
+  const emoji = isRestDay ? '🧘' : (sportEmoji[workoutSport] || '💪');
   const hasIntelligence = Object.keys(intelligence).length > 0;
 
   return (
@@ -196,7 +197,9 @@ export default function EveningBriefingEmail({
       </Head>
 
       <Preview>
-        {`Evening Debrief — ${workoutSport} ${workoutDistance} | ${date}`}
+        {isRestDay
+          ? `Evening Debrief — Recovery Day | ${date}`
+          : `Evening Debrief — ${workoutSport} ${workoutDistance} | ${date}`}
       </Preview>
 
       <Body style={body}>
@@ -207,7 +210,7 @@ export default function EveningBriefingEmail({
           {/* ══════ HEADER ══════ */}
           <Section style={headerZone}>
             <Text style={systemTag}>{'>'} EVENING DEBRIEF // {date}</Text>
-            <Text style={systemTag}>{'>'} POST-WORKOUT INTELLIGENCE</Text>
+            <Text style={systemTag}>{'>'} {isRestDay ? 'RECOVERY INTELLIGENCE' : 'POST-WORKOUT INTELLIGENCE'}</Text>
 
             <Text style={ecgLine}>───────╱╲___╱╲───────</Text>
 
@@ -215,15 +218,24 @@ export default function EveningBriefingEmail({
             <Text style={headerDate}>{date}</Text>
           </Section>
 
-          {/* ══════ WORKOUT RECAP HERO ══════ */}
+          {/* ══════ WORKOUT RECAP HERO / REST DAY HERO ══════ */}
           <Section style={sectionPadding}>
             <Section style={workoutHero}>
               <Text style={workoutEmojiText}>{emoji}</Text>
-              <Text style={workoutNameText}>{workoutName.toUpperCase()}</Text>
-              <Text style={workoutStats}>
-                {workoutDistance}{'  '}&#x2022;{'  '}{workoutDuration}
-                {workoutStrain != null && (<>{'  '}&#x2022;{'  '}Strain {workoutStrain}</>)}
+              <Text style={workoutNameText}>
+                {isRestDay ? 'RECOVERY DAY' : workoutName.toUpperCase()}
               </Text>
+              {!isRestDay && (
+                <Text style={workoutStats}>
+                  {workoutDistance}{'  '}&#x2022;{'  '}{workoutDuration}
+                  {workoutStrain != null && (<>{'  '}&#x2022;{'  '}Strain {workoutStrain}</>)}
+                </Text>
+              )}
+              {isRestDay && (
+                <Text style={workoutStats}>
+                  Strategic rest{'  '}&#x2022;{'  '}Recovery intelligence below
+                </Text>
+              )}
             </Section>
           </Section>
 
