@@ -227,7 +227,8 @@ export default function EveningBriefingEmail({
               </Text>
               {!isRestDay && (
                 <Text style={workoutStats}>
-                  {workoutDistance}{'  '}&#x2022;{'  '}{workoutDuration}
+                  {workoutDistance && <>{workoutDistance}{'  '}&#x2022;{'  '}</>}
+                  {workoutDuration}
                   {workoutStrain != null && (<>{'  '}&#x2022;{'  '}Strain {workoutStrain}</>)}
                 </Text>
               )}
