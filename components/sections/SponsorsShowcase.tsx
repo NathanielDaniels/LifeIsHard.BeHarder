@@ -166,98 +166,29 @@ export default function SponsorsShowcase() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-          className="mb-20 lg:mb-28"
+          className="mb-6"
         >
-          <span className="font-mono text-xs tracking-[0.3em] text-white/60 uppercase block mb-4">
-            Partners in the mission
+          <span className="font-mono text-xs tracking-[0.3em] text-white/60 uppercase block mb-4 text-center">
+            Partner with Patrick
           </span>
-          <h1 className="font-display text-[clamp(3rem,8vw,5rem)] leading-[0.9] uppercase tracking-tight text-white">
-            Proudly
+          <h1 className="font-display text-[clamp(3rem,8vw,5rem)] leading-[0.9] uppercase tracking-tight text-white text-center">
+            Sponsor
             <br />
-            <span className="text-orange-500">Supported By.</span>
+            <span className="text-orange-500">The Mission.</span>
           </h1>
         </motion.div>
-
-        {/* Sponsor Grid */}
-        <div className="grid gap-6 md:gap-8 mb-32 lg:mb-40">
-          {SPONSORS.map((sponsor, i) => {
-            const isActive = isMobile && activeSponsor === i;
-            return (
-              <div key={sponsor.name} ref={(el) => { cardRefs.current[i] = el; }}>
-              <motion.a
-                href={sponsor.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.1 + i * 0.08, ease: [0.22, 1, 0.36, 1] }}
-                className={`group flex flex-col md:flex-row items-center gap-6 md:gap-10 p-8 md:p-10 rounded-2xl border transition-all duration-500 cursor-pointer ${
-                  isActive
-                    ? 'bg-white/[0.05] border-white/15 scale-[1.02]'
-                    : 'bg-white/[0.02] border-white/8 hover:bg-white/[0.05] hover:border-white/15'
-                }`}
-              >
-                <div className="flex-shrink-0 w-full md:w-[200px] flex items-center justify-center md:justify-start">
-                  <Image
-                    src={sponsor.logo}
-                    alt={sponsor.name}
-                    width={200}
-                    height={80}
-                    className={`object-contain transition-all duration-500 ${
-                      isActive
-                        ? 'grayscale-0 opacity-100'
-                        : 'grayscale group-hover:grayscale-0 opacity-60 group-hover:opacity-100'
-                    } ${sponsor.logoClass || ''}`}
-                  />
-                </div>
-                <div className="flex-1 text-center md:text-left">
-                  <h3 className={`font-display text-xl md:text-2xl tracking-wide mb-2 transition-colors duration-300 ${
-                    isActive ? 'text-orange-500' : 'text-white group-hover:text-orange-500'
-                  }`}>
-                    {sponsor.name}
-                  </h3>
-                  <p className={`text-sm md:text-base leading-relaxed transition-colors duration-300 ${
-                    isActive ? 'text-white/80' : 'text-white/60 group-hover:text-white/80'
-                  }`}>
-                    {sponsor.description}
-                  </p>
-                </div>
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  className="flex-shrink-0 text-white/20 group-hover:text-orange-500 transition-all duration-300 group-hover:translate-x-1 hidden md:block"
-                  aria-hidden="true"
-                >
-                  <path d="M7 17L17 7M17 7H7M17 7V17" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </motion.a>
-              </div>
-            );
-          })}
-        </div>
 
         {/* Become a Sponsor */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
           className="mb-32 lg:mb-40"
         >
-          <div className="text-center mb-16">
-            <span className="font-mono text-xs tracking-[0.3em] text-white/60 uppercase block mb-4">
-              Join the team
-            </span>
-            <h2 className="font-display text-[clamp(2.5rem,6vw,4rem)] leading-[0.9] uppercase tracking-tight text-white mb-6">
-              Become a <span className="text-orange-500">Sponsor.</span>
-            </h2>
-            <p className="text-white/70 max-w-2xl mx-auto leading-relaxed text-lg">
-              Put your brand behind an athlete who doesn't quit. Equipment, travel, race sponsorship, gear.
-              Every partnership powers the next mile toward Nationals.
-            </p>
-          </div>
+          <p className="text-white/70 max-w-2xl mx-auto leading-relaxed text-lg text-center mb-8">
+            Put your brand behind an athlete who doesn't quit. Equipment, travel, race sponsorship, gear.
+            Every partnership powers the next mile toward Nationals.
+          </p>
 
           <div className="max-w-2xl mx-auto">
             {formState === 'sent' ? (
@@ -351,6 +282,83 @@ export default function SponsorsShowcase() {
                 </a>
               </form>
             )}
+          </div>
+        </motion.div>
+
+        {/* Sponsor Grid */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+          className="mb-32 lg:mb-40"
+        >
+          <div className="text-center mb-16">
+            <span className="font-mono text-xs tracking-[0.3em] text-white/60 uppercase block mb-4">
+              Partners in the mission
+            </span>
+            <h2 className="font-display text-[clamp(2.5rem,6vw,4rem)] leading-[0.9] uppercase tracking-tight text-white">
+              Proudly <span className="text-orange-500">Supported By.</span>
+            </h2>
+          </div>
+          <div className="grid gap-6 md:gap-8">
+            {SPONSORS.map((sponsor, i) => {
+              const isActive = isMobile && activeSponsor === i;
+              return (
+                <div key={sponsor.name} ref={(el) => { cardRefs.current[i] = el; }}>
+                <motion.a
+                  href={sponsor.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] }}
+                  className={`group flex flex-col md:flex-row items-center gap-6 md:gap-10 p-8 md:p-10 rounded-2xl border transition-all duration-500 cursor-pointer ${
+                    isActive
+                      ? 'bg-white/[0.05] border-white/15 scale-[1.02]'
+                      : 'bg-white/[0.02] border-white/8 hover:bg-white/[0.05] hover:border-white/15'
+                  }`}
+                >
+                  <div className="flex-shrink-0 w-full md:w-[200px] flex items-center justify-center md:justify-start">
+                    <Image
+                      src={sponsor.logo}
+                      alt={sponsor.name}
+                      width={200}
+                      height={80}
+                      className={`object-contain transition-all duration-500 ${
+                        isActive
+                          ? 'grayscale-0 opacity-100'
+                          : 'grayscale group-hover:grayscale-0 opacity-60 group-hover:opacity-100'
+                      } ${sponsor.logoClass || ''}`}
+                    />
+                  </div>
+                  <div className="flex-1 text-center md:text-left">
+                    <h3 className={`font-display text-xl md:text-2xl tracking-wide mb-2 transition-colors duration-300 ${
+                      isActive ? 'text-orange-500' : 'text-white group-hover:text-orange-500'
+                    }`}>
+                      {sponsor.name}
+                    </h3>
+                    <p className={`text-sm md:text-base leading-relaxed transition-colors duration-300 ${
+                      isActive ? 'text-white/80' : 'text-white/60 group-hover:text-white/80'
+                    }`}>
+                      {sponsor.description}
+                    </p>
+                  </div>
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    className="flex-shrink-0 text-white/20 group-hover:text-orange-500 transition-all duration-300 group-hover:translate-x-1 hidden md:block"
+                    aria-hidden="true"
+                  >
+                    <path d="M7 17L17 7M17 7H7M17 7V17" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </motion.a>
+                </div>
+              );
+            })}
           </div>
         </motion.div>
 

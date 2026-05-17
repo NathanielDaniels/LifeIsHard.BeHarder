@@ -51,6 +51,12 @@ const socialLinks = [
     size: 32,
   },
   {
+    href: "https://www.youtube.com/@PatWingIt",
+    label: "YOUTUBE",
+    iconSrc: `${SITE}/icons/youtube.png`,
+    size: 32,
+  },
+  {
     href: "https://give.dare2tri.org/fundraiser/6928347",
     label: "DARE2TRI",
     iconSrc: `${SITE}/icons/dare2tri.png`,
@@ -677,13 +683,13 @@ const styles: Record<string, React.CSSProperties> = {
 
   // --- Social Icons ---
   socialRow: {
-    width: "280px",
+    width: "350px",
     margin: "0 auto 28px",
   },
   socialCol: {
     textAlign: "center" as const,
     verticalAlign: "top" as const,
-    width: "25%",
+    width: "20%",
   },
   socialIconWrap: {
     height: "40px",

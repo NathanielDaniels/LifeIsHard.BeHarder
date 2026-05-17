@@ -201,6 +201,17 @@ export async function getActivity(
 }
 
 /**
+ * Fetches HR and power zone distribution for an activity.
+ * Strava API: GET /activities/{id}/zones
+ */
+export async function getActivityZones(
+  accessToken: string,
+  activityId: number,
+): Promise<any[]> {
+  return stravaFetch<any[]>(`/activities/${activityId}/zones`, accessToken);
+}
+
+/**
  * Fetches recent activities (most recent first).
  * Used for initial backfill.
  */

@@ -87,9 +87,15 @@ export async function GET(request: NextRequest) {
       elapsedMs: elapsed,
     });
   } catch (error) {
-    console.error('[daily-briefing] Cron error:', error);
+    const message = error instanceof Error
+      ? error.message
+      : typeof error === 'object' && error !== null
+        ? JSON.stringify(error)
+        : String(error);
+    const stack = error instanceof Error ? error.stack : undefined;
+    console.error('[daily-briefing] Cron error:', message, stack || '');
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Unknown error' },
+      { error: message, stack: stack?.split('\n').slice(0, 3) },
       { status: 500 },
     );
   }

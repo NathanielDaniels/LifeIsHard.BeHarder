@@ -17,6 +17,11 @@ import {
   getWorkoutHistory,
   getSleepHistory,
 } from './whoop-client';
+import {
+  selectSnapshotSourcesForDate,
+  toDateString,
+  toLocalDateString,
+} from './whoop-snapshot-freshness';
 import type { DailySnapshot, WorkoutRecord, WhoopRecovery, WhoopCycle, WhoopWorkout, WhoopSleep } from '@/types/whoop';
 
 const TABLE = 'whoop_daily_snapshots';
@@ -58,23 +63,23 @@ function buildSnapshot(
 
   return {
     date,
-    recovery_score: recovery?.score?.recovery_score ?? null,
-    resting_heart_rate: recovery?.score?.resting_heart_rate ?? null,
+    recovery_score: recovery?.score?.recovery_score != null ? Math.round(recovery.score.recovery_score) : null,
+    resting_heart_rate: recovery?.score?.resting_heart_rate != null ? Math.round(recovery.score.resting_heart_rate) : null,
     hrv: recovery?.score?.hrv_rmssd_milli ?? null,
     spo2: recovery?.score?.spo2_percentage ?? null,
     skin_temp: recovery?.score?.skin_temp_celsius ?? null,
     strain: cycle?.score?.strain ?? null,
     calories: cycleCals,
-    average_heart_rate: cycle?.score?.average_heart_rate ?? null,
-    max_heart_rate: cycle?.score?.max_heart_rate ?? null,
+    average_heart_rate: cycle?.score?.average_heart_rate != null ? Math.round(cycle.score.average_heart_rate) : null,
+    max_heart_rate: cycle?.score?.max_heart_rate != null ? Math.round(cycle.score.max_heart_rate) : null,
     workout_sport: workout?.sport_name ?? null,
     workout_strain: workout?.score?.strain ?? null,
     workout_duration_minutes: workoutDuration,
-    workout_avg_hr: workout?.score?.average_heart_rate ?? null,
-    workout_max_hr: workout?.score?.max_heart_rate ?? null,
+    workout_avg_hr: workout?.score?.average_heart_rate != null ? Math.round(workout.score.average_heart_rate) : null,
+    workout_max_hr: workout?.score?.max_heart_rate != null ? Math.round(workout.score.max_heart_rate) : null,
     workout_calories: workoutCals,
-    sleep_performance: sleep?.score?.sleep_performance_percentage ?? null,
-    sleep_efficiency: sleep?.score?.sleep_efficiency_percentage ?? null,
+    sleep_performance: sleep?.score?.sleep_performance_percentage != null ? Math.round(sleep.score.sleep_performance_percentage) : null,
+    sleep_efficiency: sleep?.score?.sleep_efficiency_percentage != null ? Math.round(sleep.score.sleep_efficiency_percentage) : null,
     sleep_duration_minutes: sleepDuration,
     sleep_disturbances: stages?.disturbance_count ?? null,
     sleep_light_minutes: stages ? Math.round(stages.total_light_sleep_time_milli / 60000) : null,
@@ -88,26 +93,6 @@ function buildSnapshot(
 // ============================================
 // Match records to dates
 // ============================================
-
-function toDateString(isoString: string): string {
-  return isoString.split('T')[0];
-}
-
-/**
- * Convert a UTC ISO timestamp to a local date string using a WHOOP timezone offset.
- * WHOOP offsets are like "-05:00" or "+05:30".
- * A workout at 2026-04-17T01:30:00Z with offset "-05:00" → 2026-04-16 (8:30pm CDT).
- */
-function toLocalDateString(isoString: string, timezoneOffset?: string): string {
-  if (!timezoneOffset) return toDateString(isoString);
-  const dt = new Date(isoString);
-  const match = timezoneOffset.match(/^([+-])(\d{2}):(\d{2})$/);
-  if (!match) return toDateString(isoString);
-  const sign = match[1] === '+' ? 1 : -1;
-  const offsetMinutes = sign * (parseInt(match[2]) * 60 + parseInt(match[3]));
-  const local = new Date(dt.getTime() + offsetMinutes * 60000);
-  return local.toISOString().split('T')[0];
-}
 
 function findBestWorkout(workouts: WhoopWorkout[], date: string): WhoopWorkout | null {
   const dayWorkouts = workouts
@@ -145,18 +130,28 @@ export async function snapshotToday(accessToken: string): Promise<DailySnapshot>
     getRecoveryHistory(accessToken, start, end),
     getCycleHistory(accessToken, start, end),
     getWorkoutHistory(accessToken, start, end),
-    getSleepHistory(accessToken, 1).catch(() => []),
+    getSleepHistory(accessToken, 5).catch(() => []),
   ]);
 
-  // Find the most recent non-nap sleep
-  const latestSleep = sleeps.find((s) => !s.nap && s.score_state === 'SCORED') ?? null;
+  const sources = selectSnapshotSourcesForDate({
+    date: today,
+    recoveries,
+    cycles,
+    workouts,
+    sleeps,
+  });
+  if (sources.missingRequiredSources.length > 0) {
+    console.warn(
+      `[whoop-history] Snapshot ${today} missing same-day ${sources.missingRequiredSources.join(', ')}; writing nulls until WHOOP scores today`,
+    );
+  }
 
   const snapshot = buildSnapshot(
     today,
-    recoveries[0] ?? null,
-    cycles[0] ?? null,
+    sources.recovery,
+    sources.cycle,
     findBestWorkout(workouts, today),
-    latestSleep,
+    sources.sleep,
   );
 
   await upsertSnapshot(snapshot);
@@ -302,8 +297,8 @@ function buildWorkoutRecord(workout: WhoopWorkout): WorkoutRecord {
     date: toLocalDateString(workout.start, workout.timezone_offset),
     sport_name: workout.sport_name ?? null,
     strain: workout.score?.strain ?? null,
-    avg_hr: workout.score?.average_heart_rate ?? null,
-    max_hr: workout.score?.max_heart_rate ?? null,
+    avg_hr: workout.score?.average_heart_rate != null ? Math.round(workout.score.average_heart_rate) : null,
+    max_hr: workout.score?.max_heart_rate != null ? Math.round(workout.score.max_heart_rate) : null,
     duration_minutes: duration,
     calories,
     distance_meters: workout.score?.distance_meter ?? null,
