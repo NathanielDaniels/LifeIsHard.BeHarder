@@ -17,6 +17,11 @@ import {
   getWorkoutHistory,
   getSleepHistory,
 } from './whoop-client';
+import {
+  selectSnapshotSourcesForDate,
+  toDateString,
+  toLocalDateString,
+} from './whoop-snapshot-freshness';
 import type { DailySnapshot, WorkoutRecord, WhoopRecovery, WhoopCycle, WhoopWorkout, WhoopSleep } from '@/types/whoop';
 
 const TABLE = 'whoop_daily_snapshots';
@@ -89,26 +94,6 @@ function buildSnapshot(
 // Match records to dates
 // ============================================
 
-function toDateString(isoString: string): string {
-  return isoString.split('T')[0];
-}
-
-/**
- * Convert a UTC ISO timestamp to a local date string using a WHOOP timezone offset.
- * WHOOP offsets are like "-05:00" or "+05:30".
- * A workout at 2026-04-17T01:30:00Z with offset "-05:00" → 2026-04-16 (8:30pm CDT).
- */
-function toLocalDateString(isoString: string, timezoneOffset?: string): string {
-  if (!timezoneOffset) return toDateString(isoString);
-  const dt = new Date(isoString);
-  const match = timezoneOffset.match(/^([+-])(\d{2}):(\d{2})$/);
-  if (!match) return toDateString(isoString);
-  const sign = match[1] === '+' ? 1 : -1;
-  const offsetMinutes = sign * (parseInt(match[2]) * 60 + parseInt(match[3]));
-  const local = new Date(dt.getTime() + offsetMinutes * 60000);
-  return local.toISOString().split('T')[0];
-}
-
 function findBestWorkout(workouts: WhoopWorkout[], date: string): WhoopWorkout | null {
   const dayWorkouts = workouts
     .filter((w) => {
@@ -145,18 +130,28 @@ export async function snapshotToday(accessToken: string): Promise<DailySnapshot>
     getRecoveryHistory(accessToken, start, end),
     getCycleHistory(accessToken, start, end),
     getWorkoutHistory(accessToken, start, end),
-    getSleepHistory(accessToken, 1).catch(() => []),
+    getSleepHistory(accessToken, 5).catch(() => []),
   ]);
 
-  // Find the most recent non-nap sleep
-  const latestSleep = sleeps.find((s) => !s.nap && s.score_state === 'SCORED') ?? null;
+  const sources = selectSnapshotSourcesForDate({
+    date: today,
+    recoveries,
+    cycles,
+    workouts,
+    sleeps,
+  });
+  if (sources.missingRequiredSources.length > 0) {
+    console.warn(
+      `[whoop-history] Snapshot ${today} missing same-day ${sources.missingRequiredSources.join(', ')}; writing nulls until WHOOP scores today`,
+    );
+  }
 
   const snapshot = buildSnapshot(
     today,
-    recoveries[0] ?? null,
-    cycles[0] ?? null,
+    sources.recovery,
+    sources.cycle,
     findBestWorkout(workouts, today),
-    latestSleep,
+    sources.sleep,
   );
 
   await upsertSnapshot(snapshot);
