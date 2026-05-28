@@ -5,8 +5,8 @@ import React from "react";
 import LeonsTriathlonInviteEmail from "./leons-triathlon-invite-email";
 
 const previewImageMap: Record<string, { path: string; mime: string }> = {
-  "https://patrickwingert.com/race-weekend/leons-americas-race-logo-clean.png": {
-    path: "public/race-weekend/leons-americas-race-logo-clean.png",
+  "https://patrickwingert.com/race-weekend/leons-americas-race-logo-email.png": {
+    path: "public/race-weekend/leons-americas-race-logo-email.png",
     mime: "image/png",
   },
   "https://patrickwingert.com/sponsors/performance-wealth-partners-email.png": {
