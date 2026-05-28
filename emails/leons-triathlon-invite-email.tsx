@@ -179,8 +179,8 @@ export default function LeonsTriathlonInviteEmail({
 
           <Section style={styles.leonsLogoWrap}>
             <Img
-              src={`${SITE}/race-weekend/leons-americas-race-logo-clean.png`}
-              width="280"
+              src={`${SITE}/race-weekend/leons-americas-race-logo-email.png`}
+              width="340"
               alt="America's Race, Leon's Triathlon"
               style={styles.leonsLogo}
             />
@@ -479,7 +479,7 @@ const styles: Record<string, React.CSSProperties> = {
   leonsLogo: {
     display: "inline-block",
     margin: "0 auto",
-    width: "280px",
+    width: "340px",
     maxWidth: "100%",
     height: "auto",
     border: "none",
