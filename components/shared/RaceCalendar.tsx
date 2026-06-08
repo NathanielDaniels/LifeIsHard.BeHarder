@@ -166,6 +166,18 @@ interface RaceCardProps {
   themeColor: string;
 }
 
+const STAMP_ROTATIONS = [-12, 7, -5, 10, -9, 4] as const;
+
+function getStampRotation(race: Race): number {
+  const key = `${race.date}-${race.cityCode}-${race.name}`;
+  const hash = Array.from(key).reduce(
+    (total, char) => total + char.charCodeAt(0),
+    0,
+  );
+
+  return STAMP_ROTATIONS[hash % STAMP_ROTATIONS.length];
+}
+
 function RaceCard({ race, isNext, themeColor }: RaceCardProps) {
   const [expanded, setExpanded] = useState(false);
   const [hasStamped, setHasStamped] = useState(false);
@@ -186,6 +198,7 @@ function RaceCard({ race, isNext, themeColor }: RaceCardProps) {
   const isToday = isSameDay && !race.result;
   const isPast = (raceDate < now && !isSameDay) || (isSameDay && !!race.result);
   const daysUntil = getDaysUntil(raceDate);
+  const stampRotation = getStampRotation(race);
   const hasDetails =
     race.distance ||
     race.course ||
@@ -446,8 +459,8 @@ function RaceCard({ race, isNext, themeColor }: RaceCardProps) {
           <AnimatePresence>
             {hasStamped && race.result && (
               <motion.div
-                initial={{ scale: 2.5, opacity: 0, rotate: -12 }}
-                animate={{ scale: 1, opacity: 1, rotate: -12 }}
+                initial={{ scale: 2.5, opacity: 0, rotate: stampRotation }}
+                animate={{ scale: 1, opacity: 1, rotate: stampRotation }}
                 transition={{
                   scale: { type: "spring", stiffness: 600, damping: 20 },
                   opacity: { duration: 0.1 },
@@ -455,7 +468,7 @@ function RaceCard({ race, isNext, themeColor }: RaceCardProps) {
                 className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none"
               >
                 <div className="relative">
-                  <div className="absolute inset-0 bg-black/60 rounded-xl blur-md" />
+                  <div className="absolute inset-0 rounded-xl bg-black/45 blur-md sm:hidden" />
                   <Image
                     src="/icons/Mission_Accomplished_Volt.webp"
                     alt="Mission Accomplished"
@@ -585,8 +598,8 @@ function RaceCard({ race, isNext, themeColor }: RaceCardProps) {
         <AnimatePresence>
           {hasStamped && race.result && (
             <motion.div
-              initial={{ scale: 2.5, opacity: 0, rotate: -12 }}
-              animate={{ scale: 1, opacity: 1, rotate: -12 }}
+              initial={{ scale: 2.5, opacity: 0, rotate: stampRotation }}
+              animate={{ scale: 1, opacity: 1, rotate: stampRotation }}
               transition={{
                 scale: { type: "spring", stiffness: 600, damping: 20 },
                 opacity: { duration: 0.1 },
@@ -594,7 +607,7 @@ function RaceCard({ race, isNext, themeColor }: RaceCardProps) {
               className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none"
             >
               <div className="relative">
-                <div className="absolute inset-0 bg-black/60 rounded-xl blur-md" />
+                <div className="absolute inset-0 rounded-xl bg-black/45 blur-md sm:hidden" />
                 <Image
                   src="/icons/Mission_Accomplished_Volt.webp"
                   alt="Mission Accomplished"
