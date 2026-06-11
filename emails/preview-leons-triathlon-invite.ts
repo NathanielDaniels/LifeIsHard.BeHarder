@@ -9,28 +9,28 @@ const previewImageMap: Record<string, { path: string; mime: string }> = {
     path: "public/race-weekend/leons-americas-race-logo-email.png",
     mime: "image/png",
   },
-  "https://patrickwingert.com/sponsors/performance-wealth-partners-email.png": {
-    path: "public/sponsors/performance-wealth-partners-email.png",
+  "https://patrickwingert.com/sponsors/performance-wealth-partners-email_grey_transparent.png": {
+    path: "public/sponsors/performance-wealth-partners-email_grey_transparent.png",
     mime: "image/png",
   },
-  "https://patrickwingert.com/sponsors/CAF_logo.png": {
-    path: "public/sponsors/CAF_logo.png",
+  "https://patrickwingert.com/sponsors/CAF_logo_transparent.png": {
+    path: "public/sponsors/CAF_logo_transparent.png",
     mime: "image/png",
   },
-  "https://patrickwingert.com/sponsors/ATF_logo_email.png": {
-    path: "public/sponsors/ATF_logo_email.png",
+  "https://patrickwingert.com/sponsors/ATF_logo_email_dark_gray_transparent.png": {
+    path: "public/sponsors/ATF_logo_email_dark_gray_transparent.png",
     mime: "image/png",
   },
-  "https://patrickwingert.com/sponsors/D2T_logo_short.png": {
-    path: "public/sponsors/D2T_logo_short.png",
+  "https://patrickwingert.com/sponsors/D2T_logo_short_transparent.png": {
+    path: "public/sponsors/D2T_logo_short_transparent.png",
     mime: "image/png",
   },
-  "https://patrickwingert.com/sponsors/SEBCM_color.png": {
-    path: "public/sponsors/SEBCM_color.png",
+  "https://patrickwingert.com/sponsors/SEBCM_color_transparent.png": {
+    path: "public/sponsors/SEBCM_color_transparent.png",
     mime: "image/png",
   },
-  "https://patrickwingert.com/sponsors/david-rotter-logo_orig.png": {
-    path: "public/sponsors/david-rotter-logo_orig.png",
+  "https://patrickwingert.com/sponsors/david-rotter-logo_orig_transparent.png": {
+    path: "public/sponsors/david-rotter-logo_orig_transparent.png",
     mime: "image/png",
   },
   "https://patrickwingert.com/icons/instagram.png": {

@@ -390,7 +390,7 @@ export default function RaceReportEmail({ email }: RaceReportEmailProps) {
             <Section style={styles.logoWrap}>
               <Img
                 className="h-logo-baked"
-                src={`${SITE}/sponsors/performance-wealth-partners-email.png`}
+                src={`${SITE}/sponsors/performance-wealth-partners-email_grey_transparent.png`}
                 width="240"
                 alt="Performance Wealth Partners"
                 style={{
@@ -401,7 +401,7 @@ export default function RaceReportEmail({ email }: RaceReportEmailProps) {
               />
               <Img
                 className="h-logo-transparent"
-                src={`${SITE}/sponsors/performance-wealth-partners-light.png`}
+                src={`${SITE}/sponsors/performance-wealth-partners-light_transparent.png`}
                 width="160"
                 alt=""
                 style={{

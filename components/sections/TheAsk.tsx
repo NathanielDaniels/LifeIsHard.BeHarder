@@ -17,25 +17,25 @@ export default function TheAsk() {
       className: 'h-16 md:h-20 grayscale hover:grayscale-0'
     },
     {
-      src: '/sponsors/ATF_logo.png',
+      src: '/sponsors/ATF_logo_dark_transparent.png',
       link: 'https://www.adaptivetrainingfoundation.org/',
       alt: 'Adaptive Training Foundation',
       className: 'h-28 md:h-36 lg:h-44 invert brightness-200'
     },
     {
-      src: '/sponsors/CAF_logo.webp',
+      src: '/sponsors/CAF_logo_transparent.webp',
       link: 'https://www.challengedathletes.org/',
       alt: 'Challenged Athletes Foundation',
       className: 'h-28 md:h-36 mix-blend-screen invert grayscale hover:grayscale-0 hover:invert-0 opacity-100'
     },
     {
-      src: '/sponsors/david-rotter-logo_orig.png',
+      src: '/sponsors/david-rotter-logo_orig_transparent.png',
       link: 'https://www.rotterprosthetics.com/',
       alt: 'David Rotter Prosthetics',
       className: 'h-16 md:h-20 grayscale hover:grayscale-0 brightness-200 hover:brightness-100'
     },
     {
-      src: '/sponsors/SEBCM_color.webp',
+      src: '/sponsors/SEBCM_color_transparent.webp',
       link: 'https://soeverybodycanmove.org',
       alt: 'SEBCM',
       className: 'h-16 md:h-20 grayscale hover:grayscale-0 brightness-200 hover:brightness-100'

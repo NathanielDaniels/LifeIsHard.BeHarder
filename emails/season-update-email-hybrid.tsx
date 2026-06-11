@@ -271,16 +271,15 @@ export default function SeasonUpdateEmailHybrid({
           </Section>
 
           {/* PWP — Title Sponsor
-               Baked-bg logo (opaque white bg) = visible on ANY background.
-               Gmail can't modify pixels inside an image.
-               Apple Mail dark mode: CSS hides baked logo, shows transparent light version. */}
+               Default grey logo stays legible in clients that ignore dark-mode classes.
+               Apple Mail dark mode: CSS hides default logo, shows transparent light version. */}
           <Section className="h-card" style={styles.supporterCard}>
             <Text style={styles.supporterTier}>TITLE SPONSOR</Text>
             <Section style={styles.logoWrap}>
-              {/* Opaque logo with white bg baked in (Gmail default — always visible) */}
+              {/* Default transparent logo for clients that ignore dark-mode classes. */}
               <Img
                 className="h-logo-baked"
-                src={`${SITE}/sponsors/performance-wealth-partners-email.png`}
+                src={`${SITE}/sponsors/performance-wealth-partners-email_grey_transparent.png`}
                 width="240"
                 alt="Performance Wealth Partners"
                 style={{
@@ -289,10 +288,10 @@ export default function SeasonUpdateEmailHybrid({
                   paddingBottom: "16px",
                 }}
               />
-              {/* Transparent light logo for dark bg (Apple Mail dark mode only) */}
+              {/* Transparent light logo for dark bg (Apple Mail dark mode only). */}
               <Img
                 className="h-logo-transparent"
-                src={`${SITE}/sponsors/performance-wealth-partners-light.png`}
+                src={`${SITE}/sponsors/performance-wealth-partners-light_transparent.png`}
                 width="160"
                 alt=""
                 style={{
@@ -339,18 +338,18 @@ export default function SeasonUpdateEmailHybrid({
           <Section className="h-card" style={styles.supporterCard}>
             <Text style={styles.supporterTier}>RACE PARTNER</Text>
             <Section style={styles.logoWrap}>
-              {/* Opaque logo with white bg baked in (Gmail default — always visible) */}
+              {/* Default transparent logo for clients that ignore dark-mode classes. */}
               <Img
                 className="h-logo-baked"
-                src={`${SITE}/sponsors/ATF_logo_email.png`}
+                src={`${SITE}/sponsors/ATF_logo_email_dark_gray_transparent.png`}
                 width="180"
                 alt="Adaptive Training Foundation"
                 style={{ ...styles.sponsorLogo, borderRadius: "6px" }}
               />
-              {/* Transparent light logo for dark bg (Apple Mail dark mode only) */}
+              {/* Transparent light logo for dark bg (Apple Mail dark mode only). */}
               <Img
                 className="h-logo-transparent"
-                src={`${SITE}/sponsors/ATF_logo_light.png`}
+                src={`${SITE}/sponsors/ATF_logo_email_light_gray_transparent.png`}
                 width="180"
                 alt=""
                 style={{

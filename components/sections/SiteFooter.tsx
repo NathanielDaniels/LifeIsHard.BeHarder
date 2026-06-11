@@ -38,7 +38,7 @@ export default function SiteFooter() {
           className="flex items-center opacity-60 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-300"
         >
           <Image
-            src="/sponsors/D2T_logo_short.webp"
+            src="/sponsors/D2T_logo_short_transparent.webp"
             alt="Dare2Tri"
             width={120}
             height={40}

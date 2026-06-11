@@ -99,7 +99,7 @@ const sponsorTiers = [
     label: "TITLE SPONSOR",
     columns: [
       {
-        src: `${SITE}/sponsors/performance-wealth-partners-email.png`,
+        src: `${SITE}/sponsors/performance-wealth-partners-email_grey_transparent.png`,
         alt: "Performance Wealth Partners",
         width: "260",
         height: "82",
@@ -110,13 +110,13 @@ const sponsorTiers = [
     label: "FOUNDATION PARTNERS",
     columns: [
       {
-        src: `${SITE}/sponsors/CAF_logo.png`,
+        src: `${SITE}/sponsors/CAF_logo_transparent.png`,
         alt: "Challenged Athletes Foundation",
         width: "150",
         height: "62",
       },
       {
-        src: `${SITE}/sponsors/ATF_logo_email.png`,
+        src: `${SITE}/sponsors/ATF_logo_email_dark_gray_transparent.png`,
         alt: "Adaptive Training Foundation",
         width: "150",
         height: "72",
@@ -127,19 +127,19 @@ const sponsorTiers = [
     label: "TEAM SUPPORT",
     columns: [
       {
-        src: `${SITE}/sponsors/D2T_logo_short.png`,
+        src: `${SITE}/sponsors/D2T_logo_short_transparent.png`,
         alt: "Dare2Tri",
         width: "116",
         height: "44",
       },
       {
-        src: `${SITE}/sponsors/SEBCM_color.png`,
+        src: `${SITE}/sponsors/SEBCM_color_transparent.png`,
         alt: "So Every Body Can Move",
         width: "116",
         height: "44",
       },
       {
-        src: `${SITE}/sponsors/david-rotter-logo_orig.png`,
+        src: `${SITE}/sponsors/david-rotter-logo_orig_transparent.png`,
         alt: "David Rotter Prosthetics",
         width: "116",
         height: "44",

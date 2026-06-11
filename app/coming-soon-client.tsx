@@ -1141,11 +1141,10 @@ export default function ComingSoonClient() {
           <div className="flex flex-wrap justify-center items-center gap-10 md:gap-16 lg:gap-20 pr-8 md:pr-16">
             {[
               { src: '/sponsors/performance-wealth-partners-light.svg', link: 'https://performancewealthpartners.com', alt: 'Performance Wealth Partners', className: 'h-16 md:h-20 grayscale group-hover:grayscale-0' },
-              { src: '/sponsors/ATF_logo.png', link: 'https://www.adaptivetrainingfoundation.org/', alt: 'Adaptive Training Foundation', className: 'h-28 md:h-36 lg:h-44 invert brightness-200' },
-              // Invert turns the white background black and logo white. Mix-blend-screen then makes the black background invisible
-              { src: '/sponsors/CAF_logo.webp', link: 'https://www.challengedathletes.org/', alt: 'Sponsor 3', className: 'h-24 md:h-32 mix-blend-screen invert grayscale group-hover:grayscale-0 group-hover:invert-0 opacity-100 rounded-[50%] object-cover' },
-              { src: '/sponsors/david-rotter-logo_orig.png', link: 'https://www.rotterprosthetics.com/', alt: 'David Rotter Prosthetics', className: 'h-16 md:h-20 grayscale group-hover:grayscale-0 brightness-200 group-hover:brightness-100' },
-              { src: '/sponsors/SEBCM_color.webp', link: 'https://soeverybodycanmove.org', alt: 'So Every Body Can Move', className: 'h-10 md:h-12 grayscale group-hover:grayscale-0 brightness-200 group-hover:brightness-100' },
+              { src: '/sponsors/ATF_logo_dark_transparent.png', link: 'https://www.adaptivetrainingfoundation.org/', alt: 'Adaptive Training Foundation', className: 'h-28 md:h-36 lg:h-44 invert brightness-200' },
+              { src: '/sponsors/CAF_logo_transparent.webp', link: 'https://www.challengedathletes.org/', alt: 'Challenged Athletes Foundation', className: 'h-24 md:h-32 grayscale group-hover:grayscale-0 opacity-100 object-contain' },
+              { src: '/sponsors/david-rotter-logo_orig_transparent.png', link: 'https://www.rotterprosthetics.com/', alt: 'David Rotter Prosthetics', className: 'h-16 md:h-20 grayscale group-hover:grayscale-0 brightness-200 group-hover:brightness-100' },
+              { src: '/sponsors/SEBCM_color_transparent.webp', link: 'https://soeverybodycanmove.org', alt: 'So Every Body Can Move', className: 'h-10 md:h-12 grayscale group-hover:grayscale-0 brightness-200 group-hover:brightness-100' },
             ].map((sponsor, i) => (
               <motion.div
                 key={sponsor.alt}
@@ -1217,7 +1216,7 @@ export default function ComingSoonClient() {
             className="flex items-center justify-end opacity-60 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-300 cursor-pointer outline-none"
           >
             <Image
-              src="/sponsors/D2T_logo_short.webp"
+              src="/sponsors/D2T_logo_short_transparent.webp"
               alt="Dare2Tri Elite Team Athlete."
               width={120}
               height={40}
