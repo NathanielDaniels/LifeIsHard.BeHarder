@@ -2,20 +2,22 @@ import { render } from "@react-email/components";
 import { readFileSync, writeFileSync } from "fs";
 import { resolve } from "path";
 import React from "react";
-import LeonsTriathlonInviteEmail from "./leons-triathlon-invite-email";
+import LeonsRaceReportEmail from "./leons-race-report-email";
 
 // Remote URL path -> local file under public/, inlined as data URIs so the
 // preview HTML renders without deploying the assets first.
 const previewImagePaths = [
-  "email/leons-race-logo.png",
   "email/performance-wealth.png",
   "email/caf.png",
   "email/atf.png",
   "email/dare2tri.png",
   "email/sebcm.png",
   "email/david-rotter.png",
-  "pat_new_bike.jpg",
-  "pat_race_suite.png",
+  "email/race-finish-chute.jpg",
+  "email/race-melissa.jpg",
+  "email/race-james.jpg",
+  "email/race-podium.jpg",
+  "email/race-medal.jpg",
 ];
 
 function inlineLocalPreviewImages(html: string) {
@@ -36,14 +38,14 @@ function inlineLocalPreviewImages(html: string) {
 async function main() {
   const html = inlineLocalPreviewImages(
     await render(
-      React.createElement(LeonsTriathlonInviteEmail, {
+      React.createElement(LeonsRaceReportEmail, {
         email: "patrick@example.com",
       }),
     ),
   );
 
-  writeFileSync("emails/leons-triathlon-invite-preview.html", html);
-  console.log("Preview saved to emails/leons-triathlon-invite-preview.html");
+  writeFileSync("emails/leons-race-report-preview.html", html);
+  console.log("Preview saved to emails/leons-race-report-preview.html");
 }
 
 main().catch((error) => {
