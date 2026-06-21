@@ -118,7 +118,7 @@ export const sponsorTiers = [
 
 export const socialLinks = [
   { href: "https://www.instagram.com/patwingit", label: "INSTAGRAM" },
-  { href: "https://give.dare2tri.org/fundraiser/6928347", label: "DARE2TRI" },
+  { href: "https://www.dare2tri.org", label: "DARE2TRI" },
   { href: "https://linktr.ee/patrickwingert", label: "LINKTREE" },
 ];
 
