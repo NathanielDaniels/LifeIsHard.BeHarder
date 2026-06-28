@@ -57,6 +57,7 @@ export default function ComingSoonClient() {
   const [daysSinceAccident, setDaysSinceAccident] = useState(0);
   const [daysSober, setDaysSober] = useState(0);
   const [daysUntilRace, setDaysUntilRace] = useState(0);
+  const [isRaceDay, setIsRaceDay] = useState(false);
   const [daysUntilNationals, setDaysUntilNationals] = useState(0);
   const [showNationals, setShowNationals] = useState(false);
   const [showScrollHint, setShowScrollHint] = useState(false);
@@ -139,7 +140,9 @@ export default function ComingSoonClient() {
     setDaysSinceAccident(getDaysSince(ACCIDENT_DATE));
     setDaysSober(getDaysSince(SOBRIETY_DATE));
     const next = getNextRace();
-    setDaysUntilRace(next ? getDaysUntil(parseLocalDate(next.date)) : 0);
+    const daysToRace = next ? getDaysUntil(parseLocalDate(next.date)) : 0;
+    setDaysUntilRace(daysToRace);
+    setIsRaceDay(!!next && daysToRace === 0);
     setDaysUntilNationals(getDaysUntil(NATIONALS_DATE));
   }, []);
 
@@ -736,13 +739,21 @@ export default function ComingSoonClient() {
                     transition={{ duration: 0.3 }}
                   >
                     <div
-                      className="font-display text-[clamp(3.5rem,10vw,7rem)] font-bold leading-none"
+                      className={`font-display font-bold leading-none ${
+                        !showNationals && isRaceDay
+                          ? 'text-[clamp(2.5rem,8vw,5.5rem)] whitespace-nowrap'
+                          : 'text-[clamp(3.5rem,10vw,7rem)]'
+                      }`}
                       style={{ color: themeColor }}
                     >
-                      <AnimatedCounter value={showNationals ? daysUntilNationals : daysUntilRace} duration={2600} />
+                      {!showNationals && isRaceDay ? (
+                        'RACE DAY!'
+                      ) : (
+                        <AnimatedCounter value={showNationals ? daysUntilNationals : daysUntilRace} duration={2600} />
+                      )}
                     </div>
                     <div className="font-mono text-[0.7rem] md:text-[0.8rem] tracking-[0.3em] text-white/70 mt-2 font-medium">
-                      {showNationals ? 'DAYS UNTIL NATIONALS' : 'DAYS UNTIL NEXT RACE'}
+                      {showNationals ? 'DAYS UNTIL NATIONALS' : isRaceDay ? 'GO TIME' : 'DAYS UNTIL NEXT RACE'}
                     </div>
                   </motion.div>
                 </AnimatePresence>
