@@ -57,6 +57,7 @@ export default function ComingSoonClient() {
   const [daysSinceAccident, setDaysSinceAccident] = useState(0);
   const [daysSober, setDaysSober] = useState(0);
   const [daysUntilRace, setDaysUntilRace] = useState(0);
+  const [isRaceDay, setIsRaceDay] = useState(false);
   const [daysUntilNationals, setDaysUntilNationals] = useState(0);
   const [showNationals, setShowNationals] = useState(false);
   const [showScrollHint, setShowScrollHint] = useState(false);
@@ -136,11 +137,55 @@ export default function ComingSoonClient() {
   const themeColor = theme.primaryColor;
 
   useEffect(() => {
-    setDaysSinceAccident(getDaysSince(ACCIDENT_DATE));
-    setDaysSober(getDaysSince(SOBRIETY_DATE));
-    const next = getNextRace();
-    setDaysUntilRace(next ? getDaysUntil(parseLocalDate(next.date)) : 0);
-    setDaysUntilNationals(getDaysUntil(NATIONALS_DATE));
+    const recompute = () => {
+      setDaysSinceAccident(getDaysSince(ACCIDENT_DATE));
+      setDaysSober(getDaysSince(SOBRIETY_DATE));
+      const next = getNextRace();
+      const daysToRace = next ? getDaysUntil(parseLocalDate(next.date)) : 0;
+      setDaysUntilRace(daysToRace);
+      setIsRaceDay(!!next && daysToRace === 0);
+      setDaysUntilNationals(getDaysUntil(NATIONALS_DATE));
+    };
+
+    recompute();
+
+    // The day-based counters are computed from the local date, so they need to
+    // refresh when the date rolls over. Schedule a recompute just after the next
+    // local midnight, then reschedule for each following day. `cancelled` stops
+    // the recursive reschedule from queuing a new timer after the effect tears
+    // down (e.g. if the callback fires during unmount).
+    let cancelled = false;
+    let midnightTimer: ReturnType<typeof setTimeout>;
+    const scheduleMidnightRefresh = () => {
+      const now = new Date();
+      const nextMidnight = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate() + 1,
+        0,
+        0,
+        1, // a second past midnight, to avoid landing on the boundary
+      );
+      midnightTimer = setTimeout(() => {
+        if (cancelled) return;
+        recompute();
+        scheduleMidnightRefresh();
+      }, nextMidnight.getTime() - now.getTime());
+    };
+    scheduleMidnightRefresh();
+
+    // Backstop: timers are throttled while the machine sleeps, so also recompute
+    // when the tab becomes visible again (e.g. waking a laptop the next morning).
+    const handleVisibility = () => {
+      if (!cancelled && document.visibilityState === 'visible') recompute();
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(midnightTimer);
+      document.removeEventListener('visibilitychange', handleVisibility);
+    };
   }, []);
 
 
@@ -736,13 +781,21 @@ export default function ComingSoonClient() {
                     transition={{ duration: 0.3 }}
                   >
                     <div
-                      className="font-display text-[clamp(3.5rem,10vw,7rem)] font-bold leading-none"
+                      className={`font-display font-bold leading-none ${
+                        !showNationals && isRaceDay
+                          ? 'text-[clamp(2.5rem,8vw,5.5rem)] whitespace-nowrap'
+                          : 'text-[clamp(3.5rem,10vw,7rem)]'
+                      }`}
                       style={{ color: themeColor }}
                     >
-                      <AnimatedCounter value={showNationals ? daysUntilNationals : daysUntilRace} duration={2600} />
+                      {!showNationals && isRaceDay ? (
+                        'RACE DAY!'
+                      ) : (
+                        <AnimatedCounter value={showNationals ? daysUntilNationals : daysUntilRace} duration={2600} />
+                      )}
                     </div>
                     <div className="font-mono text-[0.7rem] md:text-[0.8rem] tracking-[0.3em] text-white/70 mt-2 font-medium">
-                      {showNationals ? 'DAYS UNTIL NATIONALS' : 'DAYS UNTIL NEXT RACE'}
+                      {showNationals ? 'DAYS UNTIL NATIONALS' : isRaceDay ? 'GO TIME' : 'DAYS UNTIL NEXT RACE'}
                     </div>
                   </motion.div>
                 </AnimatePresence>
