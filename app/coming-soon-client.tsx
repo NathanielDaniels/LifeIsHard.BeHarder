@@ -137,13 +137,55 @@ export default function ComingSoonClient() {
   const themeColor = theme.primaryColor;
 
   useEffect(() => {
-    setDaysSinceAccident(getDaysSince(ACCIDENT_DATE));
-    setDaysSober(getDaysSince(SOBRIETY_DATE));
-    const next = getNextRace();
-    const daysToRace = next ? getDaysUntil(parseLocalDate(next.date)) : 0;
-    setDaysUntilRace(daysToRace);
-    setIsRaceDay(!!next && daysToRace === 0);
-    setDaysUntilNationals(getDaysUntil(NATIONALS_DATE));
+    const recompute = () => {
+      setDaysSinceAccident(getDaysSince(ACCIDENT_DATE));
+      setDaysSober(getDaysSince(SOBRIETY_DATE));
+      const next = getNextRace();
+      const daysToRace = next ? getDaysUntil(parseLocalDate(next.date)) : 0;
+      setDaysUntilRace(daysToRace);
+      setIsRaceDay(!!next && daysToRace === 0);
+      setDaysUntilNationals(getDaysUntil(NATIONALS_DATE));
+    };
+
+    recompute();
+
+    // The day-based counters are computed from the local date, so they need to
+    // refresh when the date rolls over. Schedule a recompute just after the next
+    // local midnight, then reschedule for each following day. `cancelled` stops
+    // the recursive reschedule from queuing a new timer after the effect tears
+    // down (e.g. if the callback fires during unmount).
+    let cancelled = false;
+    let midnightTimer: ReturnType<typeof setTimeout>;
+    const scheduleMidnightRefresh = () => {
+      const now = new Date();
+      const nextMidnight = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate() + 1,
+        0,
+        0,
+        1, // a second past midnight, to avoid landing on the boundary
+      );
+      midnightTimer = setTimeout(() => {
+        if (cancelled) return;
+        recompute();
+        scheduleMidnightRefresh();
+      }, nextMidnight.getTime() - now.getTime());
+    };
+    scheduleMidnightRefresh();
+
+    // Backstop: timers are throttled while the machine sleeps, so also recompute
+    // when the tab becomes visible again (e.g. waking a laptop the next morning).
+    const handleVisibility = () => {
+      if (!cancelled && document.visibilityState === 'visible') recompute();
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(midnightTimer);
+      document.removeEventListener('visibilitychange', handleVisibility);
+    };
   }, []);
 
 
