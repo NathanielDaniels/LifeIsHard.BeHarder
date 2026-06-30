@@ -69,6 +69,23 @@ function normalize(post: IgApiPost): FeedPost {
   };
 }
 
+const FETCH_TIMEOUT_MS = 10_000;
+
+/** fetch() with an abort-based timeout so a stalled Instagram call fails fast
+ *  instead of hanging until the serverless platform timeout. */
+async function fetchWithTimeout(
+  input: Parameters<typeof fetch>[0],
+  init: Parameters<typeof fetch>[1] = {}
+): Promise<Response> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+  try {
+    return await fetch(input, { ...init, signal: controller.signal });
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 /**
  * Fetch recent posts from Patrick's Instagram professional account.
  * Returns [] on any failure — the caller is responsible for fallback UI.
@@ -87,7 +104,7 @@ export async function getInstagramPosts(limit = 6): Promise<FeedPost[]> {
   const url = `${GRAPH_BASE}/me/media?fields=${fields}&limit=${limit}`;
 
   try {
-    const res = await fetch(url, {
+    const res = await fetchWithTimeout(url, {
       headers: { Authorization: `Bearer ${token}` },
       next: { revalidate: 1800 },
     });
@@ -114,7 +131,7 @@ export async function getInstagramPosts(limit = 6): Promise<FeedPost[]> {
 export async function refreshInstagramToken(currentToken: string): Promise<string | null> {
   try {
     const url = `${REFRESH_BASE}/refresh_access_token?grant_type=ig_refresh_token&access_token=${encodeURIComponent(currentToken)}`;
-    const res = await fetch(url);
+    const res = await fetchWithTimeout(url);
     if (!res.ok) {
       console.error('[instagram] token refresh failed: HTTP', res.status);
       return null;

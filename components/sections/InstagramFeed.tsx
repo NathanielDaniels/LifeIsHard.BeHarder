@@ -51,7 +51,9 @@ export default function InstagramFeed({ themeColor }: InstagramFeedProps) {
     fetch('/api/instagram?limit=6', { signal: controller.signal })
       .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
-        if (data?.posts?.length) setPosts(data.posts);
+        // Replace on any valid array (incl. empty) so we never present the stock
+        // placeholders as the real feed. A fetch/parse failure leaves placeholders.
+        if (Array.isArray(data?.posts)) setPosts(data.posts);
       })
       .catch(() => {
         /* keep placeholders */

@@ -8,7 +8,7 @@ import { getInstagramPosts } from '@/lib/instagram';
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const requested = Number(searchParams.get('limit'));
-  const limit = Number.isFinite(requested) && requested > 0 ? Math.min(requested, 25) : 6;
+  const limit = Number.isInteger(requested) && requested > 0 ? Math.min(requested, 25) : 6;
 
   const posts = await getInstagramPosts(limit);
 
