@@ -1,148 +1,145 @@
 // Instagram API Integration Helper
-// Provides utilities for fetching Instagram posts via Basic Display API
-// Documentation: https://developers.facebook.com/docs/instagram-basic-display-api
+// Uses the "Instagram API with Instagram Login" (Graph-based) endpoints.
+// NOTE: the old Instagram Basic Display API was shut down Dec 4, 2024 — do not use it.
+// Docs: https://developers.facebook.com/docs/instagram-platform/instagram-api-with-instagram-login
+//
+// Requires a server-only INSTAGRAM_ACCESS_TOKEN (long-lived, 60 days, self-refreshing).
+// Never expose this as NEXT_PUBLIC_* — it would leak into the browser bundle.
 
-interface InstagramPost {
+const GRAPH_VERSION = 'v25.0';
+const GRAPH_BASE = `https://graph.instagram.com/${GRAPH_VERSION}`;
+// refresh_access_token lives on the unversioned host
+const REFRESH_BASE = 'https://graph.instagram.com';
+const PROFILE_URL = 'https://www.instagram.com/patwingit';
+
+type IgMediaType = 'IMAGE' | 'VIDEO' | 'CAROUSEL_ALBUM';
+
+interface IgApiPost {
   id: string;
-  caption: string;
-  media_type: 'IMAGE' | 'VIDEO' | 'CAROUSEL_ALBUM';
-  media_url: string;
-  permalink: string;
+  caption?: string;
+  media_type: IgMediaType;
+  media_url?: string;
+  thumbnail_url?: string;
+  permalink?: string;
   timestamp: string;
 }
 
-interface InstagramResponse {
-  data: InstagramPost[];
-  paging?: {
-    cursors: {
-      before: string;
-      after: string;
-    };
-    next?: string;
+interface IgApiResponse {
+  data?: IgApiPost[];
+  error?: { message?: string; code?: number };
+}
+
+// Normalized shape consumed by the InstagramFeed component.
+export interface FeedPost {
+  id: string;
+  image: string; // displayable cover: video poster frame, carousel first child, or photo
+  caption: string;
+  permalink: string;
+  isVideo: boolean;
+  timeLabel: string; // relative age, e.g. "3h", "2d", "1w"
+}
+
+/** Compact relative-age label. Computed server-side at fetch time (cached 30m). */
+function relativeLabel(iso: string): string {
+  const then = new Date(iso).getTime();
+  if (Number.isNaN(then)) return '';
+  const seconds = Math.max(0, (Date.now() - then) / 1000);
+  const DAY = 86400;
+  if (seconds < 3600) return `${Math.max(1, Math.floor(seconds / 60))}m`;
+  if (seconds < DAY) return `${Math.floor(seconds / 3600)}h`;
+  if (seconds < DAY * 7) return `${Math.floor(seconds / DAY)}d`;
+  if (seconds < DAY * 30) return `${Math.floor(seconds / (DAY * 7))}w`;
+  if (seconds < DAY * 365) return `${Math.floor(seconds / (DAY * 30))}mo`;
+  return `${Math.floor(seconds / (DAY * 365))}y`;
+}
+
+function normalize(post: IgApiPost): FeedPost {
+  const isVideo = post.media_type === 'VIDEO';
+  // Videos expose only an .mp4 in media_url (not <img>-renderable), so we need
+  // thumbnail_url for the poster frame. Carousels return the first child's image
+  // in media_url, which is exactly the cover we want. Photos use media_url.
+  const image = isVideo ? (post.thumbnail_url ?? '') : (post.media_url ?? '');
+  return {
+    id: post.id,
+    image,
+    caption: post.caption?.trim() ?? '',
+    permalink: post.permalink ?? PROFILE_URL,
+    isVideo,
+    timeLabel: relativeLabel(post.timestamp),
   };
 }
 
-/**
- * Fetch recent Instagram posts
- * Requires INSTAGRAM_ACCESS_TOKEN and INSTAGRAM_USER_ID in environment
- */
-export async function getInstagramPosts(limit: number = 12): Promise<InstagramPost[]> {
+const FETCH_TIMEOUT_MS = 10_000;
+
+/** fetch() with an abort-based timeout so a stalled Instagram call fails fast
+ *  instead of hanging until the serverless platform timeout. */
+async function fetchWithTimeout(
+  input: Parameters<typeof fetch>[0],
+  init: Parameters<typeof fetch>[1] = {}
+): Promise<Response> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
   try {
-    const userId = process.env.INSTAGRAM_USER_ID;
-    const accessToken = process.env.NEXT_PUBLIC_INSTAGRAM_ACCESS_TOKEN;
-
-    if (!userId || !accessToken) {
-      console.warn('Instagram credentials not configured');
-      return getMockInstagramPosts();
-    }
-
-    const fields = 'id,caption,media_type,media_url,permalink,timestamp';
-    const url = `https://graph.instagram.com/${userId}/media?fields=${fields}&access_token=${accessToken}&limit=${limit}`;
-
-    const response = await fetch(url, {
-      next: { revalidate: 1800 } // Cache for 30 minutes
-    });
-
-    if (!response.ok) {
-      throw new Error(`Instagram API error: ${response.status}`);
-    }
-
-    const data: InstagramResponse = await response.json();
-    return data.data || [];
-  } catch (error) {
-    console.error('Error fetching Instagram posts:', error);
-    return getMockInstagramPosts();
+    return await fetch(input, { ...init, signal: controller.signal });
+  } finally {
+    clearTimeout(timeout);
   }
 }
 
 /**
- * Mock Instagram posts for development/fallback
+ * Fetch recent posts from Patrick's Instagram professional account.
+ * Returns [] on any failure — the caller is responsible for fallback UI.
  */
-function getMockInstagramPosts(): InstagramPost[] {
-  return [
-    {
-      id: '1',
-      caption: 'Morning run complete 💪',
-      media_type: 'IMAGE',
-      media_url: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=600&q=80',
-      permalink: 'https://instagram.com/p/mock1',
-      timestamp: new Date().toISOString()
-    },
-    {
-      id: '2',
-      caption: 'Training day',
-      media_type: 'IMAGE',
-      media_url: 'https://images.unsplash.com/photo-1551632811-561732d1e306?w=600&q=80',
-      permalink: 'https://instagram.com/p/mock2',
-      timestamp: new Date().toISOString()
-    },
-    {
-      id: '3',
-      caption: 'Push through',
-      media_type: 'IMAGE',
-      media_url: 'https://images.unsplash.com/photo-1452626038306-9aae5e071dd3?w=600&q=80',
-      permalink: 'https://instagram.com/p/mock3',
-      timestamp: new Date().toISOString()
-    },
-    {
-      id: '4',
-      caption: 'Race prep',
-      media_type: 'IMAGE',
-      media_url: 'https://images.unsplash.com/photo-1530549387789-4c1017266635?w=600&q=80',
-      permalink: 'https://instagram.com/p/mock4',
-      timestamp: new Date().toISOString()
-    },
-    {
-      id: '5',
-      caption: 'Mountain views',
-      media_type: 'IMAGE',
-      media_url: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80',
-      permalink: 'https://instagram.com/p/mock5',
-      timestamp: new Date().toISOString()
-    },
-    {
-      id: '6',
-      caption: 'Summit day',
-      media_type: 'IMAGE',
-      media_url: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=600&q=80',
-      permalink: 'https://instagram.com/p/mock6',
-      timestamp: new Date().toISOString()
+export async function getInstagramPosts(limit = 6): Promise<FeedPost[]> {
+  const token = process.env.INSTAGRAM_ACCESS_TOKEN;
+  if (!token) {
+    console.warn('[instagram] INSTAGRAM_ACCESS_TOKEN not configured');
+    return [];
+  }
+
+  const fields = 'id,caption,media_type,media_url,thumbnail_url,permalink,timestamp';
+  // Token goes in the Authorization header, never the query string, so it can't
+  // leak into Vercel/Node request logs. The Next Data Cache (next.revalidate) holds
+  // the upstream response for 30 min so we never approach the Instagram rate limit.
+  const url = `${GRAPH_BASE}/me/media?fields=${fields}&limit=${limit}`;
+
+  try {
+    const res = await fetchWithTimeout(url, {
+      headers: { Authorization: `Bearer ${token}` },
+      next: { revalidate: 1800 },
+    });
+    const json: IgApiResponse = await res.json();
+
+    if (!res.ok || json.error) {
+      console.error('[instagram] API error:', json.error?.message ?? `HTTP ${res.status}`);
+      return [];
     }
-  ];
+
+    // Drop anything without a renderable cover (e.g. a video missing its thumbnail).
+    return (json.data ?? []).map(normalize).filter((p) => p.image);
+  } catch (error) {
+    console.error('[instagram] fetch failed:', error);
+    return [];
+  }
 }
 
 /**
- * Refresh Instagram access token
- * Long-lived tokens expire after 60 days and need refresh
+ * Refresh a long-lived Instagram access token.
+ * Long-lived tokens expire after 60 days; refresh once they're >24h old.
+ * Returns the new token, or null on failure.
  */
 export async function refreshInstagramToken(currentToken: string): Promise<string | null> {
   try {
-    const url = `https://graph.instagram.com/refresh_access_token?grant_type=ig_refresh_token&access_token=${currentToken}`;
-    
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error('Failed to refresh token');
+    const url = `${REFRESH_BASE}/refresh_access_token?grant_type=ig_refresh_token&access_token=${encodeURIComponent(currentToken)}`;
+    const res = await fetchWithTimeout(url);
+    if (!res.ok) {
+      console.error('[instagram] token refresh failed: HTTP', res.status);
+      return null;
     }
-
-    const data = await response.json();
-    return data.access_token;
+    const data = await res.json();
+    return data.access_token ?? null;
   } catch (error) {
-    console.error('Error refreshing Instagram token:', error);
+    console.error('[instagram] token refresh error:', error);
     return null;
   }
 }
-
-// Example API route implementation:
-// Create /app/api/instagram/route.ts with this content:
-/*
-import { getInstagramPosts } from '@/lib/instagram';
-
-export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const limit = parseInt(searchParams.get('limit') || '12');
-  
-  const posts = await getInstagramPosts(limit);
-  
-  return Response.json({ posts });
-}
-*/

@@ -16,7 +16,7 @@ import dynamic from 'next/dynamic';
 
 const RaceCalendar = dynamic(() => import('@/components/shared/RaceCalendar'), { ssr: false });
 const RaceGlobe = dynamic(() => import('@/components/shared/RaceGlobe'), { ssr: false });
-// import InstagramFeed from '@/components/sections/InstagramFeed';
+import InstagramFeed from '@/components/sections/InstagramFeed';
 import CustomCursor from '@/components/shared/CustomCursor';
 // import PixelRunner from '@/components/shared/PixelRunner';
 
@@ -1081,62 +1081,8 @@ export default function ComingSoonClient() {
         </motion.div>
       </section>
 
-      <section className="relative w-full flex justify-center py-32 md:py-48 overflow-hidden">
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 0.15 }}
-            viewport={{ once: true }}
-            transition={{ duration: 1.5, delay: 0.5 }}
-            className="w-[60vw] h-[60vw] max-w-[600px] max-h-[600px] rounded-full blur-[100px] md:blur-[120px]"
-            style={{ backgroundColor: themeColor }}
-          />
-        </div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 1, ease: "easeOut" }}
-          className="relative pointer-events-auto z-10 w-full max-w-5xl px-6"
-        >
-          <motion.div
-            initial={{ scale: 1 }}
-            whileInView={{ scale: 1.05 }}
-            viewport={{ once: true, margin: "-30% 0px -30% 0px", amount: 0.3 }}
-            transition={{ duration: 2, ease: "easeOut" }}
-          >
-            <Image
-              src="/pat-run.webp"
-              alt="Patrick Wingert running background"
-              width={1200}
-              height={1200}
-              className="relative z-0 object-contain drop-shadow-2xl grayscale max-h-[85vh] w-full"
-              priority
-            />
-          </motion.div>
-
-          {/* Color overlay reveals on scroll */}
-          {mounted && (
-            <motion.div
-              initial={{ opacity: 0, scale: 1 }}
-              whileInView={{ opacity: 1, scale: 1.05 }}
-              viewport={{ once: true, margin: "-30% 0px -30% 0px", amount: 0.3 }}
-              transition={{ duration: 2, ease: "easeOut" }}
-              className="absolute inset-0 top-0 left-0 px-6 z-10"
-            >
-              <Image
-                src="/pat-crop-run.webp"
-                alt="Patrick Wingert running color overlay"
-                width={1200}
-                height={1200}
-                className="w-full h-full object-contain drop-shadow-2xl"
-                priority
-              />
-            </motion.div>
-          )}
-        </motion.div>
-      </section>
+      {/* === INSTAGRAM FEED (replaces the running-photo reveal) === */}
+      <InstagramFeed themeColor={themeColor} />
 
       {/* === RACE MAP GLOBE === */}
       <section className="relative py-20 md:py-32 px-6">
@@ -1164,9 +1110,6 @@ export default function ComingSoonClient() {
           <RaceCalendar themeColor={themeColor} />
         </motion.div>
       </section>
-
-      {/* === INSTAGRAM FEED === */}
-      {/* <InstagramFeed themeColor={themeColor} /> */}
 
       {/* === SPONSORS === */}
       <section className="relative z-20 py-32 md:py-40 px-6 backdrop-blur-md border-t border-white/5">
