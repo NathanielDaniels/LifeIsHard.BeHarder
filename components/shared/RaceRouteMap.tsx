@@ -23,21 +23,18 @@ const RACE_POINTS = [
   { id: 'hammond',          coords: [-87.50, 41.58]  as [number, number], label: 'HAMMOND',           date: 'JUN 7',  order: 2,  type: 'tri' },
   { id: 'long-beach',       coords: [-118.19, 33.77] as [number, number], label: 'LONG BEACH',       date: 'JUN 19', order: 3,  type: 'tri' },
   { id: 'pleasant-prairie', coords: [-87.93, 42.55]  as [number, number], label: 'PLEASANT PRAIRIE', date: 'JUN 28', order: 4,  type: 'tri' },
-  { id: 'sf',               coords: SF_HOME,                              label: 'SAN FRANCISCO',    date: 'JUL 26', order: 5,  type: 'run', isHome: true },
-  { id: 'milwaukee',        coords: [-87.91, 43.04]  as [number, number], label: 'MILWAUKEE',        date: 'AUG 9',  order: 6,  type: 'tri', isTarget: true },
-  { id: 'chicago',          coords: [-87.63, 41.88]  as [number, number], label: 'CHICAGO',          date: 'AUG 23', order: 7,  type: 'tri' },
-  { id: 'la-jolla',         coords: [-117.27, 32.85] as [number, number], label: 'LA JOLLA',         date: 'OCT 25', order: 8,  type: 'tri' },
-  { id: 'berkeley',         coords: [-122.27, 37.87] as [number, number], label: 'BERKELEY',         date: 'NOV 15', order: 9,  type: 'run' },
-  { id: 'sacramento',       coords: [-121.49, 38.58] as [number, number], label: 'SACRAMENTO',       date: 'DEC 6',  order: 10, type: 'run' },
+  { id: 'milwaukee',        coords: [-87.91, 43.04]  as [number, number], label: 'MILWAUKEE',        date: 'AUG 9',  order: 5,  type: 'tri', isTarget: true },
+  { id: 'chicago',          coords: [-87.63, 41.88]  as [number, number], label: 'CHICAGO',          date: 'AUG 23', order: 6,  type: 'tri' },
+  { id: 'la-jolla',         coords: [-117.27, 32.85] as [number, number], label: 'LA JOLLA',         date: 'OCT 25', order: 7,  type: 'tri' },
+  { id: 'berkeley',         coords: [-122.27, 37.87] as [number, number], label: 'BERKELEY',         date: 'NOV 15', order: 8,  type: 'run' },
+  { id: 'sacramento',       coords: [-121.49, 38.58] as [number, number], label: 'SACRAMENTO',       date: 'DEC 6',  order: 9,  type: 'run' },
 ];
 
 // Hub-and-spoke: every race originates from SF home base
-const RACE_ARCS = RACE_POINTS
-  .filter((p) => p.id !== 'sf')
-  .map((point) => ({
-    from: SF_HOME,
-    to: point.coords as [number, number],
-  }));
+const RACE_ARCS = RACE_POINTS.map((point) => ({
+  from: SF_HOME,
+  to: point.coords as [number, number],
+}));
 
 function RaceRouteMap({ themeColor }: RaceRouteMapProps) {
   const [prefersReduced, setPrefersReduced] = useState(false);
@@ -154,7 +151,7 @@ function RaceRouteMap({ themeColor }: RaceRouteMapProps) {
           </Marker>
 
           {/* Race markers */}
-          {RACE_POINTS.filter((p) => p.id !== 'sf').map((point, i) => (
+          {RACE_POINTS.map((point, i) => (
             <Marker key={point.id} coordinates={point.coords as [number, number]}>
               <motion.g
                 initial={{ opacity: 0, scale: 0 }}

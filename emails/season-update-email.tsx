@@ -197,7 +197,6 @@ export default function SeasonUpdateEmail({ email }: SeasonUpdateEmailProps) {
 
             <Text style={styles.calendarGroupLabel}>RUNNING</Text>
             {[
-              ["JUL 26", "San Francisco Marathon", ""],
               ["NOV 15", "Berkeley Half Marathon", ""],
               ["DEC 6", "California International Marathon", ""],
             ].map(([date, race, note], i) => (

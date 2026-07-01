@@ -49,7 +49,6 @@ Next Race:      April 11, 2026 (AlphaWin Napa Valley Triathlon - California Stat
 
 **Running:**
 
-- Jul 26: San Francisco Marathon
 - Nov 15: Berkeley Half Marathon
 - Dec 6: California International Marathon
 
