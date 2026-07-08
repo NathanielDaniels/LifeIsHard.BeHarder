@@ -6,7 +6,6 @@ import { Providers } from "@/components/Providers";
 import Script from "next/script";
 import SiteControls from "@/components/SiteControls";
 import { Analytics } from "@vercel/analytics/next";
-import { GoogleAnalytics } from "@next/third-parties/google";
 
 const inter = Inter({ subsets: ["latin"] });
 const bebasNeue = Bebas_Neue({
@@ -20,6 +19,9 @@ export const metadata: Metadata = {
   title: "Patrick Wingert | Dare2tri Elite Team Athlete",
   description:
     "Life is Hard. Be Harder. Follow Patrick Wingert's journey as a Dare2tri Elite Team athlete, record-setting trekker, and unstoppable force in adaptive-sports.",
+  alternates: {
+    canonical: "/",
+  },
   keywords: [
     "Patrick Wingert",
     "Dare2tri",
@@ -61,25 +63,40 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const gaId = process.env.NEXT_PUBLIC_GA_ID;
   const metaPixelId = process.env.NEXT_PUBLIC_META_PIXEL_ID;
+  const isVercelDeployment = process.env.VERCEL === "1";
 
   return (
     <html lang="en" className="scroll-smooth">
       <body
         className={`${inter.className} ${bebasNeue.variable} antialiased bg-black`}
       >
-        <Providers>
+        <Providers whoopDemoMode={!isVercelDeployment}>
           <SmoothScroll>
             {children}
             <SiteControls />
           </SmoothScroll>
         </Providers>
-        <Analytics />
-        {process.env.NEXT_PUBLIC_GA_ID && (
-          <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
+        {isVercelDeployment && <Analytics />}
+        {gaId && (
+          <>
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
+              strategy="lazyOnload"
+            />
+            <Script id="google-analytics" strategy="lazyOnload">
+              {`
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', '${gaId}');
+              `}
+            </Script>
+          </>
         )}
         {metaPixelId && (
-          <Script id="meta-pixel" strategy="afterInteractive">
+          <Script id="meta-pixel" strategy="lazyOnload">
             {`
               !function(f,b,e,v,n,t,s)
               {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
