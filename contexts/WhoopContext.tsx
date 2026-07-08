@@ -175,7 +175,9 @@ export function WhoopProvider({
         if (!isMountedRef.current) return;
 
         const message = err instanceof Error ? err.message : 'Connection failed';
-        console.error('[WhoopContext] fetchStats error:', message);
+        if (process.env.NODE_ENV !== 'production') {
+          console.warn('[WhoopContext] fetchStats error:', message);
+        }
         setError(message);
         setMode('error');
         setConnectionStatus('error');
@@ -195,9 +197,11 @@ export function WhoopProvider({
     failureCountRef.current += 1;
     const delay = getBackoffDelay(failureCountRef.current);
 
-    console.warn(
-      `[WhoopContext] Scheduling retry #${failureCountRef.current} in ${delay}ms`
-    );
+    if (process.env.NODE_ENV !== 'production') {
+      console.warn(
+        `[WhoopContext] Scheduling retry #${failureCountRef.current} in ${delay}ms`
+      );
+    }
 
     retryTimerRef.current = setTimeout(() => {
       if (isMountedRef.current) {

@@ -23,6 +23,7 @@ import CustomCursor from '@/components/shared/CustomCursor';
 const ACCIDENT_DATE = parseLocalDate('2020-11-01');
 const SOBRIETY_DATE = parseLocalDate('2020-01-20');
 const NATIONALS_DATE = parseLocalDate('2026-08-09');
+const ENABLE_BOOT_SEQUENCE = process.env.NEXT_PUBLIC_ENABLE_BOOT_SEQUENCE === 'true';
 
 export default function ComingSoonClient() {
   const { energyState, theme } = useVitality();
@@ -41,8 +42,9 @@ export default function ComingSoonClient() {
 
   // Skip boot sequence when WHOOP data is already loaded (navigating back from another page)
   const dataAlreadyLoaded = connectionStatus === 'connected' || connectionStatus === 'error' || connectionStatus === 'unauthorized';
+  const bootSequenceEnabled = ENABLE_BOOT_SEQUENCE && !dataAlreadyLoaded;
 
-  const [phase, setPhase] = useState(dataAlreadyLoaded ? 6 : 0);
+  const [phase, setPhase] = useState(bootSequenceEnabled ? 0 : 6);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
   useEffect(() => {
@@ -190,12 +192,15 @@ export default function ComingSoonClient() {
 
 
   // === CONNECTION-SYNCED PROGRESS BAR ===
-  const [loadingProgress, setLoadingProgress] = useState(dataAlreadyLoaded ? 100 : 0);
+  const [loadingProgress, setLoadingProgress] = useState(bootSequenceEnabled ? 0 : 100);
   const targetProgressRef = useRef(0);
   const animFrameRef = useRef<number | null>(null);
 
   useEffect(() => {
-    switch (connectionStatus) {
+    if (!bootSequenceEnabled) return;
+
+    const status = connectionStatus as string;
+    switch (status) {
       case 'idle':
         targetProgressRef.current = 5;
         break;
@@ -211,9 +216,11 @@ export default function ComingSoonClient() {
         targetProgressRef.current = 100;
         break;
     }
-  }, [connectionStatus]);
+  }, [bootSequenceEnabled, connectionStatus]);
 
   useEffect(() => {
+    if (!bootSequenceEnabled) return;
+
     const animate = () => {
       setLoadingProgress(prev => {
         const target = targetProgressRef.current;
@@ -229,52 +236,65 @@ export default function ComingSoonClient() {
     return () => {
       if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
     };
-  }, []);
+  }, [bootSequenceEnabled]);
 
-  // Don't rush the boot even if API is instant
-  const [minTimeElapsed, setMinTimeElapsed] = useState(dataAlreadyLoaded);
+  // Keep the biometric boot feel without delaying first meaningful paint.
+  const [minTimeElapsed, setMinTimeElapsed] = useState(!bootSequenceEnabled);
   useEffect(() => {
-    const timer = setTimeout(() => setMinTimeElapsed(true), 2500);
+    if (!bootSequenceEnabled) return;
+
+    const timer = setTimeout(() => setMinTimeElapsed(true), 900);
     return () => clearTimeout(timer);
-  }, []);
+  }, [bootSequenceEnabled]);
 
-  const dataReady = connectionStatus === 'connected' || connectionStatus === 'error' || connectionStatus === 'unauthorized';
+  const dataReady =
+    connectionStatus === 'connected' ||
+    connectionStatus === 'stale' ||
+    connectionStatus === 'error' ||
+    connectionStatus === 'unauthorized';
   useEffect(() => {
-    if (loadingProgress >= 99 && minTimeElapsed && phase === 0) {
-      const timer = setTimeout(() => setPhase(1), 600); // Brief pause at 100% so user sees it complete
+    if (!bootSequenceEnabled) return;
+
+    if ((dataReady || loadingProgress >= 99) && minTimeElapsed && phase === 0) {
+      setLoadingProgress(100);
+      const timer = setTimeout(() => setPhase(1), 150);
       return () => clearTimeout(timer);
     }
-  }, [loadingProgress, minTimeElapsed, phase]);
+  }, [bootSequenceEnabled, dataReady, loadingProgress, minTimeElapsed, phase]);
 
   // Fallback if API hangs
   useEffect(() => {
+    if (!bootSequenceEnabled) return;
+
     const fallback = setTimeout(() => {
       if (phase === 0) {
         targetProgressRef.current = 100;
         setMinTimeElapsed(true);
       }
-    }, 8000);
+    }, 4000);
     return () => clearTimeout(fallback);
-  }, [phase]);
+  }, [bootSequenceEnabled, phase]);
 
   const cascadeStarted = useRef(false);
   useEffect(() => {
+    if (!bootSequenceEnabled) return;
+
     if (phase === 1 && !cascadeStarted.current) {
       cascadeStarted.current = true;
-      setTimeout(() => setPhase(2), 2000);
-      setTimeout(() => setPhase(3), 2700);
-      setTimeout(() => setPhase(4), 3400);
-      setTimeout(() => setPhase(5), 3800);
-      setTimeout(() => setPhase(6), 4200);
+      setTimeout(() => setPhase(2), 600);
+      setTimeout(() => setPhase(3), 900);
+      setTimeout(() => setPhase(4), 1200);
+      setTimeout(() => setPhase(5), 1450);
+      setTimeout(() => setPhase(6), 1650);
     }
-  }, [phase]);
+  }, [bootSequenceEnabled, phase]);
 
   useEffect(() => {
-    document.body.style.overflow = phase < 1 ? 'hidden' : '';
-  }, [phase]);
+    document.body.style.overflow = bootSequenceEnabled && phase < 1 ? 'hidden' : '';
+  }, [bootSequenceEnabled, phase]);
 
   return (
-    <div 
+    <main
       className="relative bg-[#050505] text-white overflow-x-hidden cursor-crosshair"
       onMouseMove={handleMouseMove}
       style={{ '--theme-color': themeColor } as React.CSSProperties}
@@ -485,9 +505,9 @@ export default function ComingSoonClient() {
             
             <motion.div
               initial={{ opacity: 0 }}
-              animate={{ opacity: 0.3 }}
+              animate={{ opacity: 1 }}
               transition={{ delay: 2.7 }}
-              className="absolute bottom-10 font-mono text-xs text-white/50 tracking-[0.2em]"
+              className="absolute bottom-10 font-mono text-xs text-white/70 tracking-[0.2em]"
             >
               {isConnected ? 'VITALITY_STREAM // LIVE' : 'VITALITY_STREAM // DEMO'}
             </motion.div>
@@ -572,9 +592,9 @@ export default function ComingSoonClient() {
           <AnimatePresence>
             {phase >= 1 && (
               <motion.div
-                initial={{ opacity: 0, y: 100, filter: 'blur(20px)' }}
+                initial={{ opacity: 0, y: 60, filter: 'blur(8px)' }}
                 animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
+                transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
               >
                 <h1 className="font-display font-bold leading-[0.85] tracking-tight">
                   <span className="block text-[clamp(4rem,15vw,13rem)] text-white drop-shadow-[2px_2px_0_rgba(0,0,0,0.5)]">
@@ -728,7 +748,7 @@ export default function ComingSoonClient() {
                 width={800}
                 height={800}
                 className="relative z-10 object-contain drop-shadow-2xl grayscale hover:grayscale-0 transition-all duration-700 max-h-[40vh] md:max-h-[45vh] w-auto"
-                priority
+                sizes="(max-width: 768px) 45vw, 260px"
               />
             </div>
           </motion.div>
@@ -1136,11 +1156,11 @@ export default function ComingSoonClient() {
 
           <div className="flex flex-wrap justify-center items-center gap-10 md:gap-16 lg:gap-20 pr-8 md:pr-16">
             {[
-              { src: '/sponsors/performance-wealth-partners-light.svg', link: 'https://performancewealthpartners.com', alt: 'Performance Wealth Partners', className: 'h-16 md:h-20 grayscale group-hover:grayscale-0' },
-              { src: '/sponsors/ATF_logo_dark_transparent.png', link: 'https://www.adaptivetrainingfoundation.org/', alt: 'Adaptive Training Foundation', className: 'h-28 md:h-36 lg:h-44 invert brightness-200' },
-              { src: '/sponsors/CAF_logo_transparent.webp', link: 'https://www.challengedathletes.org/', alt: 'Challenged Athletes Foundation', className: 'h-24 md:h-32 grayscale group-hover:grayscale-0 opacity-100 object-contain' },
-              { src: '/sponsors/david-rotter-logo_orig_transparent.png', link: 'https://www.rotterprosthetics.com/', alt: 'David Rotter Prosthetics', className: 'h-16 md:h-20 grayscale group-hover:grayscale-0 brightness-200 group-hover:brightness-100' },
-              { src: '/sponsors/SEBCM_color_transparent.webp', link: 'https://soeverybodycanmove.org', alt: 'So Every Body Can Move', className: 'h-10 md:h-12 grayscale group-hover:grayscale-0 brightness-200 group-hover:brightness-100' },
+              { src: '/sponsors/performance-wealth-partners-light.svg', link: 'https://performancewealthpartners.com', alt: 'Performance Wealth Partners', width: 300, height: 119, className: 'h-16 md:h-20 grayscale group-hover:grayscale-0' },
+              { src: '/sponsors/atf-logo-site.webp', link: 'https://www.adaptivetrainingfoundation.org/', alt: 'Adaptive Training Foundation', width: 360, height: 360, className: 'h-28 md:h-36 lg:h-44 invert brightness-200' },
+              { src: '/sponsors/caf-logo-site.webp', link: 'https://www.challengedathletes.org/', alt: 'Challenged Athletes Foundation', width: 360, height: 300, className: 'h-24 md:h-32 grayscale group-hover:grayscale-0 opacity-100 object-contain' },
+              { src: '/sponsors/david-rotter-logo-site.webp', link: 'https://www.rotterprosthetics.com/', alt: 'David Rotter Prosthetics', width: 420, height: 300, className: 'h-16 md:h-20 grayscale group-hover:grayscale-0 brightness-200 group-hover:brightness-100' },
+              { src: '/sponsors/sebcm-logo-site.webp', link: 'https://soeverybodycanmove.org', alt: 'So Every Body Can Move', width: 600, height: 160, className: 'h-10 md:h-12 grayscale group-hover:grayscale-0 brightness-200 group-hover:brightness-100' },
             ].map((sponsor, i) => (
               <motion.div
                 key={sponsor.alt}
@@ -1150,19 +1170,24 @@ export default function ComingSoonClient() {
                 transition={{ duration: 0.6, delay: i * 0.15 }}
                 className="relative cursor-pointer transition-opacity duration-500 opacity-40 hover:opacity-100 group"
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
                 {sponsor.link ? (
                   <a href={sponsor.link} target="_blank" rel="noopener noreferrer" className="block outline-none">
-                    <img 
+                    <Image
                       src={sponsor.src} 
                       alt={sponsor.alt}
+                      width={sponsor.width}
+                      height={sponsor.height}
+                      sizes="(max-width: 768px) 45vw, 180px"
                       className={`object-contain transition-all duration-500 ${sponsor.className}`}
                     />
                   </a>
                 ) : (
-                  <img 
+                  <Image
                     src={sponsor.src} 
                     alt={sponsor.alt}
+                    width={sponsor.width}
+                    height={sponsor.height}
+                    sizes="(max-width: 768px) 45vw, 180px"
                     className={`object-contain transition-all duration-500 ${sponsor.className}`}
                   />
                 )}
@@ -1221,6 +1246,6 @@ export default function ComingSoonClient() {
           </a>
         </div>
       </footer>
-    </div>
+    </main>
   );
 }
