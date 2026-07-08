@@ -64,7 +64,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const gaId = process.env.NEXT_PUBLIC_GA_ID;
-  const metaPixelId = process.env.NEXT_PUBLIC_META_PIXEL_ID;
+  const metaPixelId =
+    process.env.NEXT_PUBLIC_ENABLE_META_PIXEL === "true"
+      ? process.env.NEXT_PUBLIC_META_PIXEL_ID
+      : undefined;
   const isVercelDeployment = process.env.VERCEL === "1";
 
   return (
