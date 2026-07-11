@@ -118,7 +118,7 @@ export default function LongBeachEmail({ email }: LongBeachEmailProps) {
             </Text>
 
             <CtaButton href={SUPERTRI_URL}>
-              SUPERTRI LONG BEACH · PARATRIATHLON&nbsp;&nbsp;→
+              SUPERTRI LONG BEACH&nbsp;&nbsp;→
             </CtaButton>
 
             <Text style={styles.bodyTextTop}>
