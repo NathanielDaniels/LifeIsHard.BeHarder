@@ -615,6 +615,9 @@ const styles: Record<string, React.CSSProperties> = {
     // and below before the "Why We're Moving" heading.
     margin: "0 auto 30px",
     border: "none",
+    // The PNG ships with a baked-in white plate so the black artwork stays
+    // legible in forced dark mode; round its corners to read as a panel.
+    borderRadius: "10px",
   },
   campaignHeader: {
     fontFamily: bebas,
