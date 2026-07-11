@@ -341,18 +341,15 @@ export default function LongBeachEmail({ email }: LongBeachEmailProps) {
           </Section>
 
           {/* Funding Forward Motion block (from Patrick's draft) */}
-          <Section style={styles.bannerCard}>
+          <Section style={styles.card}>
             <Link href={DARE2TRI_URL}>
               <Img
                 src={IMG.fundingForward}
-                width="560"
+                width="440"
                 alt="Dare2Tri Funding Forward Motion campaign"
-                style={styles.bannerPhoto}
+                style={styles.campaignBanner}
               />
             </Link>
-          </Section>
-
-          <Section style={styles.card}>
             <Text style={styles.campaignHeader}>
               Why We're Moving—And What It Means
             </Text>
@@ -609,6 +606,14 @@ const styles: Record<string, React.CSSProperties> = {
   },
 
   /* Funding Forward Motion campaign block */
+  campaignBanner: {
+    display: "block",
+    width: "100%",
+    maxWidth: "440px",
+    height: "auto",
+    margin: "0 auto 22px",
+    border: "none",
+  },
   campaignHeader: {
     fontFamily: bebas,
     fontSize: "26px",
