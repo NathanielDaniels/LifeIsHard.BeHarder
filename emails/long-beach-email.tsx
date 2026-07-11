@@ -611,7 +611,9 @@ const styles: Record<string, React.CSSProperties> = {
     width: "100%",
     maxWidth: "440px",
     height: "auto",
-    margin: "0 auto 22px",
+    // Match the card's 30px top padding so the image has equal space above
+    // and below before the "Why We're Moving" heading.
+    margin: "0 auto 30px",
     border: "none",
   },
   campaignHeader: {
