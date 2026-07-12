@@ -143,6 +143,23 @@ export function Masthead({ tag, sub }: { tag: string; sub: string }) {
   );
 }
 
+/**
+ * Standard Patrick Wingert header banner. Include this at the top of every
+ * email (right after <Masthead />) so all sends share the same branded header.
+ */
+export function HeaderBanner() {
+  return (
+    <Section style={s.headerImageCard}>
+      <Img
+        src={`${SITE}/email/header.jpeg`}
+        width="620"
+        alt="Patrick Wingert — Dare2Tri Elite"
+        style={s.headerImage}
+      />
+    </Section>
+  );
+}
+
 export function CardLabel({ children }: { children: React.ReactNode }) {
   return (
     <table
@@ -280,6 +297,19 @@ export function BrandFooter({ email }: { email?: string }) {
 const s: Record<string, React.CSSProperties> = {
   masthead: {
     padding: "22px 24px 18px",
+  },
+  headerImageCard: {
+    backgroundColor: colors.ink,
+    width: "100%",
+    margin: "0 auto 18px",
+    overflow: "hidden",
+  },
+  headerImage: {
+    display: "block",
+    width: "100%",
+    maxWidth: "100%",
+    height: "auto",
+    border: "none",
   },
   mastheadLeft: {
     width: "55%",

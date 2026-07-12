@@ -15,6 +15,7 @@ import {
   BrandFooter,
   CardLabel,
   CtaButton,
+  HeaderBanner,
   Masthead,
   SITE,
   SponsorsCard,
@@ -42,7 +43,6 @@ const DARE2TRI_URL = "https://give.dare2tri.org/fundraiser/6928347";
 // Image slots. Files live in public/email/long-beach/.
 // Until they exist, preview-long-beach.ts renders a labeled placeholder.
 const IMG = {
-  header: `${SITE}/email/header.jpeg`,
   hero: `${SITE}/email/long-beach/long-beach-hero.jpg`,
   cafBadge: `${SITE}/email/long-beach/caf-cycling-badge.png`,
   group: `${SITE}/email/long-beach/dare2tri-group.jpg`,
@@ -83,15 +83,7 @@ export default function LongBeachEmail({ email }: LongBeachEmailProps) {
 
           <Masthead tag="RACE WEEK DISPATCH" sub="JULY 2026" />
 
-          {/* PW header banner (matches the last email) */}
-          <Section style={styles.headerImageCard}>
-            <Img
-              src={IMG.header}
-              width="620"
-              alt="Patrick Wingert — Dare2Tri Elite"
-              style={styles.headerImage}
-            />
-          </Section>
+          <HeaderBanner />
 
           {/* Poster card: headline + italic quote + running photo + date band */}
           <Section style={styles.posterCard}>
@@ -448,21 +440,6 @@ const styles: Record<string, React.CSSProperties> = {
     height: "5px",
     width: "100%",
     borderRadius: "3px",
-  },
-
-  /* PW header banner */
-  headerImageCard: {
-    backgroundColor: c.ink,
-    width: "100%",
-    margin: "0 auto 18px",
-    overflow: "hidden",
-  },
-  headerImage: {
-    display: "block",
-    width: "100%",
-    maxWidth: "100%",
-    height: "auto",
-    border: "none",
   },
 
   /* Poster card */
