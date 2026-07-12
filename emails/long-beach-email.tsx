@@ -42,6 +42,7 @@ const DARE2TRI_URL = "https://give.dare2tri.org/fundraiser/6928347";
 // Image slots. Files live in public/email/long-beach/.
 // Until they exist, preview-long-beach.ts renders a labeled placeholder.
 const IMG = {
+  header: `${SITE}/email/header.jpeg`,
   hero: `${SITE}/email/long-beach/long-beach-hero.jpg`,
   cafBadge: `${SITE}/email/long-beach/caf-cycling-badge.png`,
   group: `${SITE}/email/long-beach/dare2tri-group.jpg`,
@@ -82,14 +83,18 @@ export default function LongBeachEmail({ email }: LongBeachEmailProps) {
 
           <Masthead tag="RACE WEEK DISPATCH" sub="JULY 2026" />
 
-          {/* Poster card: hero shot + headline + italic quote + date band */}
-          <Section style={styles.posterCard}>
+          {/* PW header banner (matches the last email) */}
+          <Section style={styles.headerImageCard}>
             <Img
-              src={IMG.hero}
-              width="560"
-              alt="Patrick on the beach in Long Beach, California"
-              style={styles.heroPhoto}
+              src={IMG.header}
+              width="620"
+              alt="Patrick Wingert — Dare2Tri Elite"
+              style={styles.headerImage}
             />
+          </Section>
+
+          {/* Poster card: headline + italic quote + running photo + date band */}
+          <Section style={styles.posterCard}>
             <Section style={styles.posterTop}>
               <Text style={styles.ecgLine}>{"——————/\\__/\\——————"}</Text>
               <Text style={styles.headline}>THE COURSE HASN'T CHANGED.</Text>
@@ -99,6 +104,12 @@ export default function LongBeachEmail({ email }: LongBeachEmailProps) {
                 return to find out how far I've come.
               </Text>
             </Section>
+            <Img
+              src={IMG.hero}
+              width="560"
+              alt="Patrick racing the Long Beach course in his Dare2Tri kit"
+              style={styles.heroPhoto}
+            />
             <Section style={styles.posterBand}>
               <Text style={styles.bandDate}>NEXT SATURDAY — SUPERTRI LONG BEACH</Text>
               <Text style={styles.bandPlace}>
@@ -437,6 +448,21 @@ const styles: Record<string, React.CSSProperties> = {
     height: "5px",
     width: "100%",
     borderRadius: "3px",
+  },
+
+  /* PW header banner */
+  headerImageCard: {
+    backgroundColor: c.ink,
+    width: "100%",
+    margin: "0 auto 18px",
+    overflow: "hidden",
+  },
+  headerImage: {
+    display: "block",
+    width: "100%",
+    maxWidth: "100%",
+    height: "auto",
+    border: "none",
   },
 
   /* Poster card */

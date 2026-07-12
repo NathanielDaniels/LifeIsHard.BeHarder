@@ -18,6 +18,8 @@ const images: { path: string; label: string }[] = [
   { path: "email/dare2tri.png", label: "DARE2TRI" },
   { path: "email/sebcm.png", label: "SO EVERY BODY CAN MOVE" },
   { path: "email/david-rotter.png", label: "DAVID ROTTER" },
+  // PW header banner
+  { path: "email/header.jpeg", label: "HEADER" },
   // Patrick's Long Beach photos (drop into public/email/long-beach/)
   { path: "email/long-beach/long-beach-hero.jpg", label: "HERO · PATRICK AT LONG BEACH" },
   { path: "email/long-beach/caf-cycling-badge.png", label: "BADGE · CAF NORCAL CYCLING CLUB" },
