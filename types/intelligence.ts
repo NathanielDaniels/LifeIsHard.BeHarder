@@ -46,6 +46,7 @@ export interface DisciplineRecoveryCost {
     emoji: string            // "🏊", "🏃", "🚴"
     costPerStrain: number    // recovery points lost per unit strain
     label: string            // "low cost", "moderate", "high cost"
+    color?: string           // hex color: green (boost) → yellow (moderate) → red (high cost)
   }[]
   insight: string            // "Long bike sessions (>90 min) hit 2x harder..."
 }
