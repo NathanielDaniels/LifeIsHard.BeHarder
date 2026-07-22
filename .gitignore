@@ -45,3 +45,9 @@ next-env.d.ts
 # superpowers
 .superpowers
 .worktrees
+
+# source photos for email asset optimization (never served; see scripts/optimize-*)
+/assets/source
+
+# generated email previews
+emails/*-preview.html
