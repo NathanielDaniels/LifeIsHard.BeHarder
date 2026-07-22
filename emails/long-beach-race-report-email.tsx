@@ -35,8 +35,9 @@ interface LongBeachRaceReportEmailProps {
 const NBSP = " ";
 const DOT = `${NBSP}${NBSP}·${NBSP}${NBSP}`;
 
+// Patrick's own opening line, used verbatim as the subject. Do not rewrite it.
 export const longBeachRaceReportSubject =
-  "Long Beach Recap: 16 Minutes, 32 Seconds Faster Than a Year Ago";
+  "A year ago, I crossed the finish line in Long Beach wondering what was possible.";
 
 const PREVIEW =
   "A year ago Long Beach was the start. This weekend it was the measuring stick. The stopwatch only tells the truth.";
