@@ -309,7 +309,7 @@ export default function LongBeachRaceReportEmail({
             <Text style={styles.bodyText}>
               A year ago, I arrived at Dare2Tri&rsquo;s Train to Race Camp as the
               nervous new guy hoping just to survive. I spent the first 200m of
-              last years swim trying to convince myself it was ok to quit.
+              last year&rsquo;s swim trying to convince myself it was ok to quit.
               Instead I pushed through. Every workout, every transition, every
               question was a reminder that I was still trying to figure this
               sport out.
@@ -494,7 +494,7 @@ export default function LongBeachRaceReportEmail({
               off.
             </Text>
             <Text style={styles.bodyText}>
-              Now it&rsquo;s time to see what it&rsquo;s all adds up to.
+              Now it&rsquo;s time to see what it all adds up to.
             </Text>
             <Text style={styles.bodyTextLast}>The goal is simple.</Text>
             <Text style={styles.pullLine}>Stand on the podium at Nationals.</Text>
