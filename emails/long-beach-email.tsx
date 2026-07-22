@@ -15,6 +15,7 @@ import {
   BrandFooter,
   CardLabel,
   CtaButton,
+  HeaderBanner,
   Masthead,
   SITE,
   SponsorsCard,
@@ -82,14 +83,10 @@ export default function LongBeachEmail({ email }: LongBeachEmailProps) {
 
           <Masthead tag="RACE WEEK DISPATCH" sub="JULY 2026" />
 
-          {/* Poster card: hero shot + headline + italic quote + date band */}
+          <HeaderBanner />
+
+          {/* Poster card: headline + italic quote + running photo + date band */}
           <Section style={styles.posterCard}>
-            <Img
-              src={IMG.hero}
-              width="560"
-              alt="Patrick on the beach in Long Beach, California"
-              style={styles.heroPhoto}
-            />
             <Section style={styles.posterTop}>
               <Text style={styles.ecgLine}>{"——————/\\__/\\——————"}</Text>
               <Text style={styles.headline}>THE COURSE HASN'T CHANGED.</Text>
@@ -99,6 +96,12 @@ export default function LongBeachEmail({ email }: LongBeachEmailProps) {
                 return to find out how far I've come.
               </Text>
             </Section>
+            <Img
+              src={IMG.hero}
+              width="560"
+              alt="Patrick racing the Long Beach course in his Dare2Tri kit"
+              style={styles.heroPhoto}
+            />
             <Section style={styles.posterBand}>
               <Text style={styles.bandDate}>NEXT SATURDAY — SUPERTRI LONG BEACH</Text>
               <Text style={styles.bandPlace}>
