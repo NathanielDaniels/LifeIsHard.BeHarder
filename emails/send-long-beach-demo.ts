@@ -34,6 +34,8 @@ const images: { url: string; cid: string; label?: string }[] = [
   { url: "email/dare2tri.png", cid: "d2t" },
   { url: "email/sebcm.png", cid: "sebcm" },
   { url: "email/david-rotter.png", cid: "rotter" },
+  // PW header banner
+  { url: "email/header.jpeg", cid: "lb-header", label: "PW HEADER BANNER" },
   // Patrick's Long Beach photos (placeholder until dropped into public/)
   { url: "email/long-beach/long-beach-hero.jpg", cid: "lb-hero", label: "HERO — PATRICK AT LONG BEACH" },
   { url: "email/long-beach/caf-cycling-badge.png", cid: "lb-badge", label: "BADGE — CAF NORCAL CYCLING CLUB" },
