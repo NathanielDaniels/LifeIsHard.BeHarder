@@ -22,8 +22,16 @@ import { execFileSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import { resolve, dirname, join } from "node:path";
 
+// stderr is captured rather than inherited: `git show HEAD:<path>` is expected
+// to fail for staged-but-never-committed files, and those failures are handled.
+// Letting git print "fatal: ..." straight to the terminal makes a clean run
+// look broken.
 const git = (...args) =>
-  execFileSync("git", args, { encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
+  execFileSync("git", args, {
+    encoding: "utf8",
+    maxBuffer: 64 * 1024 * 1024,
+    stdio: ["ignore", "pipe", "pipe"],
+  });
 const lines = (s) => s.trim().split("\n").filter(Boolean);
 
 const tracked = new Set(lines(git("ls-files")));
