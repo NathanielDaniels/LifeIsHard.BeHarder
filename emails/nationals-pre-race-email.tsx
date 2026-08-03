@@ -61,7 +61,6 @@ function countdownLabel() {
  * badge is reused from the Long Beach recap send.
  */
 const img = {
-  hero: `${SITE}/email/nationals/nat-hero.jpg`,
   cafJersey: `${SITE}/email/nationals/nat-caf-jersey.jpg`,
   keriMelissa: `${SITE}/email/nationals/nat-keri-melissa.jpg`,
   nationals: `${SITE}/email/long-beach-recap/lb-nationals.png`,
@@ -108,9 +107,9 @@ export default function NationalsPreRaceEmail({
               </Text>
             </Section>
             <Img
-              src={img.hero}
+              src={img.closing}
               width="560"
-              alt="Patrick Wingert at the start line, Pleasant Prairie Triathlon"
+              alt="Patrick Wingert on the run course at Long Beach"
               style={styles.posterPhoto}
             />
             <Section style={styles.posterBand}>
@@ -458,21 +457,6 @@ export default function NationalsPreRaceEmail({
               <Text style={styles.signature}>Patrick Wingert</Text>
               <Text style={styles.signatureRole}>
                 ADAPTIVE ATHLETE{DOT}DARE2TRI ELITE TEAM 2026
-              </Text>
-            </Section>
-          </Section>
-
-          {/* Closing photo */}
-          <Section style={styles.photoCard}>
-            <Img
-              src={img.closing}
-              width="528"
-              alt="Patrick Wingert on the run course at Long Beach"
-              style={styles.photo}
-            />
-            <Section style={styles.captionBar}>
-              <Text style={styles.captionText}>
-                SEE YOU IN MILWAUKEE{DOT}AUGUST 9
               </Text>
             </Section>
           </Section>

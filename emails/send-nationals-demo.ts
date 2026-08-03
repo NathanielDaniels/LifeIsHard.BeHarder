@@ -37,7 +37,6 @@ const images = [
   { url: "email/sebcm.png", cid: "sebcm" },
   { url: "email/david-rotter.png", cid: "rotter" },
   { url: "email/long-beach-recap/lb-nationals.png", cid: "nat-logo" },
-  { url: "email/nationals/nat-hero.jpg", cid: "nat-hero" },
   { url: "email/nationals/nat-caf-jersey.jpg", cid: "nat-caf" },
   { url: "email/nationals/nat-keri-melissa.jpg", cid: "nat-km" },
   { url: "email/nationals/nat-closing.jpg", cid: "nat-close" },

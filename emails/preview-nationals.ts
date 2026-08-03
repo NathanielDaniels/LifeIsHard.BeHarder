@@ -16,7 +16,6 @@ const previewImagePaths = [
   "email/sebcm.png",
   "email/david-rotter.png",
   "email/long-beach-recap/lb-nationals.png",
-  "email/nationals/nat-hero.jpg",
   "email/nationals/nat-caf-jersey.jpg",
   "email/nationals/nat-keri-melissa.jpg",
   "email/nationals/nat-closing.jpg",
