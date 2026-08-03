@@ -29,7 +29,8 @@ const OUT = resolve("public/email/nationals");
 const FULL = { width: 1056, height: 1400 };
 
 const jobs = [
-  { from: "hero-start", to: "nat-hero.jpg", ...FULL },
+  // hero-start (Pleasant Prairie profile) was cut from the email at Patrick's
+  // request; the Long Beach closing-run shot is the poster image instead.
   { from: "caf-jersey", to: "nat-caf-jersey.jpg", ...FULL },
   { from: "keri-melissa", to: "nat-keri-melissa.jpg", ...FULL },
   { from: "closing-run", to: "nat-closing.jpg", ...FULL },
