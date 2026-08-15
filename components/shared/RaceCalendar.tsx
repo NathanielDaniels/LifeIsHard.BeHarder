@@ -1,11 +1,13 @@
 "use client";
 
 import { useState, useCallback, useRef, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import Image from "next/image";
 import {
   RACES_2026,
   Race,
+  RaceStamp,
+  STAMP_MISSION_ACCOMPLISHED,
   getNextRace,
   getDaysUntil,
   parseLocalDate,
@@ -168,6 +170,19 @@ interface RaceCardProps {
 
 const STAMP_ROTATIONS = [-12, 7, -5, 10, -9, 4] as const;
 
+// Stamps are rendered at a fixed height and the width comes from the asset's
+// own ratio, so a differently shaped stamp (a short word like FINISHED wants a
+// chunkier box than MISSION ACCOMPLISHED) drops in without touching layout.
+const STAMP_HEIGHT_DESKTOP = 140;
+const STAMP_HEIGHT_MOBILE = 120;
+
+function stampSize(stamp: RaceStamp, targetHeight: number) {
+  return {
+    width: Math.round(targetHeight * (stamp.width / stamp.height)),
+    height: targetHeight,
+  };
+}
+
 function getStampRotation(race: Race): number {
   const key = `${race.date}-${race.cityCode}-${race.name}`;
   const hash = Array.from(key).reduce(
@@ -199,6 +214,25 @@ function RaceCard({ race, isNext, themeColor }: RaceCardProps) {
   const isPast = (raceDate < now && !isSameDay) || (isSameDay && !!race.result);
   const daysUntil = getDaysUntil(raceDate);
   const stampRotation = getStampRotation(race);
+  const stamp = race.stamp ?? STAMP_MISSION_ACCOMPLISHED;
+  const reduceMotion = useReducedMotion();
+
+  // The stamp slams in from 2.5x on a spring. That is a lot of movement for
+  // anyone who asked for less of it, so it just appears instead.
+  const stampMotion = reduceMotion
+    ? {
+        initial: { scale: 1, opacity: 0, rotate: stampRotation },
+        animate: { scale: 1, opacity: 1, rotate: stampRotation },
+        transition: { duration: 0 },
+      }
+    : {
+        initial: { scale: 2.5, opacity: 0, rotate: stampRotation },
+        animate: { scale: 1, opacity: 1, rotate: stampRotation },
+        transition: {
+          scale: { type: "spring" as const, stiffness: 600, damping: 20 },
+          opacity: { duration: 0.1 },
+        },
+      };
   const hasDetails =
     race.distance ||
     race.course ||
@@ -402,20 +436,29 @@ function RaceCard({ race, isNext, themeColor }: RaceCardProps) {
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
             <div className="space-y-4 flex-1">
               <div className="flex items-center gap-3">
-                <div
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full border text-xs font-mono tracking-[0.2em]"
-                  style={{
-                    backgroundColor: `${themeColor}22`,
-                    borderColor: `${themeColor}88`,
-                    color: themeColor,
-                  }}
-                >
-                  <span
-                    className="w-2 h-2 rounded-full animate-pulse"
-                    style={{ backgroundColor: themeColor }}
-                  />
-                  THE TARGET
-                </div>
+                {/* "THE TARGET" is a promise about a race still ahead. Once it
+                    has been run it reads as stale, so a finished target race
+                    falls back to the plain date label the other cards use. */}
+                {isPast ? (
+                  <div className="font-mono text-sm tracking-[0.15em] text-white/80">
+                    {formattedDate.toUpperCase()}
+                  </div>
+                ) : (
+                  <div
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-full border text-xs font-mono tracking-[0.2em]"
+                    style={{
+                      backgroundColor: `${themeColor}22`,
+                      borderColor: `${themeColor}88`,
+                      color: themeColor,
+                    }}
+                  >
+                    <span
+                      className="w-2 h-2 rounded-full animate-pulse"
+                      style={{ backgroundColor: themeColor }}
+                    />
+                    THE TARGET
+                  </div>
+                )}
                 {chevron}
               </div>
 
@@ -424,7 +467,10 @@ function RaceCard({ race, isNext, themeColor }: RaceCardProps) {
                   {race.name}
                 </h5>
                 <p className="font-mono text-sm tracking-[0.15em] text-white/60">
-                  {formattedDate.toUpperCase()} · {race.location.toUpperCase()}
+                  {/* The date has moved up top on a finished card; don't repeat it. */}
+                  {isPast
+                    ? race.location.toUpperCase()
+                    : `${formattedDate.toUpperCase()} · ${race.location.toUpperCase()}`}
                 </p>
               </div>
             </div>
@@ -459,21 +505,15 @@ function RaceCard({ race, isNext, themeColor }: RaceCardProps) {
           <AnimatePresence>
             {hasStamped && race.result && (
               <motion.div
-                initial={{ scale: 2.5, opacity: 0, rotate: stampRotation }}
-                animate={{ scale: 1, opacity: 1, rotate: stampRotation }}
-                transition={{
-                  scale: { type: "spring", stiffness: 600, damping: 20 },
-                  opacity: { duration: 0.1 },
-                }}
+                {...stampMotion}
                 className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none"
               >
                 <div className="relative">
                   <div className="absolute inset-0 rounded-xl bg-black/45 blur-md sm:hidden" />
                   <Image
-                    src="/icons/Mission_Accomplished_Volt.webp"
-                    alt="Mission Accomplished"
-                    width={320}
-                    height={140}
+                    src={stamp.src}
+                    alt={stamp.alt}
+                    {...stampSize(stamp, STAMP_HEIGHT_DESKTOP)}
                     className="relative select-none"
                     style={{
                       filter: "drop-shadow(0 4px 16px rgba(249, 115, 22, 0.4))",
@@ -598,21 +638,15 @@ function RaceCard({ race, isNext, themeColor }: RaceCardProps) {
         <AnimatePresence>
           {hasStamped && race.result && (
             <motion.div
-              initial={{ scale: 2.5, opacity: 0, rotate: stampRotation }}
-              animate={{ scale: 1, opacity: 1, rotate: stampRotation }}
-              transition={{
-                scale: { type: "spring", stiffness: 600, damping: 20 },
-                opacity: { duration: 0.1 },
-              }}
+              {...stampMotion}
               className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none"
             >
               <div className="relative">
                 <div className="absolute inset-0 rounded-xl bg-black/45 blur-md sm:hidden" />
                 <Image
-                  src="/icons/Mission_Accomplished_Volt.webp"
-                  alt="Mission Accomplished"
-                  width={280}
-                  height={120}
+                  src={stamp.src}
+                  alt={stamp.alt}
+                  {...stampSize(stamp, STAMP_HEIGHT_MOBILE)}
                   className="relative select-none"
                   style={{
                     filter: "drop-shadow(0 4px 16px rgba(249, 115, 22, 0.4))",
