@@ -4,6 +4,36 @@ export interface RaceSplit {
   pace?: string;
 }
 
+/**
+ * The stamp slapped over a finished race card.
+ *
+ * `width`/`height` are the asset's own pixel dimensions, not display size.
+ * RaceCalendar renders every stamp at a fixed height and derives the width from
+ * this ratio, so a differently shaped stamp drops in without touching layout.
+ */
+export interface RaceStamp {
+  src: string;
+  alt: string;
+  width: number;
+  height: number;
+}
+
+/** Default: podiums and wins. */
+export const STAMP_MISSION_ACCOMPLISHED: RaceStamp = {
+  src: '/icons/Mission_Accomplished_Volt.webp',
+  alt: 'Mission accomplished',
+  width: 934,
+  height: 408,
+};
+
+/** For races he completed without a podium. */
+export const STAMP_FINISHED: RaceStamp = {
+  src: '/icons/Finished_Volt.webp',
+  alt: 'Finished',
+  width: 934,
+  height: 408,
+};
+
 export interface Race {
   date: string;
   name: string;
@@ -12,6 +42,8 @@ export interface Race {
   type: 'triathlon' | 'running';
   isTarget?: boolean;
   result?: string;
+  /** Overrides the default Mission Accomplished stamp on a finished race. */
+  stamp?: RaceStamp;
   splits?: RaceSplit[];
   distance?: string;
   course?: string;
@@ -122,9 +154,20 @@ export const RACES_2026: Race[] = [
     isTarget: true,
     distance: 'Sprint',
     course: '750m swim · 20km bike · 5km run',
-    description: 'Everything builds to this.',
+    description:
+      'Fourth at the national championship, and the first time off the podium all season. A rough swim put the race in trouble early. The lesson he carried out of Milwaukee had nothing to do with the placing.',
     championship: 'National Championship',
     website: 'https://www.usatriathlon.org/2026-usa-triathlon-nationals',
+    result: '4th · 1:23:54',
+    // Not the podium, so not the Mission Accomplished stamp. He finished.
+    stamp: STAMP_FINISHED,
+    splits: [
+      { leg: 'Swim', time: '16:47', pace: '2:16/100m' },
+      { leg: 'T1', time: '4:35' },
+      { leg: 'Bike', time: '37:59', pace: '19.9 mph' },
+      { leg: 'T2', time: '2:06' },
+      { leg: 'Run', time: '22:30', pace: '7:19/mi' },
+    ],
     cityCode: 'MKE',
     stateFips: '55',
   },
