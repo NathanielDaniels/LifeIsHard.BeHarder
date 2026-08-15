@@ -45,3 +45,6 @@ next-env.d.ts
 # superpowers
 .superpowers
 .worktrees
+
+# Broadcast run artifact: which subscribers already received the race report
+emails/.nationals-race-report-sent.log
