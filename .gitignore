@@ -51,3 +51,6 @@ next-env.d.ts
 
 # generated email previews
 emails/*-preview.html
+
+# Broadcast run artifact: which subscribers already received the race report
+emails/.nationals-race-report-sent.log
