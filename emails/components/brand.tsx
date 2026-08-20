@@ -246,12 +246,32 @@ export function SponsorsCard() {
   );
 }
 
-export function BrandFooter({ email }: { email?: string }) {
+export function BrandFooter({
+  email,
+  hideMotto = false,
+  flush = false,
+}: {
+  email?: string;
+  /** Skip the big LIFE IS HARD / BE HARDER lockup — use when the email's own
+   *  closing section already delivers that beat, so the footer doesn't repeat it. */
+  hideMotto?: boolean;
+  /** Butt the footer straight against the section above (no gap, no rounded
+   *  top), so a dark close and the footer read as one continuous block. */
+  flush?: boolean;
+}) {
   return (
     <>
-      <Section style={s.footer}>
-        <Text style={s.mottoWhite}>LIFE IS HARD.</Text>
-        <Text style={s.mottoOrange}>BE HARDER.</Text>
+      <Section
+        style={
+          flush ? { ...s.footer, ...s.footerFlush } : s.footer
+        }
+      >
+        {hideMotto ? null : (
+          <>
+            <Text style={s.mottoWhite}>LIFE IS HARD.</Text>
+            <Text style={s.mottoOrange}>BE HARDER.</Text>
+          </>
+        )}
         <Text style={s.footerName}>PATRICK WINGERT</Text>
         <Text style={s.footerTag}>DARE2TRI ELITE TEAM 2026</Text>
 
@@ -424,6 +444,12 @@ const s: Record<string, React.CSSProperties> = {
     borderRadius: "14px 14px 0 0",
     width: "100%",
     marginTop: "10px",
+  },
+
+  footerFlush: {
+    borderRadius: 0,
+    marginTop: 0,
+    paddingTop: "8px",
   },
   mottoWhite: {
     fontFamily: bebas,
