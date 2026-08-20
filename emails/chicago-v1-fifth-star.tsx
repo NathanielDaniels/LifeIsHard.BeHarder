@@ -584,7 +584,7 @@ export default function ChicagoV1FifthStar({ email }: { email?: string }) {
             </Text>
             <Text style={s.climaxSub}>CHICAGO. HOME FIELD.</Text>
             <Text style={s.climaxBody}>
-              After seven races this season, this is the final sprint triathlon
+              After five races this season, this is the final sprint triathlon
               of the year. And I want the biggest crowd of the season lining
               the course.
             </Text>
