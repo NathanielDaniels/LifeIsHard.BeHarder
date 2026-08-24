@@ -187,7 +187,7 @@ export default function SponsorsShowcase() {
         >
           <p className="text-white/70 max-w-2xl mx-auto leading-relaxed text-lg text-center mb-8">
             Put your brand behind an athlete who doesn't quit. Equipment, travel, race sponsorship, gear.
-            Every partnership powers the next mile toward Nationals.
+            Every partnership powers the next mile.
           </p>
 
           <div className="max-w-2xl mx-auto">
