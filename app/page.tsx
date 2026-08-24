@@ -1,14 +1,12 @@
 import type { Metadata } from "next";
-import ComingSoonClient from "./coming-soon-client";
-// import Home from './page.full-site';
+import Home from "./home-client";
 
 export const metadata: Metadata = {
-  title: "Patrick Wingert | Coming Soon",
+  title: "Patrick Wingert | Life is Hard. Be Harder.",
   description:
-    "Something epic is coming. Patrick Wingert. Dare2tri Elite Team athlete, record-setting trekker. Life is Hard. Be Harder.",
+    "Patrick Wingert. Dare2Tri Elite Team para-triathlete, first below-knee amputee to thru-hike the Trans Bhutan Trail. Life is Hard. Be Harder.",
 };
 
-export default function ComingSoonPage() {
-  return <ComingSoonClient />;
-  // return <Home />;
+export default function HomePage() {
+  return <Home />;
 }
