@@ -141,8 +141,8 @@ function DisciplineCostCard({ data }: { data: DisciplineRecoveryCost }) {
           <Column key={i} style={disciplineCell}>
             <Text style={disciplineEmoji}>{d.emoji}</Text>
             <Text style={disciplineSport}>{d.sport}</Text>
-            <Text style={disciplineCost}>{d.costPerStrain}</Text>
-            <Text style={disciplineLabel}>{d.label}</Text>
+            <Text style={{ ...disciplineCost, color: d.color || WHITE }}>{d.costPerStrain}</Text>
+            <Text style={{ ...disciplineLabel, color: d.color ? `${d.color}99` : 'rgba(255,255,255,0.45)' }}>{d.label}</Text>
           </Column>
         ))}
       </Row>
@@ -175,7 +175,7 @@ export default function EveningBriefingEmail({
   const sportEmoji: Record<string, string> = {
     Run: '🏃', Ride: '🚴', Swim: '🏊', Bike: '🚴', Walk: '🚶', Rest: '🧘',
   };
-  const isRestDay = workoutSport === 'Rest' || !workoutDistance;
+  const isRestDay = workoutSport === 'Rest';
   const emoji = isRestDay ? '🧘' : (sportEmoji[workoutSport] || '💪');
   const hasIntelligence = Object.keys(intelligence).length > 0;
 

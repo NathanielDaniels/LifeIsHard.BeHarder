@@ -46,5 +46,11 @@ next-env.d.ts
 .superpowers
 .worktrees
 
+# source photos for email asset optimization (never served; see scripts/optimize-*)
+/assets/source
+
+# generated email previews
+emails/*-preview.html
+
 # Broadcast run artifact: which subscribers already received the race report
 emails/.nationals-race-report-sent.log

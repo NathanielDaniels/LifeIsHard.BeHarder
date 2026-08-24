@@ -8,15 +8,15 @@ import { useWhoop } from '@/contexts/WhoopContext';
 import GlitchText from '@/components/shared/GlitchText';
 import AnimatedCounter from '@/components/shared/AnimatedCounter';
 import FloatingParticles from '@/components/shared/FloatingParticles';
-import BiometricCard from '@/components/shared/BiometricCard';
-import EmailCapture from '@/components/shared/EmailCapture';
-import SocialLinks from '@/components/shared/SocialLinks';
 import { getDaysUntil, getDaysSince, parseLocalDate, getNextRace } from '@/lib/race-data';
 import dynamic from 'next/dynamic';
 
+const BiometricCard = dynamic(() => import('@/components/shared/BiometricCard'), { ssr: false });
+const EmailCapture = dynamic(() => import('@/components/shared/EmailCapture'), { ssr: false });
+const SocialLinks = dynamic(() => import('@/components/shared/SocialLinks'), { ssr: false });
 const RaceCalendar = dynamic(() => import('@/components/shared/RaceCalendar'), { ssr: false });
 const RaceGlobe = dynamic(() => import('@/components/shared/RaceGlobe'), { ssr: false });
-import InstagramFeed from '@/components/sections/InstagramFeed';
+const InstagramFeed = dynamic(() => import('@/components/sections/InstagramFeed'), { ssr: false });
 import CustomCursor from '@/components/shared/CustomCursor';
 // import PixelRunner from '@/components/shared/PixelRunner';
 
@@ -24,6 +24,46 @@ const ACCIDENT_DATE = parseLocalDate('2020-11-01');
 const SOBRIETY_DATE = parseLocalDate('2020-01-20');
 const NATIONALS_DATE = parseLocalDate('2026-08-09');
 const ENABLE_BOOT_SEQUENCE = process.env.NEXT_PUBLIC_ENABLE_BOOT_SEQUENCE === 'true';
+const DEFERRED_SECTION_ROOT_MARGIN = '900px';
+
+function DeferredRender({
+  children,
+  minHeight = '60vh',
+}: {
+  children: React.ReactNode;
+  minHeight?: string;
+}) {
+  const [shouldRender, setShouldRender] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (shouldRender) return;
+
+    const node = ref.current;
+    if (!node || !('IntersectionObserver' in window)) {
+      setShouldRender(true);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry?.isIntersecting) return;
+        setShouldRender(true);
+        observer.disconnect();
+      },
+      { rootMargin: DEFERRED_SECTION_ROOT_MARGIN },
+    );
+
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [shouldRender]);
+
+  return (
+    <div ref={ref} style={!shouldRender ? { minHeight } : undefined}>
+      {shouldRender ? children : null}
+    </div>
+  );
+}
 
 export default function ComingSoonClient() {
   const { energyState, theme } = useVitality();
@@ -46,11 +86,20 @@ export default function ComingSoonClient() {
 
   const [phase, setPhase] = useState(bootSequenceEnabled ? 0 : 6);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const [isMobileLike, setIsMobileLike] = useState(true);
 
   useEffect(() => {
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
     setPrefersReducedMotion(mq.matches);
     const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
+
+  useEffect(() => {
+    const mq = window.matchMedia('(hover: none), (pointer: coarse), (max-width: 767px)');
+    setIsMobileLike(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setIsMobileLike(e.matches);
     mq.addEventListener('change', handler);
     return () => mq.removeEventListener('change', handler);
   }, []);
@@ -86,6 +135,8 @@ export default function ComingSoonClient() {
   }, []);
 
   const mousePositionRef = useRef({ x: 0, y: 0 });
+  const allowAmbientMotion = !prefersReducedMotion && !isMobileLike;
+  const renderHeroImmediately = !bootSequenceEnabled || prefersReducedMotion || isMobileLike;
 
   const statusMessages = useMemo(() => {
     const messages = [
@@ -116,6 +167,8 @@ export default function ComingSoonClient() {
   const mouseY = useSpring(0, { stiffness: 50, damping: 20 });
 
   function handleMouseMove(e: React.MouseEvent) {
+    if (!allowAmbientMotion) return;
+
     const { clientX, clientY } = e;
     const { innerWidth, innerHeight } = window;
     const xPct = (clientX / innerWidth) - 0.5;
@@ -295,7 +348,7 @@ export default function ComingSoonClient() {
 
   return (
     <main
-      className="relative bg-[#050505] text-white overflow-x-hidden cursor-crosshair"
+      className={`relative bg-[#050505] text-white overflow-x-hidden ${allowAmbientMotion ? 'cursor-crosshair' : ''}`}
       onMouseMove={handleMouseMove}
       style={{ '--theme-color': themeColor } as React.CSSProperties}
     >
@@ -325,7 +378,7 @@ export default function ComingSoonClient() {
         ::selection { background-color: ${themeColor}4D; }
       `}</style>
 
-      <CustomCursor themeColor={themeColor} />
+      {allowAmbientMotion && <CustomCursor themeColor={themeColor} />}
 
       <div
         className="fixed inset-0 pointer-events-none z-[1000] opacity-[0.035]"
@@ -341,7 +394,7 @@ export default function ComingSoonClient() {
         }}
       />
 
-      {!prefersReducedMotion && (
+      {allowAmbientMotion && (
         <>
           <motion.div
             className="fixed top-[15%] left-[1%] font-display text-[12vw] text-white/[0.02] pointer-events-none z-[1] whitespace-nowrap font-bold tracking-tight"
@@ -359,14 +412,14 @@ export default function ComingSoonClient() {
       )}
 
       <motion.div
-        style={prefersReducedMotion ? {} : { x: xLayer1, y: yLayer1 }}
+        style={allowAmbientMotion ? { x: xLayer1, y: yLayer1 } : {}}
         className="fixed inset-0 pointer-events-none"
       >
         <div className="absolute inset-0 bg-grid opacity-[0.1]" />
         <div className="absolute inset-0 bg-noise opacity-[0.05] mix-blend-overlay" />
         <div className="absolute inset-0 vignette z-10" />
 
-        {!prefersReducedMotion && (
+        {allowAmbientMotion && (
           <>
             <motion.div
               animate={{ opacity: [0.1, 0.2, 0.1] }}
@@ -385,7 +438,7 @@ export default function ComingSoonClient() {
         )}
       </motion.div>
 
-      {!prefersReducedMotion && (
+      {allowAmbientMotion && (
         <div className="fixed inset-0 pointer-events-none overflow-hidden z-20">
           <div
             className="w-full h-[2px] bg-gradient-to-r from-transparent via-white/10 to-transparent"
@@ -548,7 +601,7 @@ export default function ComingSoonClient() {
 
       {/* === HERO === */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        {!prefersReducedMotion && (
+        {allowAmbientMotion && (
           <div className="absolute top-1/2 left-0 w-full h-[200px] -translate-y-1/2 overflow-hidden opacity-10 pointer-events-none">
             <svg
               className="absolute top-1/2 left-0 w-[200%] h-[150px]"
@@ -568,7 +621,7 @@ export default function ComingSoonClient() {
         )}
 
         <motion.div
-          style={prefersReducedMotion ? {} : { x: xLayer2, y: yLayer2 }}
+          style={allowAmbientMotion ? { x: xLayer2, y: yLayer2 } : {}}
           className="relative z-30 text-center px-6"
         >
           <motion.div
@@ -589,8 +642,19 @@ export default function ComingSoonClient() {
             />
           </motion.div>
 
-          <AnimatePresence>
-            {phase >= 1 && (
+          {phase >= 1 && (
+            renderHeroImmediately ? (
+              <div>
+                <h1 className="font-display font-bold leading-[0.85] tracking-tight">
+                  <span className="block text-[clamp(4rem,15vw,13rem)] text-white drop-shadow-[2px_2px_0_rgba(0,0,0,0.5)]">
+                    LIFE IS HARD.
+                  </span>
+                  <span className="block text-[clamp(4rem,15vw,13rem)]">
+                    <GlitchText text="BE HARDER." themeColor={themeColor} />
+                  </span>
+                </h1>
+              </div>
+            ) : (
               <motion.div
                 initial={{ opacity: 0, y: 60, filter: 'blur(8px)' }}
                 animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
@@ -605,8 +669,8 @@ export default function ComingSoonClient() {
                   </span>
                 </h1>
               </motion.div>
-            )}
-          </AnimatePresence>
+            )
+          )}
 
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -832,64 +896,66 @@ export default function ComingSoonClient() {
       </section>
 
       {/* === EMAIL CAPTURE === */}
-      <section className="relative flex items-center justify-center py-32 md:py-48 px-6 min-h-[70vh]">
-        <motion.div 
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 1 }}
-          className="max-w-xl w-full text-center"
-        >
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="font-mono text-[0.7rem] md:text-[0.75rem] tracking-[0.5em] text-white/60 mb-4 font-medium"
-          >
-            THE FULL STORY DROPS SOON
-          </motion.p>
-
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.1 }}
-            className="font-display text-5xl md:text-7xl lg:text-8xl font-bold mb-6 tracking-tight leading-none"
-          >
-            DON'T MISS <span style={{ color: themeColor }}>THE MOMENT.</span>
-          </motion.h2>
-          
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.2 }}
-            className="text-lg text-white/50 mb-10 max-w-lg mx-auto leading-relaxed"
-          >
-            An immersive digital experience documenting the journey of breaking every limit. 
-            Be the first to witness it.
-          </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.3 }}
-            className="mb-12"
-          >
-            <EmailCapture themeColor={themeColor} />
-          </motion.div>
-
+      <DeferredRender minHeight="70vh">
+        <section className="relative flex items-center justify-center py-32 md:py-48 px-6 min-h-[70vh]">
           <motion.div
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
-            transition={{ delay: 0.5 }}
+            transition={{ duration: 1 }}
+            className="max-w-xl w-full text-center"
           >
-            <SocialLinks />
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="font-mono text-[0.7rem] md:text-[0.75rem] tracking-[0.5em] text-white/60 mb-4 font-medium"
+            >
+              THE FULL STORY DROPS SOON
+            </motion.p>
+
+            <motion.h2
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 }}
+              className="font-display text-5xl md:text-7xl lg:text-8xl font-bold mb-6 tracking-tight leading-none"
+            >
+              DON'T MISS <span style={{ color: themeColor }}>THE MOMENT.</span>
+            </motion.h2>
+
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+              className="text-lg text-white/50 mb-10 max-w-lg mx-auto leading-relaxed"
+            >
+              An immersive digital experience documenting the journey of breaking every limit.
+              Be the first to witness it.
+            </motion.p>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.3 }}
+              className="mb-12"
+            >
+              <EmailCapture themeColor={themeColor} />
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.5 }}
+            >
+              <SocialLinks />
+            </motion.div>
           </motion.div>
-        </motion.div>
-      </section>
+        </section>
+      </DeferredRender>
 
       {/* === BECOME A SPONSOR CTA === */}
       <section className="relative pb-20 md:pb-32 px-6">
@@ -927,7 +993,8 @@ export default function ComingSoonClient() {
       </section>
 
       {/* === LIVE BIOMETRICS === */}
-      <section className="relative py-32 md:py-48 px-6">
+      <DeferredRender minHeight="100vh">
+        <section className="relative py-32 md:py-48 px-6">
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
@@ -1099,37 +1166,44 @@ export default function ComingSoonClient() {
             )}
           </div>
         </motion.div>
-      </section>
+        </section>
+      </DeferredRender>
 
       {/* === INSTAGRAM FEED (replaces the running-photo reveal) === */}
-      <InstagramFeed themeColor={themeColor} />
+      <DeferredRender minHeight="80vh">
+        <InstagramFeed themeColor={themeColor} />
+      </DeferredRender>
 
       {/* === RACE MAP GLOBE === */}
-      <section className="relative py-20 md:py-32 px-6">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 1, ease: 'easeOut' }}
-          className="max-w-5xl mx-auto flex justify-center"
-        >
-          <RaceGlobe themeColor={themeColor} />
-        </motion.div>
+      <DeferredRender minHeight="90vh">
+        <section className="relative py-20 md:py-32 px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 1, ease: 'easeOut' }}
+            className="max-w-5xl mx-auto flex justify-center"
+          >
+            <RaceGlobe themeColor={themeColor} />
+          </motion.div>
 
-      </section>
+        </section>
+      </DeferredRender>
 
       {/* === RACE SCHEDULE === */}
-      <section className="relative py-32 md:py-48 px-6">
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 1 }}
-          className="max-w-5xl mx-auto"
-        >
-          <RaceCalendar themeColor={themeColor} />
-        </motion.div>
-      </section>
+      <DeferredRender minHeight="120vh">
+        <section className="relative py-32 md:py-48 px-6">
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 1 }}
+            className="max-w-5xl mx-auto"
+          >
+            <RaceCalendar themeColor={themeColor} />
+          </motion.div>
+        </section>
+      </DeferredRender>
 
       {/* === SPONSORS === */}
       <section className="relative z-20 py-32 md:py-40 px-6 backdrop-blur-md border-t border-white/5">
