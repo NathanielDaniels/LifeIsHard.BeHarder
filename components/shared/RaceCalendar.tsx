@@ -38,7 +38,7 @@ export default function RaceCalendar({ themeColor }: RaceCalendarProps) {
           2026 RACE CALENDAR
         </h3>
         <p className="font-mono text-sm tracking-[0.2em] text-white/60">
-          THE ROAD TO NATIONALS
+          THE CAMPAIGN
         </p>
       </div>
 

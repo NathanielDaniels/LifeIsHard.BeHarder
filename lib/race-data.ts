@@ -178,10 +178,18 @@ export const RACES_2026: Race[] = [
     coords: [-87.63, 41.88],
     type: 'triathlon',
     distance: 'Sprint',
-    course: '750m swim · 20km bike · 5km run',
-    description: 'Racing in the city that changed everything.',
+    course: '750m swim · 24km bike · 5km run',
+    description: 'Patrick won Para Male Ambulatory on the same lakefront that rebuilt him, finishing 164th of 2,386 athletes overall. Chicago took his leg in 2020. Six years later, he left with the state title.',
     championship: 'Illinois State Championship',
     website: 'https://by.supertri.com/chicago-triathlon/',
+    result: '1st · 1:36:57',
+    splits: [
+      { leg: 'Swim', time: '16:45', pace: '2:13/100m' },
+      { leg: 'T1', time: '6:44' },
+      { leg: 'Bike', time: '45:51', pace: '19.6 mph' },
+      { leg: 'T2', time: '3:17' },
+      { leg: 'Run', time: '24:22', pace: '7:51/mi' },
+    ],
     cityCode: 'CHI',
     stateFips: '17',
   },
@@ -230,6 +238,18 @@ export const KEY_DATES = {
   accident: new Date('2020-11-01'),
   sobriety: new Date('2020-01-20'),
 } as const;
+
+/**
+ * Season totals derived from RACES_2026 so display components can't drift
+ * from the source data. A podium is any result placing 1st-3rd.
+ */
+export function getSeasonStats() {
+  return {
+    races: RACES_2026.length,
+    states: new Set(RACES_2026.map((r) => r.stateFips)).size,
+    podiums: RACES_2026.filter((r) => /^(1st|2nd|3rd)/.test(r.result ?? '')).length,
+  };
+}
 
 export function getNextRace(): Race | undefined {
   const today = todayLocal();

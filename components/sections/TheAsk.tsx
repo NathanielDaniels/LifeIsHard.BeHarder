@@ -71,7 +71,7 @@ export default function TheAsk() {
             <span style={{ color: theme.primaryColor }}>MISSION.</span>
           </h2>
           <p className="text-lg md:text-xl text-white/80 max-w-2xl mx-auto leading-relaxed">
-            Patrick trains full-time toward Nationals. Equipment, travel, coaching, race fees. Every contribution powers the next mile.
+            Patrick trains full-time toward the podium. Equipment, travel, coaching, race fees. Every contribution powers the next mile.
           </p>
         </motion.div>
 
@@ -200,7 +200,7 @@ export default function TheAsk() {
               FOLLOW THE JOURNEY
             </div>
             <p className="font-mono text-sm tracking-[0.2em] text-white/60">
-              RACE RESULTS · TRAINING UPDATES · THE ROAD TO NATIONALS
+              RACE RESULTS · TRAINING UPDATES · THE CAMPAIGN
             </p>
           </div>
 

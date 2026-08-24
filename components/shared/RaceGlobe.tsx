@@ -4,6 +4,7 @@ import { useState, useRef, useCallback } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import CobeGlobe from '@/components/shared/CobeGlobe';
 import FullRaceMap from '@/components/shared/FullRaceMap';
+import { getSeasonStats } from '@/lib/race-data';
 
 interface RaceGlobeProps {
   themeColor: string;
@@ -35,6 +36,7 @@ const RACE_ARCS = [
 ];
 
 export default function RaceGlobe({ themeColor }: RaceGlobeProps) {
+  const seasonStats = getSeasonStats();
   const [showMap, setShowMap] = useState(false);
   const pointerStart = useRef<{ x: number; y: number } | null>(null);
   const handleCloseMap = useCallback(() => setShowMap(false), []);
@@ -72,11 +74,11 @@ export default function RaceGlobe({ themeColor }: RaceGlobeProps) {
       </div>
 
       <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 mt-8 font-mono text-[10px] tracking-[0.2em] text-white/60 uppercase">
-        <span>10 Races</span>
+        <span>{seasonStats.races} Races</span>
         <span className="hidden sm:inline">·</span>
-        <span>4 States</span>
+        <span>{seasonStats.states} States</span>
         <span className="hidden sm:inline">·</span>
-        <span style={{ color: themeColor }}>Nationals: Milwaukee</span>
+        <span style={{ color: themeColor }}>{seasonStats.podiums} Podiums</span>
       </div>
 
       <button
