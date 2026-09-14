@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { ConnectionRecord, ConnectionStatus } from "@/types/api-tokens";
-import BriefingCard from './components/briefing-card';
 
 // ============================================
 // Status dot colors
@@ -318,9 +317,6 @@ export default function AdminClient() {
             {healthCheckLoading ? "Checking..." : "Refresh"}
           </button>
         </div>
-
-        {/* AI Intelligence Briefing */}
-        <BriefingCard />
 
         {/* Service Cards */}
         {connections.length === 0 && !loading && (

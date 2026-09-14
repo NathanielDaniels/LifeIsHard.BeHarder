@@ -145,6 +145,7 @@ async function whoopFetch<T>(
 ): Promise<T> {
   const response = await fetch(`${WHOOP_API_URL}${endpoint}`, {
     ...options,
+    cache: "no-store",
     headers: {
       Authorization: `Bearer ${accessToken}`,
       "Content-Type": "application/json",
@@ -182,10 +183,6 @@ export async function getLatestRecovery(
   const response = await whoopFetch<{ records: WhoopRecovery[] }>(
     "/v2/recovery?limit=3&order=descending",
     accessToken,
-  );
-  console.log(
-    "[DEBUG] Recovery records:",
-    JSON.stringify(response.records, null, 2),
   );
   return response.records[0] || null;
 }

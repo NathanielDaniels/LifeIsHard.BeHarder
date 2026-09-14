@@ -1,25 +1,30 @@
 // ============================================
 // GET /api/whoop/stats
-// Returns current WHOOP stats (Supabase-cached)
+// Returns current WHOOP stats directly from WHOOP without persisting responses
 // ============================================
 
 import { NextRequest, NextResponse } from "next/server";
-import {
-  isWhoopEnabled,
-  fetchWhoopStats,
-  getDemoStats,
-} from "@/lib/whoop-client";
+import { isWhoopEnabled, getDemoStats } from "@/lib/whoop-client";
 import {
   getValidAccessToken,
   TokenExpiredError,
   TokenRefreshError,
 } from "@/lib/whoop-token-storage";
-import { getStatsWithCache } from "@/lib/whoop-cache";
+import { fetchFreshWhoopStats } from "@/lib/whoop-live";
 import { WhoopStats } from "@/types/whoop";
 import { rateLimit, getClientIP, rateLimitResponse } from "@/lib/rate-limit";
 import { touchLastFetch } from "@/lib/api-connections";
 
 export const dynamic = "force-dynamic";
+
+const NO_STORE_HEADERS = {
+  "Cache-Control": "private, no-store, max-age=0",
+  Pragma: "no-cache",
+};
+
+function json(body: Record<string, unknown>, status = 200) {
+  return NextResponse.json(body, { status, headers: NO_STORE_HEADERS });
+}
 
 export async function GET(request: NextRequest) {
   // Rate limit: 30 req/min per IP
@@ -29,7 +34,7 @@ export async function GET(request: NextRequest) {
 
   // WHOOP not configured - return demo
   if (!isWhoopEnabled()) {
-    return NextResponse.json({ ...getDemoStats(), mode: "demo" });
+    return json({ ...getDemoStats(), mode: "demo" });
   }
 
   // Get access token
@@ -39,23 +44,10 @@ export async function GET(request: NextRequest) {
   } catch (err) {
     if (err instanceof TokenExpiredError) {
       // Refresh token is dead - tell the client to show re-auth UI
-      return NextResponse.json(
-        { ...getDemoStats(), mode: "unauthorized", authRequired: true },
-        { status: 200 },
-      );
+      return json({ ...getDemoStats(), mode: "unauthorized", authRequired: true });
     }
     if (err instanceof TokenRefreshError) {
-      // Transient failure - return stale cache if available, otherwise demo
-      const { getStaleStats } = await import("@/lib/whoop-cache");
-      const staleResult = await getStaleStats();
-      if (staleResult) {
-        return NextResponse.json({
-          ...staleResult.stats,
-          mode: "stale",
-          warning: "Using cached data - token refresh temporarily failed",
-        });
-      }
-      return NextResponse.json({
+      return json({
         ...getDemoStats(),
         mode: "error",
         error: err.message,
@@ -63,27 +55,22 @@ export async function GET(request: NextRequest) {
     }
     // Unknown error
     console.error("[stats] getValidAccessToken unexpected error:", err);
-    return NextResponse.json({ ...getDemoStats(), mode: "error" });
+    return json({ ...getDemoStats(), mode: "error" });
   }
 
   // Never authorized
   if (!accessToken) {
-    return NextResponse.json(
-      { ...getDemoStats(), mode: "unauthorized", authRequired: true },
-      { status: 200 },
-    );
+    return json({ ...getDemoStats(), mode: "unauthorized", authRequired: true });
   }
 
-  // Fetch stats (cache-first)
+  // Fetch directly from WHOOP for this request. Biometric responses are never persisted.
   try {
-    const stats: WhoopStats = await getStatsWithCache(() =>
-      fetchWhoopStats(accessToken!),
-    );
+    const stats: WhoopStats = await fetchFreshWhoopStats(accessToken);
 
     // Record successful data fetch before responding
     await touchLastFetch('whoop').catch(() => {});
 
-    return NextResponse.json({ ...stats, mode: "live" });
+    return json({ ...stats, mode: "live" });
   } catch (err: any) {
     console.error("[stats] fetchWhoopStats error:", err);
 
@@ -99,13 +86,9 @@ export async function GET(request: NextRequest) {
           console.log(
             "[stats] Forced refresh succeeded. Retrying fetchWhoopStats...",
           );
-          const { fetchWhoopStats } = await import("@/lib/whoop-client");
-          const { setCachedStats } = await import("@/lib/whoop-cache");
-
-          const stats = await fetchWhoopStats(newAccessToken);
-          await setCachedStats(stats);
+          const stats = await fetchFreshWhoopStats(newAccessToken);
           await touchLastFetch('whoop').catch(() => {});
-          return NextResponse.json({ ...stats, mode: "live" });
+          return json({ ...stats, mode: "live" });
         }
       } catch (retryErr: any) {
         console.error(
@@ -121,10 +104,7 @@ export async function GET(request: NextRequest) {
           const { clearTokens } = await import("@/lib/whoop-token-storage");
           await clearTokens().catch(() => {});
 
-          return NextResponse.json(
-            { ...getDemoStats(), mode: "unauthorized", authRequired: true },
-            { status: 200 },
-          );
+          return json({ ...getDemoStats(), mode: "unauthorized", authRequired: true });
         }
       }
 
@@ -132,25 +112,11 @@ export async function GET(request: NextRequest) {
       // Fall through to the stale cache / generic error logic.
     }
 
-    // Try stale cache before giving up
-    const { getStaleStats } = await import("@/lib/whoop-cache");
-    const staleResult = await getStaleStats();
-    if (staleResult) {
-      return NextResponse.json({
-        ...staleResult.stats,
-        mode: "stale",
-        warning: "Using cached data - WHOOP API temporarily unavailable",
-      });
-    }
-
-    return NextResponse.json(
-      {
-        ...getDemoStats(),
-        mode: "error",
-        error: err instanceof Error ? err.message : "Unknown error",
-      },
-      { status: 200 }, // Always 200 so the UI keeps working
-    );
+    return json({
+      ...getDemoStats(),
+      mode: "error",
+      error: err instanceof Error ? err.message : "Unknown error",
+    });
   }
 }
 
