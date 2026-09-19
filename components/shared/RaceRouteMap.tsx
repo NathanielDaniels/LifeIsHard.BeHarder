@@ -26,8 +26,6 @@ const RACE_POINTS = [
   { id: 'milwaukee',        coords: [-87.91, 43.04]  as [number, number], label: 'MILWAUKEE',        date: 'AUG 9',  order: 5,  type: 'tri', isTarget: true },
   { id: 'chicago',          coords: [-87.63, 41.88]  as [number, number], label: 'CHICAGO',          date: 'AUG 23', order: 6,  type: 'tri' },
   { id: 'la-jolla',         coords: [-117.27, 32.85] as [number, number], label: 'LA JOLLA',         date: 'OCT 25', order: 7,  type: 'tri' },
-  { id: 'berkeley',         coords: [-122.27, 37.87] as [number, number], label: 'BERKELEY',         date: 'NOV 15', order: 8,  type: 'run' },
-  { id: 'sacramento',       coords: [-121.49, 38.58] as [number, number], label: 'SACRAMENTO',       date: 'DEC 6',  order: 9,  type: 'run' },
 ];
 
 // Hub-and-spoke: every race originates from SF home base
