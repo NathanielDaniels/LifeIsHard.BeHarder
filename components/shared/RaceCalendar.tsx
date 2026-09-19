@@ -132,32 +132,34 @@ export default function RaceCalendar({ themeColor }: RaceCalendarProps) {
         </div>
       </div>
 
-      <div className="space-y-8">
-        <div className="flex items-center gap-4">
-          <div
-            className="h-[2px] flex-1"
-            style={{ backgroundColor: `${themeColor}33` }}
-          />
-          <h4 className="font-display text-3xl md:text-4xl tracking-[0.15em] text-white">
-            RUNNING
-          </h4>
-          <div
-            className="h-[2px] flex-1"
-            style={{ backgroundColor: `${themeColor}33` }}
-          />
-        </div>
-
-        <div className="grid gap-6">
-          {runningRaces.map((race, idx) => (
-            <RaceCard
-              key={idx}
-              race={race}
-              isNext={nextRace?.date === race.date}
-              themeColor={themeColor}
+      {runningRaces.length > 0 && (
+        <div className="space-y-8">
+          <div className="flex items-center gap-4">
+            <div
+              className="h-[2px] flex-1"
+              style={{ backgroundColor: `${themeColor}33` }}
             />
-          ))}
+            <h4 className="font-display text-3xl md:text-4xl tracking-[0.15em] text-white">
+              RUNNING
+            </h4>
+            <div
+              className="h-[2px] flex-1"
+              style={{ backgroundColor: `${themeColor}33` }}
+            />
+          </div>
+
+          <div className="grid gap-6">
+            {runningRaces.map((race, idx) => (
+              <RaceCard
+                key={idx}
+                race={race}
+                isNext={nextRace?.date === race.date}
+                themeColor={themeColor}
+              />
+            ))}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

@@ -21,8 +21,6 @@ const RACE_MARKERS = [
   { id: 'milwaukee',        location: [43.04, -87.91]  as [number, number], size: 0.07 },
   { id: 'chicago',          location: [41.88, -87.63]  as [number, number] },
   { id: 'la-jolla',         location: [32.85, -117.27] as [number, number] },
-  { id: 'berkeley',         location: [37.87, -122.27] as [number, number] },
-  { id: 'sacramento',       location: [38.58, -121.49] as [number, number] },
 ];
 
 // Hub-and-spoke from SF — only long-distance arcs visible on globe
