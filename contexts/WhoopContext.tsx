@@ -128,7 +128,7 @@ export function WhoopProvider({
         const minLoad = showLoading ? 1500 : 0;
         const start = Date.now();
 
-        const response = await fetch('/api/whoop/stats');
+        const response = await fetch('/api/whoop/stats', { cache: 'no-store' });
 
         if (!response.ok) {
           throw new Error(`HTTP ${response.status}`);

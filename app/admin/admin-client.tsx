@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { ConnectionRecord, ConnectionStatus } from "@/types/api-tokens";
-import BriefingCard from './components/briefing-card';
 
 // ============================================
 // Status dot colors
@@ -226,8 +225,6 @@ export default function AdminClient() {
       // Cookie session handles auth automatically
       if (serviceId === "whoop") {
         await fetch("/api/whoop/disconnect", { method: "POST" });
-      } else if (serviceId === "strava") {
-        await fetch("/api/strava/disconnect", { method: "POST" });
       }
       await fetchStatus();
     } catch {
@@ -318,9 +315,6 @@ export default function AdminClient() {
             {healthCheckLoading ? "Checking..." : "Refresh"}
           </button>
         </div>
-
-        {/* AI Intelligence Briefing */}
-        <BriefingCard />
 
         {/* Service Cards */}
         {connections.length === 0 && !loading && (

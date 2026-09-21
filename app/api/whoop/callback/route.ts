@@ -6,7 +6,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { exchangeCodeForTokens, getProfile, verifyTokenHealth } from '@/lib/whoop-client';
 import { storeTokens } from '@/lib/whoop-token-storage';
-import { invalidateCache } from '@/lib/whoop-cache';
 import { markConnected } from '@/lib/api-connections';
 import { supabase } from '@/lib/supabase';
 
@@ -79,9 +78,6 @@ export async function GET(request: NextRequest) {
 
     // Record connection status (fire-and-forget)
     markConnected('whoop', tokens.expires_at).catch(() => {});
-
-    // Clear any cached data
-    invalidateCache();
 
     // Redirect to home on success
     return NextResponse.redirect(

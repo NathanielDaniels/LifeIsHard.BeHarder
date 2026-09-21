@@ -6,7 +6,6 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getValidAccessToken, clearTokens } from '@/lib/whoop-token-storage';
-import { invalidateCache } from '@/lib/whoop-cache';
 import { verifyAdminRequest, adminUnauthorizedResponse } from '@/lib/admin-auth';
 import { markDisconnected } from '@/lib/api-connections';
 import { rateLimit, getClientIP, rateLimitResponse } from '@/lib/rate-limit';
@@ -45,9 +44,6 @@ export async function POST(request: NextRequest) {
 
     // Record disconnection (fire-and-forget)
     markDisconnected('whoop').catch(() => {});
-
-    // Clear cache
-    invalidateCache();
 
     return NextResponse.json({ success: true });
     

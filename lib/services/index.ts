@@ -6,7 +6,6 @@
 
 import { ServiceProvider } from '@/types/api-tokens';
 import { whoopService } from './whoop-service';
-import { stravaService } from './strava-service';
 
 /**
  * All registered service providers.
@@ -18,7 +17,6 @@ import { stravaService } from './strava-service';
  */
 const services: ServiceProvider[] = [
   whoopService,
-  stravaService,
 ];
 
 export function getAllServices(): ServiceProvider[] {
