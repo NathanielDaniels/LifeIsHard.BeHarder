@@ -77,15 +77,15 @@ export default function TokyoPage() {
           <figure className={styles.heroFigure}>
             <div className={styles.heroImage}>
               <Image
-                src="/pat-run.webp"
-                alt="Patrick running in his Dare2Tri kit, with his running prosthesis in full stride"
+                src="/email/chicago/chi-finish-cine.jpg"
+                alt="Patrick celebrating at the Chicago Marathon finish with both arms raised, wearing his Dare2Tri kit"
                 fill
                 priority
                 sizes="(max-width: 700px) 100vw, 50vw"
                 className={styles.runner}
               />
             </div>
-            <figcaption>Patrick on the run, from an earlier race.</figcaption>
+            <figcaption>Chicago finish line. Next stop: Tokyo.</figcaption>
           </figure>
         </section>
 
