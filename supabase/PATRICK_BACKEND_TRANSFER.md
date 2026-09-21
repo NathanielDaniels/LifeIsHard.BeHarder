@@ -28,7 +28,9 @@ with or exported from the Resend audience.
 ## Cutover checklist
 
 1. Apply the schema to the replacement project.
-2. Verify that exactly the three expected public tables exist and are empty.
+2. Verify that exactly the three expected public tables exist, that
+   `whoop_tokens` and `whoop_oauth_state` are empty, and that
+   `api_connections` contains exactly the seeded `whoop` row.
 3. Configure the replacement project URL and server secret in Vercel.
 4. Deploy the application cleanup before removing the legacy project values.
 5. Reauthorize Patrick through the WHOOP OAuth flow.

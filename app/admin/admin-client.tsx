@@ -225,8 +225,6 @@ export default function AdminClient() {
       // Cookie session handles auth automatically
       if (serviceId === "whoop") {
         await fetch("/api/whoop/disconnect", { method: "POST" });
-      } else if (serviceId === "strava") {
-        await fetch("/api/strava/disconnect", { method: "POST" });
       }
       await fetchStatus();
     } catch {

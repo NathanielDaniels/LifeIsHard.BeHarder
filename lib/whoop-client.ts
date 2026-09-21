@@ -365,25 +365,12 @@ export async function getWorkoutHistory(
 export async function fetchWhoopStats(
   accessToken: string,
 ): Promise<WhoopStats> {
-  try {
     // Fetch all data in parallel
     const [recovery, cycle, workout] = await Promise.all([
-      getLatestRecovery(accessToken).catch((e) => {
-        if (e.message === "WHOOP_UNAUTHORIZED") throw e;
-        console.error("Recovery fetch error:", e);
-        return null;
-      }),
-      getLatestCycle(accessToken).catch((e) => {
-        if (e.message === "WHOOP_UNAUTHORIZED") throw e;
-        console.error("Cycle fetch error:", e);
-        return null;
-      }),
+      getLatestRecovery(accessToken),
+      getLatestCycle(accessToken),
       // getLatestSleep(accessToken).catch(() => null),
-      getLatestWorkout(accessToken).catch((e) => {
-        if (e.message === "WHOOP_UNAUTHORIZED") throw e;
-        console.error("Workout fetch error:", e);
-        return null;
-      }),
+      getLatestWorkout(accessToken),
     ]);
 
     // Calculate current heart rate with decay
@@ -446,10 +433,6 @@ export async function fetchWhoopStats(
       currentHeartRate,
       heartRateSource,
     };
-  } catch (error) {
-    console.error("Error fetching WHOOP stats:", error);
-    throw error;
-  }
 }
 
 // ============================================
