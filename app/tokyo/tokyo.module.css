@@ -84,6 +84,8 @@
 
 .communityImage { width: 100%; height: auto; display: block; filter: grayscale(100%); }
 .communityFigure { margin: 0; }
+.heroImage .runner, .communityImage { transition: filter 1.2s ease-in-out; }
+.heroFigure:hover .runner, .communityFigure:hover .communityImage { filter: grayscale(0); }
 .opportunityContent { display: grid; grid-template-columns: 1.1fr 1fr; gap: 70px; padding: 56px 0 94px; }
 .opportunityContent .eyebrow { margin-bottom: 25px; }
 .opportunityContent h2 { font-size: clamp(3rem, 5.1vw, 5.6rem); }

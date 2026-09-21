@@ -15,7 +15,16 @@ async (page) => {
   await feature.getByRole('link', { name: 'Explore Tokyo 2027' }).click();
   await page.waitForURL(`${origin}/tokyo`);
   check(await page.locator('h1').count() === 1, 'Campaign must have one primary heading');
-  await page.waitForFunction(() => [...document.images].every(image => image.complete && image.naturalWidth > 0), null, { timeout: 10000 });
+  const heroPhoto = page.locator('main img').first();
+  const communityPhoto = page.locator('main img').nth(1);
+  check(await heroPhoto.getAttribute('fetchpriority') === 'high', 'Hero photo must keep loading priority');
+  check(await communityPhoto.getAttribute('loading') === 'lazy', 'Below-fold community photo must lazy-load');
+  await heroPhoto.evaluate(image => image.decode());
+  await communityPhoto.scrollIntoViewIfNeeded();
+  await communityPhoto.evaluate(image => image.decode());
+  check(await communityPhoto.evaluate(image => image.complete && image.naturalWidth > 0),
+    'Community photo must load when scrolled into view');
+  await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
   check(await page.evaluate(() => !window.lenis), 'Tokyo must use native scrolling');
   check(await page.locator('header').count() === 0, 'Tokyo must not have a separate campaign header');
   for (const name of ['Tokyo 2027 campaign', 'Schedule', 'Supporters', 'Team']) {

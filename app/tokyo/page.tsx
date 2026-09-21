@@ -150,7 +150,6 @@ export default function TokyoPage() {
           <figure className={styles.communityFigure}>
             <Image
               src="/email/long-beach/dare2tri-group.jpg"
-              loading="eager"
               alt="A community of adaptive athletes and supporters celebrating together beneath a swim-finish arch"
               width={1120}
               height={676}
