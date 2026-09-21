@@ -1,0 +1,33 @@
+.feature { position: relative; z-index: 30; padding: 128px 24px; }
+.inner { width: min(100%, 1024px); margin: 0 auto; text-align: center; }
+.eyebrow, .link, .note { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+.eyebrow { font-size: .7rem; font-weight: 500; letter-spacing: .3em; text-transform: uppercase; color: rgb(255 255 255 / 60%); line-height: 1.8; }
+.inner h2 { font-family: var(--font-bebas), "Bebas Neue", Impact, sans-serif; font-weight: 700; font-size: clamp(4.5rem, 8vw, 8rem); line-height: .95; letter-spacing: -.025em; margin: 24px 0 0; }
+.inner h2 span { color: var(--theme-color, #ff5722); }
+.copy { position: relative; }
+.description { max-width: 540px; margin-inline: auto; color: rgb(255 255 255 / 65%); font-size: 1.125rem; line-height: 1.8; }
+.link { display: inline-flex; align-items: center; justify-content: center; gap: 24px; min-height: 56px; margin-top: 28px; padding: 17px 28px; color: #fff; background: color-mix(in srgb, var(--theme-color, #ff5722) 5%, transparent); border: 1px solid color-mix(in srgb, var(--theme-color, #ff5722) 50%, transparent); border-radius: 4px; font-size: .75rem; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; text-decoration: none; transition: background-color .2s, box-shadow .2s; }
+.link:hover { background: color-mix(in srgb, var(--theme-color, #ff5722) 15%, transparent); box-shadow: 0 0 30px color-mix(in srgb, var(--theme-color, #ff5722) 20%, transparent); }
+.link:focus-visible { outline: 2px solid #fff; outline-offset: 6px; }
+.note { color: rgb(255 255 255 / 50%); font-size: .65rem; line-height: 1.8; letter-spacing: .04em; margin-top: 18px; }
+.photo { position: relative; width: min(100%, 440px); height: clamp(360px, 36vw, 460px); margin: 16px auto 28px; }
+.photo::before { content: ""; position: absolute; inset: 15% 20%; border-radius: 50%; background: var(--theme-color, #ff5722); filter: blur(70px); opacity: .18; pointer-events: none; }
+.portraitViewport { position: absolute; inset: 0; overflow: hidden; }
+/* The existing cutout has transparent padding. Frame the athlete without editing the original asset. */
+.photo img { object-fit: contain; transform: scale(1.8); transform-origin: 50% 67%; filter: grayscale(100%); transition: filter 1.2s ease-in-out; }
+.photo:hover img { filter: grayscale(0); }
+@media (min-width: 768px) {
+  .feature { padding-block: 192px; }
+}
+@media (max-width: 700px) {
+  .eyebrow { font-size: .6rem; letter-spacing: .2em; }
+  .inner h2 { font-size: clamp(3.4rem, 15vw, 5.5rem); }
+  .photo { height: clamp(320px, 85vw, 380px); margin-block: 12px 24px; }
+  .description { font-size: 1rem; }
+  .link { padding-inline: 22px; gap: 18px; font-size: .7rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .link, .photo img { transition: none; }
+  /* Keep the fade, but suppress scroll displacement even before hydration. */
+  .reveal { transform: none !important; }
+}

@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef, useMemo } from 'react';
 import Image from 'next/image';
+import TokyoCampaignFeature from '@/components/sections/TokyoCampaignFeature';
 import { motion, AnimatePresence, useSpring, useTransform, useScroll } from 'framer-motion';
 import { useVitality } from '@/contexts/VitalityContext';
 import { useWhoop } from '@/contexts/WhoopContext';
@@ -752,10 +753,10 @@ export default function ComingSoonClient() {
         </motion.div>
       </section>
 
-      <div className="w-full h-[20vh] pointer-events-none" />
+      <TokyoCampaignFeature />
 
       {/* === THE STORY / STATS === */}
-      <section className="relative min-h-screen flex items-center justify-center py-16 md:py-20 px-6">
+      <section className="relative flex items-center justify-center pt-32 pb-16 md:pt-48 md:pb-20 px-6">
         <motion.div 
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
@@ -811,7 +812,7 @@ export default function ComingSoonClient() {
                 alt="Patrick Wingert"
                 width={800}
                 height={800}
-                className="relative z-10 object-contain drop-shadow-2xl grayscale hover:grayscale-0 transition-all duration-700 max-h-[40vh] md:max-h-[45vh] w-auto"
+                className="relative z-10 object-contain drop-shadow-2xl grayscale hover:grayscale-0 transition-[filter] duration-[1200ms] ease-in-out max-h-[40vh] md:max-h-[45vh] w-auto"
                 sizes="(max-width: 768px) 45vw, 260px"
               />
             </div>
