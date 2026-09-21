@@ -1,10 +1,14 @@
 'use client';
 
 import { ReactNode, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 import Lenis from 'lenis';
 
 export default function SmoothScroll({ children }: { children: ReactNode }) {
+  const usesNativeScroll = usePathname() === '/tokyo';
   useEffect(() => {
+    // Campaign anchors and reduced-motion behavior use the browser's native scrolling.
+    if (usesNativeScroll) return;
     const lenisInstance = new Lenis({
       duration: 0.9,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
@@ -30,7 +34,7 @@ export default function SmoothScroll({ children }: { children: ReactNode }) {
       delete (window as unknown as { lenis?: Lenis }).lenis;
       lenisInstance.destroy();
     };
-  }, []);
+  }, [usesNativeScroll]);
 
   return <>{children}</>;
 }

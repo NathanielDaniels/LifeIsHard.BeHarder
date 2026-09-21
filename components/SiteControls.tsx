@@ -4,7 +4,23 @@ import { useState, useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { useVitality } from "@/contexts/VitalityContext";
-import { HeartPulse, HeartOff, Users, Handshake, CalendarDays, ArrowLeft } from "lucide-react";
+import { HeartPulse, HeartOff, Users, Handshake, CalendarDays, ArrowLeft, Plane } from "lucide-react";
+
+function BackToMainSite() {
+  return (
+    <Link
+      href="/"
+      className="fixed top-3 left-3 md:top-4 md:left-4 z-50 group p-3 md:p-3.5 backdrop-blur-md rounded-full border flex items-center justify-center bg-white/5 text-white/50 border-white/5 hover:bg-white/10 hover:text-white/80 transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-orange-500"
+      aria-label="Back to main site"
+      title="Back to main site"
+    >
+      <ArrowLeft className="w-5 h-5" aria-hidden="true" />
+      <span className="absolute top-full mt-2 left-0 px-3 py-1.5 rounded-full bg-black/80 backdrop-blur-md border border-white/10 whitespace-nowrap font-mono text-xs tracking-wider text-white/80 opacity-0 translate-y-1 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-focus-visible:opacity-100 group-focus-visible:translate-y-0 transition-all duration-200">
+        Home
+      </span>
+    </Link>
+  );
+}
 
 export default function SiteControls() {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -207,27 +223,32 @@ export default function SiteControls() {
   const isOnTeamPage = pathname === "/team";
   const isOnSponsorsPage = pathname === "/sponsors";
   const isOnSchedulePage = pathname === "/schedule";
+  const isOnTokyoPage = pathname === "/tokyo";
   const isOnAdminPage = pathname === "/admin";
   const isOnHomePage = pathname === "/";
 
-  // Hide all controls on admin page
+  // Hide all controls on admin page.
   if (isOnAdminPage) return null;
 
   return (
     <>
-    {!isOnHomePage && (
+    {!isOnHomePage && <BackToMainSite />}
+    <div className="fixed top-3 right-3 md:top-4 md:right-4 z-50 flex items-center gap-0.5 min-[360px]:gap-2">
       <Link
-        href="/"
-        className="fixed top-3 left-3 md:top-4 md:left-4 z-50 group p-3 md:p-3.5 backdrop-blur-md rounded-full border flex items-center justify-center bg-white/5 text-white/50 border-white/5 hover:bg-white/10 hover:text-white/80 transition-colors duration-200"
-        aria-label="Back to main site"
+        href="/tokyo"
+        aria-label="Tokyo 2027 campaign"
+        aria-current={isOnTokyoPage ? "page" : undefined}
+        className={`group relative p-3 md:p-3.5 backdrop-blur-md rounded-full border transition-colors duration-200 flex items-center justify-center ${
+          isOnTokyoPage
+            ? "bg-orange-500/10 text-orange-500 border-orange-500/30"
+            : "bg-white/5 text-white/50 border-white/5 hover:bg-white/10 hover:text-white/80"
+        }`}
       >
-        <ArrowLeft className="w-5 h-5" />
-        <span className="absolute top-full mt-2 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-full bg-black/80 backdrop-blur-md border border-white/10 whitespace-nowrap font-mono text-xs tracking-wider text-white/80 opacity-0 translate-y-1 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200">
-          Home
+        <Plane className="w-5 h-5" aria-hidden="true" />
+        <span className="absolute top-full mt-2 right-1/2 translate-x-1/2 px-3 py-1.5 rounded-full bg-black/80 backdrop-blur-md border border-white/10 whitespace-nowrap font-mono text-xs tracking-wider text-white/80 opacity-0 translate-y-1 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-focus-visible:opacity-100 transition-all duration-200">
+          Tokyo 2027
         </span>
       </Link>
-    )}
-    <div className="fixed top-3 right-3 md:top-4 md:right-4 z-50 flex items-center gap-2">
       <Link
         href="/schedule"
         className={`group relative p-3 md:p-3.5 backdrop-blur-md rounded-full border transition-colors duration-200 flex items-center justify-center ${
