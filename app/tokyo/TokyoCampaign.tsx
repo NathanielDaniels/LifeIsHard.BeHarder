@@ -117,7 +117,7 @@ function Hero() {
   const copyY = useTransform(scrollYProgress, [0, 1], [0, reduceMotion ? 0 : 120]);
 
   return (
-    <section ref={ref} className="relative h-[100svh] min-h-[620px] overflow-hidden" aria-labelledby="tokyo-title">
+    <section ref={ref} className="relative h-[100svh] min-h-[520px] overflow-hidden" aria-labelledby="tokyo-title">
       <SunriseScene
         horizon={HERO_HORIZON}
         sunSize="min(66svh, 86vw)"
@@ -139,7 +139,7 @@ function Hero() {
           so it can never ride up into the scene. The headline scales with height
           as well as width so the whole block, button included, fits a short phone. */}
       <motion.div
-        className="absolute inset-x-0 bottom-0 flex flex-col items-center justify-start px-5 pt-5 md:pt-8 text-center"
+        className="absolute inset-x-0 bottom-0 flex flex-col items-center justify-start px-5 pt-5 md:pt-8 md:[@media(max-height:640px)]:pt-5 text-center"
         style={{ top: `${HERO_HORIZON}%`, opacity: copyOpacity, y: copyY }}
       >
         <p className="font-mono text-[10px] md:text-xs tracking-[0.35em] uppercase text-white/60">
@@ -147,14 +147,14 @@ function Hero() {
         </p>
         <h1
           id="tokyo-title"
-          className="font-display leading-[0.84] mt-2 md:mt-3 text-[clamp(3.2rem,min(22vw,11svh),7.5rem)] md:text-[clamp(5rem,min(10.5vw,16svh),12.5rem)]"
+          className="font-display leading-[0.84] mt-2 md:mt-3 text-[clamp(3rem,min(22vw,10svh),7.5rem)] md:text-[clamp(5rem,min(10.5vw,16svh),12.5rem)]"
         >
           <span className="block md:inline">ONE LEG.</span>{" "}
           <span className="block md:inline" style={{ color: THEME }}>TWO STARS.</span>
         </h1>
         <p className="mt-3 md:mt-4 text-base md:text-xl text-white/80">Tokyo World Major Marathon is next.</p>
         {/* Patrick: "Click donate, boom." The ask sits above the fold, not only at the end. */}
-        <DonateButton className="mt-5 md:mt-8" compact />
+        <DonateButton className="mt-5 md:mt-8 md:[@media(max-height:640px)]:mt-5" compact />
         <p className="mt-3 md:mt-4 font-mono text-[10px] md:text-[11px] tracking-[0.3em] uppercase text-white/45 [@media(max-height:700px)]:hidden" aria-live="off">
           {days === null ? " " : `${days} days to the start line`}
         </p>
