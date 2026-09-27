@@ -81,11 +81,30 @@ function useDaysToTokyo() {
   return days;
 }
 
+/** The one money button. Used in the hero and again at the climax. */
+function DonateButton({ className = "", compact = false }: { className?: string; compact?: boolean }) {
+  return (
+    <a
+      href={GOFUNDME_DONATE_URL}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={`group inline-flex items-center gap-4 rounded-md font-mono font-bold tracking-[0.2em] uppercase text-black transition-transform duration-200 hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white ${
+        compact ? "px-7 py-4 text-xs md:text-sm" : "px-9 py-5 text-sm"
+      } ${className}`}
+      style={{ background: THEME, boxShadow: "0 0 50px color-mix(in srgb, var(--theme-color, #f97316) 45%, transparent)" }}
+    >
+      Donate to Tokyo
+      <ArrowUpRight className="w-5 h-5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" aria-hidden="true" />
+      <span className="sr-only"> on GoFundMe (opens in a new tab)</span>
+    </a>
+  );
+}
+
 /* ------------------------------------------------------------------ */
 /* Hero                                                                */
 /* ------------------------------------------------------------------ */
 
-const HERO_HORIZON = 60;
+const HERO_HORIZON = 56;
 
 function Hero() {
   const ref = useRef<HTMLElement>(null);
@@ -98,7 +117,7 @@ function Hero() {
   const copyY = useTransform(scrollYProgress, [0, 1], [0, reduceMotion ? 0 : 120]);
 
   return (
-    <section ref={ref} className="relative h-[100svh] min-h-[620px] overflow-hidden" aria-labelledby="tokyo-title">
+    <section ref={ref} className="relative h-[100svh] min-h-[520px] overflow-hidden" aria-labelledby="tokyo-title">
       <SunriseScene
         horizon={HERO_HORIZON}
         sunSize="min(66svh, 86vw)"
@@ -116,19 +135,27 @@ function Hero() {
         東京マラソン
       </p>
 
+      {/* Copy hangs from the horizon rather than centring in the space below it,
+          so it can never ride up into the scene. The headline scales with height
+          as well as width so the whole block, button included, fits a short phone. */}
       <motion.div
-        className="absolute inset-x-0 bottom-0 flex flex-col items-center justify-center px-5 pb-10 text-center"
+        className="absolute inset-x-0 bottom-0 flex flex-col items-center justify-start px-5 pt-5 md:pt-8 md:[@media(max-height:640px)]:pt-5 text-center"
         style={{ top: `${HERO_HORIZON}%`, opacity: copyOpacity, y: copyY }}
       >
-        <p className="font-mono text-[10px] md:text-xs tracking-[0.35em] uppercase text-white/60">
+        <p className="font-mono text-[10px] md:text-xs tracking-[0.35em] max-[380px]:tracking-[0.18em] uppercase text-white/60 whitespace-nowrap">
           Tokyo Marathon · <time dateTime={TOKYO_RACE_DATE_ISO}>{TOKYO_RACE_DATE_LABEL}</time>
         </p>
-        <h1 id="tokyo-title" className="font-display leading-[0.84] mt-3 text-[clamp(4rem,22vw,7.5rem)] md:text-[clamp(6rem,10.5vw,12.5rem)]">
+        <h1
+          id="tokyo-title"
+          className="font-display leading-[0.84] mt-2 md:mt-3 text-[clamp(3rem,min(22vw,10svh),7.5rem)] md:text-[clamp(5rem,min(10.5vw,16svh),12.5rem)]"
+        >
           <span className="block md:inline">ONE LEG.</span>{" "}
           <span className="block md:inline" style={{ color: THEME }}>TWO STARS.</span>
         </h1>
-        <p className="mt-4 text-base md:text-xl text-white/80">Tokyo World Major Marathon is next.</p>
-        <p className="mt-3 font-mono text-[10px] md:text-[11px] tracking-[0.3em] uppercase text-white/45" aria-live="off">
+        <p className="mt-3 md:mt-4 text-base md:text-xl text-white/80">Tokyo World Major Marathon is next.</p>
+        {/* Patrick: "Click donate, boom." The ask sits above the fold, not only at the end. */}
+        <DonateButton className="mt-5 [@media(max-height:600px)]:mt-4 md:mt-8 md:[@media(max-height:640px)]:mt-5" compact />
+        <p className="mt-3 md:mt-4 font-mono text-[10px] md:text-[11px] tracking-[0.3em] uppercase text-white/45 [@media(max-height:700px)]:hidden" aria-live="off">
           {days === null ? " " : `${days} days to the start line`}
         </p>
       </motion.div>
@@ -496,17 +523,7 @@ function Ask() {
           donate, sharing this campaign with someone who might connect with my story is another way to help.
         </p>
         <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4">
-          <a
-            href={GOFUNDME_DONATE_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group inline-flex items-center gap-4 px-9 py-5 rounded-md font-mono text-sm font-bold tracking-[0.2em] uppercase text-black transition-transform duration-200 hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
-            style={{ background: THEME, boxShadow: "0 0 50px color-mix(in srgb, var(--theme-color, #f97316) 45%, transparent)" }}
-          >
-            Donate to Tokyo
-            <ArrowUpRight className="w-5 h-5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" aria-hidden="true" />
-            <span className="sr-only"> on GoFundMe (opens in a new tab)</span>
-          </a>
+          <DonateButton />
           <ShareButton
             url={GOFUNDME_URL}
             title="One Leg. Two Stars. Patrick Wingert's road to the Tokyo Marathon"
