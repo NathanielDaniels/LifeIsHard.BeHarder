@@ -241,8 +241,8 @@ function Chapters() {
               <Image
                 src="/tokyo/floor.jpg"
                 alt="My crutches, my prosthetic liner and the Chicago medal on the floor at home"
-                width={1100}
-                height={1375}
+                width={800}
+                height={1000}
                 sizes="(max-width: 768px) 90vw, 448px"
                 className="w-full h-auto"
               />
@@ -270,8 +270,8 @@ function Chapters() {
               <Image
                 src="/tokyo/chicago-street.jpg"
                 alt="Running through downtown Chicago during the 2025 Chicago Marathon"
-                width={2400}
-                height={1600}
+                width={1400}
+                height={933}
                 sizes="(max-width: 768px) 90vw, 700px"
                 className="w-full h-auto"
               />
@@ -342,14 +342,14 @@ const AFTERMATH = [
   },
   {
     src: "/tokyo/wheelchair.jpg",
-    width: 1000,
-    height: 1250,
+    width: 800,
+    height: 1000,
     alt: "After the finish, in a wheelchair with the medal between my teeth and my running blade across my lap",
   },
   {
     src: "/tokyo/medal.jpg",
-    width: 1000,
-    height: 1250,
+    width: 800,
+    height: 1000,
     alt: "Holding up my 2025 Chicago Marathon medal",
   },
 ];
@@ -418,8 +418,8 @@ function TheWork() {
           <Image
             src="/tokyo/portrait.jpg"
             alt="Mid-race at the 2025 Chicago Marathon, sunglasses on, hand up for the camera"
-            width={1152}
-            height={1153}
+            width={1040}
+            height={1041}
             sizes="(max-width: 768px) 90vw, 520px"
             className="w-full h-auto"
           />
