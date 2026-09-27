@@ -4,6 +4,9 @@ const nextConfig = {
     optimizePackageImports: ['lucide-react', 'framer-motion', 'recharts'],
   },
   images: {
+    // AVIF first: roughly 20-30% lighter than WebP at the same quality. Browsers
+    // without AVIF support fall back to WebP automatically.
+    formats: ['image/avif', 'image/webp'],
     remotePatterns: [
       {
         protocol: 'https',
