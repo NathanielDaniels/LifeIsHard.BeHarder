@@ -23,8 +23,9 @@ import { BrandFooter, HeaderBanner, SITE } from "./components/brand";
  * for the budget.
  *
  * Design system, one device per job:
- *   - Sunrise over an ECG horizon: the Hinomaru (the real red disc of Japan's
- *     flag, not an invented symbol) crossed by the heartbeat line.
+ *   - The website hero as a still: Patrick running out of the Hinomaru (the
+ *     real red disc of Japan's flag, not an invented symbol), the heartbeat
+ *     line as the horizon.
  *   - The Six Star tracker: all six original Majors in race-calendar order,
  *     Chicago earned, Tokyo next. The story's spine in one row.
  *   - The receipts as a boarding pass: the ask presented as a ticket to the
@@ -59,7 +60,11 @@ const c = {
   rule: "#d8d6cd",
 };
 
-const bebas = '"Bebas Neue", Arial Narrow, Arial, Helvetica, sans-serif';
+// Gmail strips web fonts, so the fallbacks must be condensed too or the wide
+// default (Roboto/Arial) overflows fixed cells: "TOKYO" off the pass, city
+// names breaking mid-word. sans-serif-condensed is Roboto Condensed on Android.
+const bebas =
+  '"Bebas Neue", "Arial Narrow", "Roboto Condensed", sans-serif-condensed, "HelveticaNeue-CondensedBold", "AvenirNextCondensed-DemiBold", Impact, Arial, sans-serif';
 const mono =
   'ui-monospace, "SF Mono", Menlo, Consolas, "Courier New", monospace';
 const system =
@@ -90,6 +95,13 @@ const receipts = [
   { label: "Contingency for unexpected costs", amount: 1000 },
 ];
 const GOAL = 5500;
+
+/** Star colour by state: earned solid orange, next outlined orange, open muted. */
+const STAR_COLOUR: Record<"earned" | "next" | "open", string> = {
+  earned: c.orange,
+  next: c.orange,
+  open: "#5c5549",
+};
 
 const usd = (n: number) => `$${n.toLocaleString("en-US")}`;
 
@@ -145,9 +157,10 @@ export default function TokyoFundraiserEmail({ email }: { email?: string }) {
             .sec { padding-left: 22px !important; padding-right: 22px !important; }
             .fs-hero { font-size: 60px !important; }
             .fs-days { font-size: 64px !important; }
-            .fs-city { font-size: 12px !important; letter-spacing: 0.5px !important; }
+            .fs-city { font-size: 12px !important; letter-spacing: 0 !important; }
+            .fs-route { font-size: 26px !important; letter-spacing: 0 !important; }
             .fs-total { font-size: 40px !important; }
-            .fs-amounts { font-size: 38px !important; }
+            .fs-amounts { font-size: 34px !important; letter-spacing: 1px !important; }
           }
           @media (prefers-color-scheme: dark) {
             .bg-canvas { background-color: #f1f1ee !important; }
@@ -183,9 +196,10 @@ export default function TokyoFundraiserEmail({ email }: { email?: string }) {
             <Text style={s.heroSub}>Tokyo World Major Marathon is next.</Text>
           </Section>
           <Img
-            src={`${SITE}/email/tokyo/sunrise-ecg.jpg`}
+            src={`${SITE}/email/tokyo/sunrise-runner.jpg`}
             width="620"
-            alt=""
+            height="320"
+            alt="Running out of a rising red sun, a heartbeat line across the horizon"
             style={s.photo}
           />
           <Section className="sec" style={s.tracker}>
@@ -201,19 +215,17 @@ export default function TokyoFundraiserEmail({ email }: { email?: string }) {
                 <tr>
                   {majors.map((m) => (
                     <td key={m.city} width="16.66%" style={s.starCell}>
-                      <Img
-                        src={`${SITE}/email/tokyo/star-${m.state}.png`}
-                        width="40"
-                        height="40"
-                        alt={
-                          m.state === "earned"
-                            ? `${m.city}: star earned`
-                            : m.state === "next"
-                              ? `${m.city}: next`
-                              : ""
+                      {/* Text, not images: forced dark mode (Samsung Email, Gmail) turned the
+                          near-black star PNGs into white squares. Text recolours cleanly. */}
+                      <Text
+                        role="img"
+                        aria-label={
+                          m.state === "earned" ? `${m.city}: star earned` : m.state === "next" ? `${m.city}: next` : m.city
                         }
-                        style={s.starImg}
-                      />
+                        style={{ ...s.star, color: STAR_COLOUR[m.state] }}
+                      >
+                        {m.state === "earned" ? "\u2605\uFE0E" : "\u2606\uFE0E"}
+                      </Text>
                       <Text
                         className="fs-city"
                         style={m.state === "open" ? s.cityOpen : s.cityLit}
@@ -358,15 +370,23 @@ export default function TokyoFundraiserEmail({ email }: { email?: string }) {
               </Section>
 
               {/* The destination's own mark, like the airline block on a real pass */}
-              <Section style={s.passLogoRow}>
-                <Img
-                  src={`${SITE}/email/tokyo/tokyo-marathon-2027-logo.jpg`}
-                  width="220"
-                  height="98"
-                  alt="Tokyo Marathon 2027"
-                  style={s.passLogo}
-                />
-              </Section>
+              {/* Centred with a td align attribute: some desktop clients ignore
+                  margin: auto on images, which left the logo hugging the left edge. */}
+              <table role="presentation" cellPadding="0" cellSpacing="0" border={0} width="100%">
+                <tbody>
+                  <tr>
+                    <td align="center" style={s.passLogoRow}>
+                      <Img
+                        src={`${SITE}/email/tokyo/tokyo-marathon-2027-logo.jpg`}
+                        width="220"
+                        height="98"
+                        alt="Tokyo Marathon 2027"
+                        style={s.passLogo}
+                      />
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
 
               <table
                 role="presentation"
@@ -381,14 +401,14 @@ export default function TokyoFundraiserEmail({ email }: { email?: string }) {
                   <tr>
                     <td width="42%" style={s.routeCellL}>
                       <Text style={s.routeLabel}>FROM</Text>
-                      <Text style={s.routeCity}>BAY AREA</Text>
+                      <Text className="fs-route" style={s.routeCity}>BAY AREA</Text>
                     </td>
                     <td width="16%" style={s.routeMid}>
                       <Text style={s.routeArrow}>→</Text>
                     </td>
                     <td width="42%" style={s.routeCellR}>
                       <Text style={s.routeLabelR}>TO</Text>
-                      <Text style={s.routeCityR}>TOKYO</Text>
+                      <Text className="fs-route" style={s.routeCityR}>TOKYO</Text>
                     </td>
                   </tr>
                 </tbody>
@@ -608,12 +628,14 @@ const s = {
     verticalAlign: "top" as const,
     padding: "0 2px",
   },
-  starImg: {
-    display: "block",
-    width: "40px",
+  star: {
+    // System symbol font, not Bebas: the glyph must exist on every client.
+    fontFamily: "Arial, Helvetica, sans-serif",
+    fontSize: "34px",
+    lineHeight: "40px",
     height: "40px",
-    margin: "0 auto 10px",
-    border: "none",
+    margin: "0 0 8px",
+    textAlign: "center" as const,
   },
   cityLit: {
     fontFamily: bebas,
@@ -622,6 +644,7 @@ const s = {
     lineHeight: "1",
     color: c.white,
     margin: 0,
+    whiteSpace: "nowrap" as const,
   },
   cityOpen: {
     fontFamily: bebas,
@@ -630,15 +653,18 @@ const s = {
     lineHeight: "1",
     color: "#6f685c",
     margin: 0,
+    whiteSpace: "nowrap" as const,
   },
   cityNote: {
     fontFamily: mono,
     fontSize: "9px",
     fontWeight: 700,
-    letterSpacing: "1px",
+    // Tight enough that "4:17:17" fits a phone-width column on one line.
+    letterSpacing: "0.3px",
     color: c.orange,
     margin: "6px 0 0",
     lineHeight: "1.2",
+    whiteSpace: "nowrap" as const,
   },
   trackerRule: {
     height: "1px",
@@ -790,7 +816,8 @@ const s = {
     margin: 0,
   },
   passLogoRow: { padding: "22px 22px 2px", textAlign: "center" as const },
-  passLogo: { display: "block", width: "220px", maxWidth: "100%", height: "auto", border: "none", margin: "0 auto" },
+  // Inline, not block: a block image ignores the cell's align="center" once a client strips margin: auto.
+  passLogo: { display: "inline-block", verticalAlign: "middle", width: "220px", maxWidth: "100%", height: "auto", border: "none" },
   route: { borderBottom: `2px solid ${c.ink}` },
   routeCellL: { padding: "20px 0 18px 22px", verticalAlign: "bottom" as const, textAlign: "left" as const },
   routeCellR: { padding: "20px 22px 18px 0", verticalAlign: "bottom" as const, textAlign: "right" as const },

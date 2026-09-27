@@ -54,3 +54,5 @@ emails/*-preview.html
 
 # Broadcast run artifact: which subscribers already received the race report
 emails/.nationals-race-report-sent.log
+# every broadcast's send log (one delivered address per line); a run artifact
+emails/.*-sent.log

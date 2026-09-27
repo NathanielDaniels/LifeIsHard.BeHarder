@@ -13,10 +13,7 @@ import TokyoFundraiserEmail from "./tokyo-fundraiser-email";
 const imagePaths = [
   "email/header.jpeg",
   "email/dare2tri.png",
-  "email/tokyo/sunrise-ecg.jpg",
-  "email/tokyo/star-earned.png",
-  "email/tokyo/star-next.png",
-  "email/tokyo/star-open.png",
+  "email/tokyo/sunrise-runner.jpg",
   "email/chicago/chi-finish-cine.jpg",
   "email/tokyo/floor-crutches.jpg",
   "email/tokyo/road-stop.jpg",
