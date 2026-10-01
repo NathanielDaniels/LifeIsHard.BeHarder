@@ -206,6 +206,19 @@ export const RACES_2026: Race[] = [
     cityCode: 'SDG',
     stateFips: '06',
   },
+  {
+    date: '2026-12-06',
+    name: 'California International Marathon',
+    location: 'Sacramento, CA',
+    coords: [-121.49, 38.58],
+    type: 'running',
+    distance: 'Full Marathon',
+    course: '42.2km',
+    description: 'Closing out the year. Full send.',
+    website: 'https://runsra.org/california-international-marathon/',
+    cityCode: 'SAC',
+    stateFips: '06',
+  },
 ];
 
 export const KEY_DATES = {
