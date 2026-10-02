@@ -2,7 +2,7 @@
 // API Connections — Supabase CRUD
 //
 // Table: api_connections
-//   id                    text PRIMARY KEY  ('whoop', 'instagram', 'strava')
+//   id                    text PRIMARY KEY  ('whoop')
 //   display_name          text NOT NULL
 //   status                text NOT NULL DEFAULT 'disconnected'
 //   token_expires_at      timestamptz

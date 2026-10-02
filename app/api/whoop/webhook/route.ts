@@ -5,9 +5,6 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { WhoopWebhookPayload } from '@/types/whoop';
-import { invalidateCache } from '@/lib/whoop-cache';
-import { getValidAccessToken } from '@/lib/whoop-token-storage';
-import { saveAllWorkouts } from '@/lib/whoop-history';
 import { rateLimit, getClientIP, rateLimitResponse } from '@/lib/rate-limit';
 import crypto from 'crypto';
 
@@ -63,54 +60,14 @@ export async function POST(request: NextRequest) {
       timestamp: payload.timestamp,
     });
 
-    // Respond to WHOOP immediately - do the async work after
-    // (Vercel will keep the function alive long enough to finish)
-    const processingPromise = handleWebhookEvent(payload);
-
-    // Return success fast so WHOOP doesn't retry
-    const response = NextResponse.json({ received: true });
-
-    // Await processing in background (Next.js edge keeps fn alive)
-    await processingPromise;
-
-    return response;
+    // The public site reads fresh data from WHOOP on demand. Acknowledge the
+    // event without persisting the payload or derived biometric data.
+    return NextResponse.json({ received: true });
   } catch (error) {
     console.error('[webhook] Unexpected error:', error);
     // Always 200 to prevent WHOOP from retrying indefinitely
     return NextResponse.json({ received: true, error: 'Processing failed' });
   }
-}
-
-async function handleWebhookEvent(payload: WhoopWebhookPayload): Promise<void> {
-  switch (payload.type) {
-    case 'workout.updated': {
-      console.log(`[webhook] Workout updated: ${payload.id}`);
-      // Save all recent workouts to Supabase so the coach briefing sees every activity.
-      // Uses upsert on whoop_workout_id so duplicates are harmless.
-      const token = await getValidAccessToken();
-      if (token) {
-        const result = await saveAllWorkouts(token);
-        console.log(`[webhook] Saved ${result.saved} workout(s)`, result.errors.length ? result.errors : '');
-      } else {
-        console.error('[webhook] No valid access token — cannot save workouts');
-      }
-      break;
-    }
-    // case 'sleep.updated':
-    //   console.log(`[webhook] Sleep updated: ${payload.id}`);
-    //   break;
-    case 'recovery.updated':
-      console.log(`[webhook] Recovery updated: ${payload.id}`);
-      break;
-    default:
-      console.log(`[webhook] Unhandled type: ${payload.type}`);
-  }
-
-  // Invalidate the Supabase cache so next /api/whoop/stats call
-  // fetches fresh data. This is now Supabase-backed so it works
-  // across all serverless instances.
-  await invalidateCache();
-  console.log(`[webhook] Cache invalidated after ${payload.type}`);
 }
 
 function verifySignature(body: string, signature: string, secret: string): boolean {
