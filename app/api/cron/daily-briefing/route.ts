@@ -3,8 +3,7 @@
 //
 // Runs daily via Vercel cron. Steps:
 // 1. Snapshot today's WHOOP data to Supabase
-// 2. Sync new Strava activities (smart poll)
-// 3. Prune old data (90-day retention)
+// 2. Prune old WHOOP data (90-day retention)
 //
 // AI briefing generation + email is handled locally
 // via Claude Code (no Anthropic API cost).
@@ -12,9 +11,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getValidAccessToken } from '@/lib/whoop-token-storage';
-import { getValidAccessToken as getStravaToken } from '@/lib/strava-token-storage';
 import { snapshotToday, saveAllWorkouts, pruneOldSnapshots } from '@/lib/whoop-history';
-import { syncNewActivities, pruneOldActivities } from '@/lib/strava-history';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 30;
@@ -50,31 +47,10 @@ export async function GET(request: NextRequest) {
     ]);
     console.log(`[daily-briefing] Snapshot saved for ${snapshot.date}, ${workoutResult.saved} workout(s) stored`);
 
-    // 3. Sync Strava activities (non-fatal if not connected)
-    let stravaSynced = 0;
-    const stravaToken = await getStravaToken();
-    if (stravaToken) {
-      try {
-        const stravaResult = await syncNewActivities(stravaToken);
-        stravaSynced = stravaResult.newActivities;
-        if (stravaSynced > 0) {
-          console.log(`[daily-briefing] Strava: ${stravaSynced} new activity(s) synced`);
-        }
-      } catch (err) {
-        console.error('[daily-briefing] Strava sync failed (non-fatal):', err);
-      }
-    }
-
-    // 4. Prune old data
-    const [pruned, stravaPruned] = await Promise.all([
-      pruneOldSnapshots(),
-      pruneOldActivities().catch(() => 0),
-    ]);
+    // 3. Prune old WHOOP data
+    const pruned = await pruneOldSnapshots();
     if (pruned > 0) {
       console.log(`[daily-briefing] Pruned ${pruned} old WHOOP snapshots`);
-    }
-    if (stravaPruned > 0) {
-      console.log(`[daily-briefing] Pruned ${stravaPruned} old Strava activities`);
     }
 
     const elapsed = Date.now() - startTime;
@@ -82,8 +58,7 @@ export async function GET(request: NextRequest) {
       success: true,
       date: snapshot.date,
       workoutsSaved: workoutResult.saved,
-      stravaSynced,
-      prunedCount: pruned + stravaPruned,
+      prunedCount: pruned,
       elapsedMs: elapsed,
     });
   } catch (error) {
