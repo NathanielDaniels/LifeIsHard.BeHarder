@@ -6,10 +6,12 @@ import TokyoCampaignFeature from '@/components/sections/TokyoCampaignFeature';
 import { motion, AnimatePresence, useSpring, useTransform, useScroll } from 'framer-motion';
 import { useVitality } from '@/contexts/VitalityContext';
 import { useWhoop } from '@/contexts/WhoopContext';
+import type { WhoopStats } from '@/types/whoop';
 import GlitchText from '@/components/shared/GlitchText';
 import AnimatedCounter from '@/components/shared/AnimatedCounter';
 import FloatingParticles from '@/components/shared/FloatingParticles';
 import { getDaysUntil, getDaysSince, parseLocalDate, getNextRace } from '@/lib/race-data';
+import { TOKYO_RACE_DATE_ISO } from '@/lib/tokyo-campaign';
 import dynamic from 'next/dynamic';
 
 const BiometricCard = dynamic(() => import('@/components/shared/BiometricCard'), { ssr: false });
@@ -23,8 +25,23 @@ import CustomCursor from '@/components/shared/CustomCursor';
 
 const ACCIDENT_DATE = parseLocalDate('2020-11-01');
 const SOBRIETY_DATE = parseLocalDate('2020-01-20');
-const NATIONALS_DATE = parseLocalDate('2026-08-09');
-const ENABLE_BOOT_SEQUENCE = process.env.NEXT_PUBLIC_ENABLE_BOOT_SEQUENCE === 'true';
+// Once the 2026 calendar is exhausted, the countdown points at Tokyo instead of reading 0.
+const TOKYO_DATE = parseLocalDate(TOKYO_RACE_DATE_ISO);
+type LastWorkout = NonNullable<WhoopStats['lastWorkout']>;
+
+// Unscored WHOOP workouts (e.g. sauna) come back with null HR and 0 strain/calories.
+// Only surface metrics that carry a real reading instead of printing blanks and zeros.
+function getWorkoutMetrics(workout: LastWorkout | null) {
+  if (!workout) return [];
+  return [
+    { label: 'STRAIN', value: workout.strain > 0 ? workout.strain.toFixed(1) : null, unit: null },
+    { label: 'AVG HR', value: workout.averageHeartRate || null, unit: 'BPM' },
+    { label: 'MAX HR', value: workout.maxHeartRate || null, unit: 'BPM' },
+    { label: 'CALORIES', value: workout.calories > 0 ? workout.calories : null, unit: 'kcal' },
+  ].filter((m) => m.value !== null);
+}
+
+const ENABLE_BOOT_SEQUENCE =process.env.NEXT_PUBLIC_ENABLE_BOOT_SEQUENCE === 'true';
 const DEFERRED_SECTION_ROOT_MARGIN = '900px';
 
 function DeferredRender({
@@ -80,6 +97,7 @@ export default function ComingSoonClient() {
 
   const heartbeat = currentHeartRate || 60;
   const heartbeatDuration = 60 / heartbeat;
+  const lastWorkoutMetrics = getWorkoutMetrics(whoopStats.lastWorkout);
 
   // Skip boot sequence when WHOOP data is already loaded (navigating back from another page)
   const dataAlreadyLoaded = connectionStatus === 'connected' || connectionStatus === 'error' || connectionStatus === 'unauthorized';
@@ -108,10 +126,8 @@ export default function ComingSoonClient() {
   const [mounted, setMounted] = useState(false);
   const [daysSinceAccident, setDaysSinceAccident] = useState(0);
   const [daysSober, setDaysSober] = useState(0);
-  const [daysUntilRace, setDaysUntilRace] = useState(0);
+  const [daysUntilRace, setDaysUntilRace] = useState<number | null>(0);
   const [isRaceDay, setIsRaceDay] = useState(false);
-  const [daysUntilNationals, setDaysUntilNationals] = useState(0);
-  const [showNationals, setShowNationals] = useState(false);
   const [showScrollHint, setShowScrollHint] = useState(false);
   const hasScrolledRef = useRef(false);
 
@@ -197,10 +213,12 @@ export default function ComingSoonClient() {
       setDaysSinceAccident(getDaysSince(ACCIDENT_DATE));
       setDaysSober(getDaysSince(SOBRIETY_DATE));
       const next = getNextRace();
-      const daysToRace = next ? getDaysUntil(parseLocalDate(next.date)) : 0;
+      const target = next ? parseLocalDate(next.date) : TOKYO_DATE;
+      // getDaysUntil clamps past dates to 0, which would freeze on "RACE DAY!" once Tokyo
+      // has passed with nothing newer on the calendar. Hide the countdown instead.
+      const daysToRace = getDaysSince(target) > 0 ? null : getDaysUntil(target);
       setDaysUntilRace(daysToRace);
-      setIsRaceDay(!!next && daysToRace === 0);
-      setDaysUntilNationals(getDaysUntil(NATIONALS_DATE));
+      setIsRaceDay(daysToRace === 0);
     };
 
     recompute();
@@ -843,55 +861,30 @@ export default function ComingSoonClient() {
               </motion.div>
             ))}
 
-            {/* Toggleable race countdown */}
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.5 }}
-              className="text-center cursor-pointer select-none group"
-              onClick={() => setShowNationals((prev) => !prev)}
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setShowNationals((prev) => !prev); }}
-              aria-label={showNationals ? 'Show days until next race' : 'Show days until nationals'}
-            >
-              <div className="relative overflow-hidden">
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={showNationals ? 'nationals' : 'next-race'}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <div
-                      className={`font-display font-bold leading-none ${
-                        !showNationals && isRaceDay
-                          ? 'text-[clamp(2.5rem,8vw,5.5rem)] whitespace-nowrap'
-                          : 'text-[clamp(3.5rem,10vw,7rem)]'
-                      }`}
-                      style={{ color: themeColor }}
-                    >
-                      {!showNationals && isRaceDay ? (
-                        'RACE DAY!'
-                      ) : (
-                        <AnimatedCounter value={showNationals ? daysUntilNationals : daysUntilRace} duration={2600} />
-                      )}
-                    </div>
-                    <div className="font-mono text-[0.7rem] md:text-[0.8rem] tracking-[0.3em] text-white/70 mt-2 font-medium">
-                      {showNationals ? 'DAYS UNTIL NATIONALS' : isRaceDay ? 'GO TIME' : 'DAYS UNTIL NEXT RACE'}
-                    </div>
-                  </motion.div>
-                </AnimatePresence>
-              </div>
-              <div
-                className="font-mono text-[0.55rem] tracking-[0.2em] mt-3 transition-opacity duration-300 opacity-0 group-hover:opacity-100"
-                style={{ color: `${themeColor}99` }}
+            {/* Next race countdown */}
+            {daysUntilRace !== null && (
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.5 }}
+                className="text-center"
               >
-                TAP TO {showNationals ? 'SEE NEXT RACE' : 'SEE NATIONALS'}
-              </div>
-            </motion.div>
+                <div
+                  className={`font-display font-bold leading-none ${
+                    isRaceDay
+                      ? 'text-[clamp(2.5rem,8vw,5.5rem)] whitespace-nowrap'
+                      : 'text-[clamp(3.5rem,10vw,7rem)]'
+                  }`}
+                  style={{ color: themeColor }}
+                >
+                  {isRaceDay ? 'RACE DAY!' : <AnimatedCounter value={daysUntilRace} duration={2600} />}
+                </div>
+                <div className="font-mono text-[0.7rem] md:text-[0.8rem] tracking-[0.3em] text-white/70 mt-2 font-medium">
+                  {isRaceDay ? 'GO TIME' : 'DAYS UNTIL NEXT RACE'}
+                </div>
+              </motion.div>
+            )}
           </div>
         </motion.div>
       </section>
@@ -1134,24 +1127,19 @@ export default function ComingSoonClient() {
                   {new Date(whoopStats.lastWorkout.completedAt).toLocaleDateString('en-US', { timeZone: 'America/Chicago', month: 'short', day: 'numeric' })} • {whoopStats.lastWorkout.duration} min
                 </span>
               </div>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div>
-                  <span className="font-mono text-[0.7rem] tracking-[0.2em] text-white/70 block">STRAIN</span>
-                  <span className="font-display text-3xl font-bold" style={{ color: themeColor }}>{whoopStats.lastWorkout.strain.toFixed(1)}</span>
+              {lastWorkoutMetrics.length > 0 && (
+                <div className="flex flex-wrap gap-x-12 gap-y-4">
+                  {lastWorkoutMetrics.map((m) => (
+                    <div key={m.label}>
+                      <span className="font-mono text-[0.7rem] tracking-[0.2em] text-white/70 block">{m.label}</span>
+                      <span className="font-display text-3xl font-bold" style={{ color: themeColor }}>
+                        {m.value}
+                        {m.unit && <span className="text-base font-mono text-white/60"> {m.unit}</span>}
+                      </span>
+                    </div>
+                  ))}
                 </div>
-                <div>
-                  <span className="font-mono text-[0.7rem] tracking-[0.2em] text-white/70 block">AVG HR</span>
-                  <span className="font-display text-3xl font-bold" style={{ color: themeColor }}>{whoopStats.lastWorkout.averageHeartRate} <span className="text-base font-mono text-white/60">BPM</span></span>
-                </div>
-                <div>
-                  <span className="font-mono text-[0.7rem] tracking-[0.2em] text-white/70 block">MAX HR</span>
-                  <span className="font-display text-3xl font-bold" style={{ color: themeColor }}>{whoopStats.lastWorkout.maxHeartRate} <span className="text-base font-mono text-white/60">BPM</span></span>
-                </div>
-                <div>
-                  <span className="font-mono text-[0.7rem] tracking-[0.2em] text-white/70 block">CALORIES</span>
-                  <span className="font-display text-3xl font-bold" style={{ color: themeColor }}>{whoopStats.lastWorkout.calories} <span className="text-base font-mono text-white/60">kcal</span></span>
-                </div>
-              </div>
+              )}
             </motion.div>
           )}
 
