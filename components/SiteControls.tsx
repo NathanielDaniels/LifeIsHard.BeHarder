@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { useVitality } from "@/contexts/VitalityContext";
+import { useWhoop } from "@/contexts/WhoopContext";
 import { HeartPulse, HeartOff, Users, Handshake, CalendarDays, ArrowLeft, Plane } from "lucide-react";
 
 function BackToMainSite() {
@@ -47,24 +47,10 @@ export default function SiteControls() {
     };
   }, []);
 
-  // Get vitality stats to drive the heartbeat speed
-  const { energyState } = useVitality();
-
-  // Determine heart rate based on energy state
-  const getHeartRate = () => {
-    switch (energyState) {
-      case "HIGH":
-        return 160; // Racing heart
-      case "MEDIUM":
-        return 120; // Elevated
-      case "LOW":
-        return 65; // Resting/Fatigued
-      default:
-        return 72;
-    }
-  };
-
-  const bpm = getHeartRate();
+  // Drive the audio heartbeat from the same heart rate the page displays,
+  // with the same 60 BPM fallback the hero uses when no reading is available.
+  const { currentHeartRate } = useWhoop();
+  const bpm = currentHeartRate || 60;
   const bpmRef = useRef(bpm);
   const lookahead = 25.0; // How frequently to call scheduling function (in milliseconds)
   const scheduleAheadTime = 0.1; // How far ahead to schedule audio (sec)

@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useInView, useReducedMotion } from 'framer-motion';
 
 interface AnimatedCounterProps {
   value: number;
@@ -8,26 +9,41 @@ interface AnimatedCounterProps {
 }
 
 export default function AnimatedCounter({ value, duration = 2000 }: AnimatedCounterProps) {
+  const ref = useRef<HTMLSpanElement>(null);
+  // Sections mount well before they're visible (DeferredRender), so the count-up
+  // waits until the number is actually on screen.
+  const isInView = useInView(ref, { once: true });
+  const prefersReducedMotion = useReducedMotion();
   const [displayValue, setDisplayValue] = useState(0);
-  const [hasAnimated, setHasAnimated] = useState(false);
+  const hasAnimatedRef = useRef(false);
 
   useEffect(() => {
-    if (hasAnimated) return;
-    const startTime = Date.now();
-    const animate = () => {
-      const elapsed = Date.now() - startTime;
-      const progress = Math.min(elapsed / duration, 1);
+    if (!isInView) return;
+
+    // After the first count-up (or with reduced motion), follow value changes directly,
+    // e.g. the day counters rolling over at local midnight.
+    if (hasAnimatedRef.current || prefersReducedMotion) {
+      setDisplayValue(value);
+      return;
+    }
+
+    let frame = 0;
+    const startTime = performance.now();
+    const animate = (now: number) => {
+      const progress = Math.min((now - startTime) / duration, 1);
       const eased = 1 - Math.pow(1 - progress, 3); // ease-out cubic
       setDisplayValue(Math.floor(eased * value));
 
       if (progress < 1) {
-        requestAnimationFrame(animate);
+        frame = requestAnimationFrame(animate);
       } else {
-        setHasAnimated(true);
+        hasAnimatedRef.current = true;
       }
     };
-    requestAnimationFrame(animate);
-  }, [value, duration, hasAnimated]);
+    frame = requestAnimationFrame(animate);
 
-  return <>{displayValue.toLocaleString()}</>;
+    return () => cancelAnimationFrame(frame);
+  }, [isInView, value, duration, prefersReducedMotion]);
+
+  return <span ref={ref}>{displayValue.toLocaleString()}</span>;
 }
